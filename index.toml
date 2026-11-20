@@ -1,0 +1,163 @@
+hash-format = "sha256"
+
+[[files]]
+file = "config/bettercombat/client.json"
+hash = "5e22e7c12da5ae562529c1277ee9141b92341ec36b500d462d2b5d50ffb22258"
+
+[[files]]
+file = "config/bettercombat/client.json5"
+hash = "5e22e7c12da5ae562529c1277ee9141b92341ec36b500d462d2b5d50ffb22258"
+
+[[files]]
+file = "config/bettercombat/fallback_compatibility.json"
+hash = "955701f5fa11f5f01d83ae1642646a8b1d6469bb504ced9b10bba6356a76c983"
+
+[[files]]
+file = "config/bettercombat/server.json"
+hash = "32cb5614c7d2f86cfbbf53dee076852a861b214d0e38d93f98c60fce872007a9"
+
+[[files]]
+file = "config/bettercombat/server.json5"
+hash = "32cb5614c7d2f86cfbbf53dee076852a861b214d0e38d93f98c60fce872007a9"
+
+[[files]]
+file = "config/lostcities/client.toml"
+hash = "1c5b42ef6bc41199ff82bee66f42edccbdd1c45a790cd5dd75de2f421ffeaae3"
+
+[[files]]
+file = "config/lostcities/common.toml"
+hash = "e5f811d998dc63dbd796a4fae7d97e9f812446dce451fac1980e2ec1b500f927"
+
+[[files]]
+file = "config/lostcities/profiles/pos_guerra_2010.json"
+hash = "a1ed5515f95ed086c6eddb28bf8162b79f192e3342a9ef0ab37d3a63cca537c8"
+
+[[files]]
+file = "defaultconfigs/lostcities-server.toml"
+hash = "18843e71b8aa8f2bef3aba42c73d5f0cf0830f8e002f3afdee62643e24b243f9"
+
+[[files]]
+file = "defaultconfigs/options.txt"
+hash = "e3a60af3b230f5cb8388390921eed88a1ab2be91e6304f345742a8cfdebf0212"
+
+[[files]]
+file = "kubejs/client_scripts/00_init.js"
+hash = "f68f317be9625b4f2f6e1491b3c4ffb64c1c8d556c77f03aff996c62961afa72"
+
+[[files]]
+file = "kubejs/server_scripts/00_smoke_test.js"
+hash = "4fd70a56cb45525c9c6f1dcb30922ea521180ad73ed60be9d934d5a7114c5ab2"
+
+[[files]]
+file = "kubejs/startup_scripts/00_init.js"
+hash = "fcbd6ba824a35453c57bfb743deeac59cb038796ac29f1144d005bac5af1e5ea"
+
+[[files]]
+file = "mods/architectury-api.pw.toml"
+hash = "4e81241ba2da06f425efc5e09fb6b38470125c1581c39e1310c5843a0b96ec76"
+metafile = true
+
+[[files]]
+file = "mods/better-combat.pw.toml"
+hash = "52b4f29eb4a4392ef085617292842dc9fc84d86c318da5ce470b24eab77f6bdc"
+metafile = true
+
+[[files]]
+file = "mods/caelus.pw.toml"
+hash = "8a8ea0af79b88d9c192d208aa5be4bacd934e2b92d4721566e2e796eb9761e10"
+metafile = true
+
+[[files]]
+file = "mods/cloth-config.pw.toml"
+hash = "e3dd03e7fec88831974857e2cdded54dd5c5bdcaa3f6d6248c2800e82db4dd41"
+metafile = true
+
+[[files]]
+file = "mods/curios.pw.toml"
+hash = "9eefd607e0d54ec444e798ccdeede1a09a3939440bd1e11c11b84c07a5134be2"
+metafile = true
+
+[[files]]
+file = "mods/embeddium.pw.toml"
+hash = "5ec0c37f3f4ad07a40c10376668bca80334ddb7ad2bab06eb4de8f7aac339c8e"
+metafile = true
+
+[[files]]
+file = "mods/entityculling.pw.toml"
+hash = "f27d83c5464f9c55bc281b1b3a9aba3e4dca0cdf928ea801839c52cb8ed61245"
+metafile = true
+
+[[files]]
+file = "mods/ferrite-core.pw.toml"
+hash = "902bac905b93271f02bd0951a22bac06a3da24f5c237fcaeb469e14a7679e508"
+metafile = true
+
+[[files]]
+file = "mods/ftb-library.pw.toml"
+hash = "9c490266371d372e7f45e63ca10bc7ff0a6517d847df330cd409049b7b89c715"
+metafile = true
+
+[[files]]
+file = "mods/ftb-quests.pw.toml"
+hash = "047b56963293870f6ab67deaec4167b97873fe951b6adec02d2cf070dbcdc101"
+metafile = true
+
+[[files]]
+file = "mods/ftb-teams.pw.toml"
+hash = "b2bba40d1c3b677478e79be30b3dfc82cd5b01f678a3d12b9869ee76f8a86ee1"
+metafile = true
+
+[[files]]
+file = "mods/geckolib.pw.toml"
+hash = "93e75c0ec763f3cd49fc9e3bcd24822178e123a7b2163c81a2709e82f4b70829"
+metafile = true
+
+[[files]]
+file = "mods/irons-spells-n-spellbooks.pw.toml"
+hash = "d8c354de7ab3aef949b8f8598ae57f07f1a38711d99588f27b93c1af93a14fba"
+metafile = true
+
+[[files]]
+file = "mods/jade.pw.toml"
+hash = "2088fdf5f304ba072df405b15aedceb94ed6844e6c244ca6472c5ef40c996b78"
+metafile = true
+
+[[files]]
+file = "mods/jei.pw.toml"
+hash = "7ffe94c2daa8151edea01fccefaa2bbb87e648d92dd0ca9ae485880053e50e20"
+metafile = true
+
+[[files]]
+file = "mods/kubejs.pw.toml"
+hash = "9ec37ad87c0c174bdafe7d52fc98f96b83aaef0ad42ae59e196655d3d784f31f"
+metafile = true
+
+[[files]]
+file = "mods/modernfix.pw.toml"
+hash = "99484c29e54191a2d32178d555ba03b1e4b6f93b3202f8bab6782d8146261b29"
+metafile = true
+
+[[files]]
+file = "mods/playeranimator.pw.toml"
+hash = "765987a78e5d8c782d0da2de99998b43b5907d6c41347d3804045ad109e4a586"
+metafile = true
+
+[[files]]
+file = "mods/rhino.pw.toml"
+hash = "5b92406160d9ea8a61ddf111caaecb7f6283678e2c40b08b72dce3eeaf20dc96"
+metafile = true
+
+[[files]]
+file = "mods/simply-swords.pw.toml"
+hash = "e7b4f5d39d49d95fc3b11d7e39b29dc7206ef38274200f745912aae332d496e7"
+metafile = true
+
+[[files]]
+file = "mods/the-lost-cities.pw.toml"
+hash = "71097e23679b74087641cba67eafb161a1d238cb866a01b4af49caf648d0919c"
+metafile = true
+
+[[files]]
+file = "mods/timeless-and-classics-zero.pw.toml"
+hash = "849e15667d1d13988f773ceae2cc9ba8e090381d45a3815f42366b50e8258c06"
+metafile = true

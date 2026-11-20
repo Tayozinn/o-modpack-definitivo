@@ -1,0 +1,17 @@
+{
+  "isHoldToAttackEnabled": true,
+  "isMiningWithWeaponsEnabled": true,
+  "isSwingThruGrassEnabled": true,
+  "isAttackInsteadOfMineWhenEnemiesCloseEnabled": true,
+  "isHighlightCrosshairEnabled": true,
+  "hudHighlightColor": 16711680,
+  "isShowingArmsInFirstPerson": false,
+  "isShowingOtherHandFirstPerson": true,
+  "isSweepingParticleEnabled": true,
+  "isTooltipAttackRangeEnabled": true,
+  "weaponSwingSoundVolume": 100,
+  "isDebugOBBEnabled": false,
+  "swingThruGrassBlacklist": "farmersdelight|^tacz:|irons_spellbooks:.*(spell_book|scroll|staff|wand|rod|cane|scepter|sceptre|crossbow)",
+  "mineWithWeaponBlacklist": "^tacz:|irons_spellbooks:.*(spell_book|scroll|staff|wand|rod|cane|scepter|sceptre|crossbow)",
+  "firstPersonAnimations": "AUTO"
+}

@@ -1,0 +1,13 @@
+name = "O Modpack Definitivo (Fantasia Urbana 2010)"
+author = "Equipe Autoral"
+version = "0.2.0-fase2"
+pack-format = "packwiz:1.1.0"
+
+[index]
+file = "index.toml"
+hash-format = "sha256"
+hash = "5095a7208a444a2e07c8f47540713d0d62b9380fcdd20ce716417786ac1cf935"
+
+[versions]
+forge = "47.3.0"
+minecraft = "1.20.1"

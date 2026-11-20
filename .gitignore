@@ -1,0 +1,132 @@
+# ============================================================================
+# .gitignore — O Modpack Definitivo (Minecraft 1.20.1 Forge)
+# Fantasia Urbana 2010 — Repositório de Configuração & Packwiz
+# ============================================================================
+
+# --- 1. MUNDOS, SAVES E BACKUPS ---
+saves/
+backups/
+ftbbackups/
+ftbbackups2/
+simplebackups/
+world/
+DIM*/
+
+# --- 2. LOGS, CRASH REPORTS E DIAGNÓSTICOS ---
+logs/
+crash-reports/
+debug/
+profile_results/
+hs_err_pid*.log
+replay_pid*.log
+telemetry/
+
+# --- 3. MÍDIA E CAPTURAS DO JOGADOR ---
+screenshots/
+schematics/
+recordings/
+
+# --- 4. BINÁRIOS DE MODS (Versionamos metadados Packwiz *.pw.toml e nosso Core Mod autoral) ---
+mods/*.jar
+mods/*.jar.disabled
+mods/*.disabled
+mods/*.zip
+mods/.index/
+!mods/.gitkeep
+!mods/*.pw.toml
+!mods/mythic_contracts-*.jar
+
+# --- 5. CACHES DE RUNTIME, MIXIN E KUBEJS ---
+.cache/
+.mixin.out/
+local/
+kubejs/exported/
+kubejs/cache/
+kubejs/probecache/
+kubejs/README.txt
+config/jei/world/
+config/spark/
+
+# --- 6. DADOS DE SESSÃO, AUTENTICAÇÃO E CLIENTE LOCAL (APENAS NA RAIZ) ---
+/usercache.json
+/usernamecache.json
+/options.txt
+/optionsof.txt
+/optionsshaders.txt
+/servers.dat
+/servers.dat_old
+/realms_persistence.json
+/launcher_accounts.json
+/launcher_profiles.json
+/command_history.txt
+/botania_vars.dat
+
+# --- 7. CACHES E METADADOS LOCAIS DE LAUNCHERS (Prism / CurseForge / Modrinth) ---
+.curseclient
+.modrinth/
+curseforge/
+minecraftinstance.json
+instance.cfg
+mmc-pack.json
+.prism/
+.packwiz-cache/
+/natives/
+/libraries/
+/versions/
+/assets/
+/java/
+
+# --- 8. ARQUIVOS TEMPORÁRIOS DE SISTEMA OPERACIONAL, IDEs E GRADLE/FORGE MDK ---
+.DS_Store
+Thumbs.db
+Desktop.ini
+*.tmp
+*.temp
+*.bak
+*.swp
+*~
+.idea/
+.vscode/
+.gradle/
+build/
+run/
+run-data/
+bin/
+out/
+.classpath
+.project
+.settings/
+*.iml
+*.ipr
+*.iws
+
+# --- 9. EXPLICITAÇÃO DE ARQUIVOS E DIRETÓRIOS VERSIONADOS ---
+!pack.toml
+!index.toml
+!manifest.json
+!modrinth.index.json
+!*.md
+!config/
+!config/**
+!defaultconfigs/
+!defaultconfigs/**
+!defaultconfigs/options.txt
+!defaultconfigs/lostcities-server.toml
+!kubejs/
+!kubejs/**
+kubejs/exported/**
+kubejs/cache/**
+kubejs/probecache/**
+!resourcepacks/
+!resourcepacks/**
+!datapacks/
+!datapacks/**
+!src/
+!src/**
+!gradle/wrapper/
+!gradle/wrapper/**
+!build.gradle
+!settings.gradle
+!gradle.properties
+!gradlew
+!gradlew.bat

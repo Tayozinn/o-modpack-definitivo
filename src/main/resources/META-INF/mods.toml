@@ -1,0 +1,26 @@
+modLoader="javafml"
+loaderVersion="[47,)"
+license="All Rights Reserved"
+
+[[mods]]
+modId="mythic_contracts"
+version="1.0.0"
+displayName="mythic_contracts"
+authors="MythicContracts"
+description='''
+Core mod de contratos, cultivo corporal/espiritual, infusao de mana e selos de subjugacao para O Modpack Definitivo (Forge 1.20.1).
+'''
+
+[[dependencies.mythic_contracts]]
+    modId="forge"
+    mandatory=true
+    versionRange="[47.2.0,)"
+    ordering="NONE"
+    side="BOTH"
+
+[[dependencies.mythic_contracts]]
+    modId="minecraft"
+    mandatory=true
+    versionRange="[1.20.1,1.21)"
+    ordering="NONE"
+    side="BOTH"
