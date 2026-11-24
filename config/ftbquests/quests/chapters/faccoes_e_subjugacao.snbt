@@ -1,0 +1,157 @@
+{
+	default_hide_dependency_lines: false
+	default_quest_shape: "rsquare"
+	filename: "faccoes_e_subjugacao"
+	group: "1A00000000000002"
+	icon: "mythic_contracts:subjugation_seal"
+	id: "2B00000000000005"
+	order_index: 4
+	quest_links: [ ]
+	quests: [
+		{
+			description: [
+				"Abra a tela do Cultivador [U] -> aba Facção e declare sua lealdade a uma das 4 grandes ordens de 2010:"
+				"- Errantes do Véu (Equilíbrio e Ressonância)"
+				"- Juramentados da Luz (Votos Celestiais)"
+				"- Irmandade da Dívida Eterna (Pactos Demoníacos)"
+				"- Quebradores de Tronos (Subjugação e Aura de Temor)"
+			]
+			id: "3C00000000050001"
+			rewards: [
+				{
+					id: "4D00000000050001"
+					type: "xp"
+					xp: 100
+				}
+			]
+			subtitle: "Escolha seu lado na ordem pós-guerra"
+			tasks: [
+				{
+					advancement: "mythic_contracts:first_faction"
+					criterion: ""
+					id: "5E00000000050001"
+					type: "advancement"
+				}
+			]
+			title: "1. Bandeira de Facção"
+			x: -3.0d
+			y: 0.0d
+		}
+		{
+			dependencies: ["3C00000000050001"]
+			description: [
+				"Assine seu primeiro Contrato Mítico na aba Contratos da tela [U]. Atenção aos tabus de cada pacto — quebrar um voto gera penalidades reais!"
+			]
+			id: "3C00000000050002"
+			rewards: [
+				{
+					count: 1
+					id: "4D00000000050002"
+					item: "mythic_contracts:spirit_condensation_pill"
+					type: "item"
+				}
+			]
+			subtitle: "Poder selado por juramento"
+			tasks: [
+				{
+					advancement: "mythic_contracts:first_contract"
+					criterion: ""
+					id: "5E00000000050002"
+					type: "advancement"
+				}
+			]
+			title: "2. Contrato Selado"
+			x: -1.0d
+			y: -1.5d
+		}
+		{
+			dependencies: ["3C00000000050001"]
+			description: [
+				"Independente da sua Facção, sintonize um dos 4 Resquícios Divinos (Olho de Rá, Ceifa da Morrígan, Vajra de Indra ou Passo de Tezcatlipoca) e dispare com [G]."
+				""
+				"Monitore o Anel de Resistência Divina no canto inferior esquerdo para evitar a Sobrecarga de 60s!"
+			]
+			id: "3C00000000050003"
+			rewards: [
+				{
+					count: 1
+					id: "4D00000000050003"
+					item: "mythic_contracts:body_refinement_pill"
+					type: "item"
+				}
+			]
+			subtitle: "Canalize um fragmento divino [G]"
+			tasks: [
+				{
+					advancement: "mythic_contracts:divine_channeling"
+					criterion: ""
+					id: "5E00000000050003"
+					type: "advancement"
+				}
+			]
+			title: "3. Eco dos Deuses Caídos"
+			x: -1.0d
+			y: 1.5d
+		}
+		{
+			dependencies: [
+				"3C00000000050002"
+				"3C00000000050003"
+			]
+			description: [
+				"Com a habilidade Subjugação de Alma (ou usando o Selo de Subjugação como Catalisador para iniciar a Disputa em 65% de Dominância e reduzir custos em 50%), vença a Disputa Espiritual contra qualquer criatura de #subjugatable."
+				""
+				"Suprima o Pulso de Revolta mantendo [V] ativo ou reativando [ALT + G] na janela!"
+			]
+			id: "3C00000000050004"
+			rewards: [
+				{
+					count: 2
+					id: "4D00000000050004"
+					item: "mythic_contracts:subjugation_seal"
+					type: "item"
+				}
+			]
+			subtitle: "Domine a Disputa Espiritual"
+			tasks: [
+				{
+					advancement: "mythic_contracts:first_subjugation"
+					criterion: ""
+					id: "5E00000000050004"
+					type: "advancement"
+				}
+			]
+			title: "4. Primeiro Servo Subjugado"
+			x: 1.5d
+			y: 0.0d
+		}
+		{
+			dependencies: ["3C00000000050004"]
+			description: [
+				"Forje o Selo de Subjugação para usá-lo como Catalisador contra Mini-Bosses (R5) e Bosses (R6+): além de +10% no limiar de HP, ele protege sua alma contra Colapso Espiritual em caso de falha."
+			]
+			id: "3C00000000050005"
+			rewards: [
+				{
+					count: 2
+					id: "4D00000000050005"
+					item: "mythic_contracts:tribulation_tome"
+					type: "item"
+				}
+			]
+			subtitle: "Catalisador dos Quebradores de Tronos"
+			tasks: [
+				{
+					count: 2L
+					id: "5E00000000050005"
+					item: "mythic_contracts:subjugation_seal"
+					type: "item"
+				}
+			]
+			title: "5. Correntes do Soberano"
+			x: 4.0d
+			y: 0.0d
+		}
+	]
+	title: "Facções, Contratos & Subjugação"
+}

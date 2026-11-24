@@ -1,0 +1,152 @@
+{
+	default_hide_dependency_lines: false
+	default_quest_shape: "rsquare"
+	filename: "caminho_do_espirito"
+	group: "1A00000000000002"
+	icon: "mythic_contracts:spirit_condensation_pill"
+	id: "2B00000000000004"
+	order_index: 3
+	quest_links: [ ]
+	quests: [
+		{
+			description: [
+				"O Caminho do Espírito expande seu reservatório de Qi, seu dano espiritual plano sob Infusão [V], o limite de Servos Subjugados e sua Integridade Espiritual."
+				""
+				"Dica 2.1: Sua Integridade Espiritual regenera em 3 estados (0.4x em combate, 1.0x fora de combate e 2.2x meditando agachado parado ou com a técnica Respiração do Lótus Interior)."
+			]
+			id: "3C00000000040001"
+			rewards: [
+				{
+					count: 1
+					id: "4D00000000040001"
+					item: "mythic_contracts:spirit_condensation_pill"
+					type: "item"
+				}
+			]
+			subtitle: "Equilíbrio entre Qi e Integridade Espiritual"
+			tasks: [
+				{
+					id: "5E00000000040001"
+					title: "Meditação do Lótus Interior"
+					type: "checkmark"
+				}
+			]
+			title: "1. Mar de Qi & Espírito (R1)"
+			x: -4.0d
+			y: 0.0d
+		}
+		{
+			dependencies: ["3C00000000040001"]
+			description: [
+				"Use o Tomo de Quebra de Reino com Shift + Clique Direito ao atingir a Etapa 3 para ascender ao Reino Espiritual II."
+			]
+			id: "3C00000000040002"
+			rewards: [
+				{
+					count: 2
+					id: "4D00000000040002"
+					item: "mythic_contracts:spirit_condensation_pill"
+					type: "item"
+				}
+			]
+			subtitle: "Primeiro despertar espiritual"
+			tasks: [
+				{
+					advancement: "mythic_contracts:spirit_realm_2"
+					criterion: ""
+					id: "5E00000000040002"
+					type: "advancement"
+				}
+			]
+			title: "2. Núcleo Espiritual (R2)"
+			x: -2.0d
+			y: 0.0d
+		}
+		{
+			dependencies: ["3C00000000040002"]
+			description: [
+				"Sintetize uma Estrela da Alma (Soul Star) usando Essência Arcana, Espírito Etéreo e Olho de Ender para rastrear a torre congelada do Night Lich."
+			]
+			id: "3C00000000040003"
+			rewards: [
+				{
+					count: 1
+					id: "4D00000000040003"
+					item: "irons_spellbooks:epic_ink"
+					type: "item"
+				}
+			]
+			subtitle: "Rastreie o arquimago da torre (R4)"
+			tasks: [
+				{
+					id: "5E00000000040003"
+					item: "bosses_of_mass_destruction:soul_star"
+					type: "item"
+				}
+			]
+			title: "3. Bússola da Alma (R4)"
+			x: 0.0d
+			y: 0.0d
+		}
+		{
+			dependencies: ["3C00000000040003"]
+			description: [
+				"Enfrente o Night Lich (Bosses of Mass Destruction) com Infusão [V] ativa. A Anima Ancestral dropada permite forjar 2x Tomos de Quebra de Reino!"
+			]
+			id: "3C00000000040004"
+			rewards: [
+				{
+					count: 2
+					id: "4D00000000040004"
+					item: "mythic_contracts:tribulation_tome"
+					type: "item"
+				}
+			]
+			subtitle: "Duelo arcano sob Pressão de Reino (R5)"
+			tasks: [
+				{
+					entity: "bosses_of_mass_destruction:lich"
+					id: "5E00000000040004"
+					type: "kill"
+					value: 1L
+				}
+			]
+			title: "4. Queda do Night Lich (R5)"
+			x: 2.0d
+			y: 0.0d
+		}
+		{
+			dependencies: ["3C00000000040004"]
+			description: [
+				"Desça às catacumbas de Iron's Spells e derrote (ou subjugue em R6+!) o Dead King, soberano morto-vivo da magia ancestral."
+			]
+			id: "3C00000000040005"
+			rewards: [
+				{
+					count: 3
+					id: "4D00000000040005"
+					item: "mythic_contracts:tribulation_tome"
+					type: "item"
+				}
+				{
+					id: "4D00000000040006"
+					type: "xp"
+					xp: 500
+				}
+			]
+			subtitle: "Supremacia espiritual (R6–R7)"
+			tasks: [
+				{
+					entity: "irons_spellbooks:dead_king"
+					id: "5E00000000040005"
+					type: "kill"
+					value: 1L
+				}
+			]
+			title: "5. Alma Transcendente (R6–R7)"
+			x: 4.0d
+			y: 0.0d
+		}
+	]
+	title: "Caminho do Espírito (R1–R7)"
+}

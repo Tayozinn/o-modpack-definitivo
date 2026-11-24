@@ -1,0 +1,188 @@
+{
+	default_hide_dependency_lines: false
+	default_quest_shape: "rsquare"
+	filename: "triangulo_de_combate"
+	group: "1A00000000000001"
+	icon: "tacz:ammo_box"
+	id: "2B00000000000002"
+	order_index: 1
+	quest_links: [ ]
+	quests: [
+		{
+			description: [
+				"As metrópoles devastadas de 2010 escondem estoques militares, grimórios perdidos e relíquias forjadas antes da Guerra dos Deuses."
+				""
+				"Domine o Triângulo de Combate: Armas de Fogo (TaCZ), Lâminas Marciais (Simply Swords + Better Combat) e Artes Arcanas (Iron's Spells). Todas escalam com sua Infusão de Qi [V]!"
+			]
+			id: "3C00000000020001"
+			rewards: [
+				{
+					id: "4D00000000020001"
+					type: "xp"
+					xp: 50
+				}
+			]
+			subtitle: "Sobreviva nas metrópoles em ruínas"
+			tasks: [
+				{
+					id: "5E00000000020001"
+					title: "Protocolo de Combate 2010"
+					type: "checkmark"
+				}
+			]
+			title: "1. O Triângulo de Combate"
+			x: -4.0d
+			y: 0.0d
+		}
+		{
+			dependencies: ["3C00000000020001"]
+			description: [
+				"Monte a Bancada de Armeiro (Gun Smith Table) para fabricar armas de fogo modernas, miras e munição do TaCZ."
+				""
+				"Dica: Baús nos prédios arruinados e metrôs do Lost Cities agora contêm munição tática e caixas de munição!"
+			]
+			id: "3C00000000020002"
+			rewards: [
+				{
+					count: 1
+					id: "4D00000000020002"
+					item: "tacz:ammo_box"
+					type: "item"
+				}
+			]
+			subtitle: "Poder de fogo moderno (TaCZ)"
+			tasks: [
+				{
+					id: "5E00000000020002"
+					item: "tacz:gun_smith_table"
+					type: "item"
+				}
+			]
+			title: "2. Arsenal Balístico"
+			x: -1.5d
+			y: -2.0d
+		}
+		{
+			dependencies: ["3C00000000020001"]
+			description: [
+				"Colete Essência Arcana nos prédios em ruínas ou de criaturas mágicas para iniciar seus estudos em Iron's Spells 'n Spellbooks."
+				""
+				"Sob Infusão [V], feitiços recebem escalonamento espiritual sem drenar seu Vigor corporal."
+			]
+			id: "3C00000000020003"
+			rewards: [
+				{
+					count: 2
+					id: "4D00000000020003"
+					item: "irons_spellbooks:common_ink"
+					type: "item"
+				}
+			]
+			subtitle: "Magia recuperada dos escombros"
+			tasks: [
+				{
+					count: 4L
+					id: "5E00000000020003"
+					item: "irons_spellbooks:arcane_essence"
+					type: "item"
+				}
+			]
+			title: "3. Centelha Arcana"
+			x: -1.5d
+			y: 0.0d
+		}
+		{
+			dependencies: ["3C00000000020001"]
+			description: [
+				"Encontre ou forje uma Tábua Rúnica (Simply Swords) nos túneis de metrô e masmorras."
+				""
+				"Armas Rúnicas e Únicas do Simply Swords possuem ressonância de Qi (-15% custo de Qi sob Infusão [V])!"
+			]
+			id: "3C00000000020004"
+			rewards: [
+				{
+					count: 1
+					id: "4D00000000020004"
+					item: "mythic_contracts:body_refinement_pill"
+					type: "item"
+				}
+			]
+			subtitle: "Lâminas ressonantes de Qi"
+			tasks: [
+				{
+					id: "5E00000000020004"
+					item: "simplyswords:runic_tablet"
+					type: "item"
+				}
+			]
+			title: "4. Forja Rúnica"
+			x: -1.5d
+			y: 2.0d
+		}
+		{
+			dependencies: [
+				"3C00000000020002"
+				"3C00000000020003"
+			]
+			description: [
+				"À noite, as ruínas de 2010 são patrulhadas por horrores do Born in Chaos."
+				""
+				"Recolha Pedaços ou Lingotes de Metal Sombrio para desbloquear a síntese dupla (2x) de Pílulas de Refinamento Corporal no KubeJS!"
+			]
+			id: "3C00000000020005"
+			rewards: [
+				{
+					count: 2
+					id: "4D00000000020005"
+					item: "mythic_contracts:body_refinement_pill"
+					type: "item"
+				}
+			]
+			subtitle: "Aproveite os despojos da noite urbana"
+			tasks: [
+				{
+					count: 2L
+					id: "5E00000000020005"
+					item: "born_in_chaos_v1:dark_metal_ingot"
+					type: "item"
+				}
+			]
+			title: "5. Metal Sombrio das Ruínas"
+			x: 1.5d
+			y: -1.0d
+		}
+		{
+			dependencies: [
+				"3C00000000020003"
+				"3C00000000020004"
+			]
+			description: [
+				"Desça aos túneis de metrô e enfrente espíritos inquietos para obter Espírito Etéreo."
+				""
+				"Combine-o com Essência Arcana para sintetizar 2x Pílulas Espirituais, 2x Selos de Subjugação ou uma Estrela da Alma (Night Lich)."
+			]
+			id: "3C00000000020006"
+			rewards: [
+				{
+					count: 2
+					id: "4D00000000020006"
+					item: "mythic_contracts:spirit_condensation_pill"
+					type: "item"
+				}
+			]
+			subtitle: "Combustível espiritual do pós-guerra"
+			tasks: [
+				{
+					count: 2L
+					id: "5E00000000020006"
+					item: "born_in_chaos_v1:ethereal_spirit"
+					type: "item"
+				}
+			]
+			title: "6. Essência Etérea"
+			x: 1.5d
+			y: 1.0d
+		}
+	]
+	title: "Triângulo de Combate & Ruínas"
+}

@@ -22,11 +22,31 @@ hash = "32cb5614c7d2f86cfbbf53dee076852a861b214d0e38d93f98c60fce872007a9"
 
 [[files]]
 file = "config/ftbquests/quests/chapter_groups.snbt"
-hash = "d9b521a335803395cd48e2017e6f2da0977e0e007545b94f99abe37c24f263ac"
+hash = "c311d088f0fa217e00216a37853b1972cb90dd5ceae0274825e72ec14535ce88"
+
+[[files]]
+file = "config/ftbquests/quests/chapters/caminho_do_corpo.snbt"
+hash = "edf214cec57a50e67df9becff28b1786138f1dc75676777ca0b60b0ee0bf4f25"
+
+[[files]]
+file = "config/ftbquests/quests/chapters/caminho_do_espirito.snbt"
+hash = "908b0ed60b66d6b1619ceeaf4d325c41dd5e46e1ef466669349affe6376dec1f"
 
 [[files]]
 file = "config/ftbquests/quests/chapters/despertar_2010.snbt"
 hash = "066654345c495657ab3465adc17abf7446d126e317c014c7ea3acca758b0772a"
+
+[[files]]
+file = "config/ftbquests/quests/chapters/faccoes_e_subjugacao.snbt"
+hash = "427da7932078d6c937275861fa6f1ac10f2caaedc5c123e62d334c178ca3aad6"
+
+[[files]]
+file = "config/ftbquests/quests/chapters/panteao_em_ruinas.snbt"
+hash = "bd6f2aa33663724a0d8c980041f8a13cab9875c36261b1843e998b6a4a6dde8b"
+
+[[files]]
+file = "config/ftbquests/quests/chapters/triangulo_de_combate.snbt"
+hash = "e15cd450647e28e470ee3aa5daeeffcf0319010330c5b8ff30818ce1672f25c3"
 
 [[files]]
 file = "config/ftbquests/quests/data.snbt"

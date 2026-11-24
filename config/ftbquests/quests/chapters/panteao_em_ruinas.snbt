@@ -1,0 +1,310 @@
+{
+	default_hide_dependency_lines: false
+	default_quest_shape: "hexagon"
+	filename: "panteao_em_ruinas"
+	group: "1A00000000000002"
+	icon: "cataclysm:ignitium_ingot"
+	id: "2B00000000000006"
+	order_index: 5
+	quest_links: [ ]
+	quests: [
+		{
+			description: [
+				"Os remanescentes da Guerra dos Deuses ainda respiram sob a crosta, nos oceanos, no Nether e no End."
+				""
+				"AVISO: Todos os Bosses deste capítulo possuem PRESSÃO DE REINO (#high_realm_boss) — sem Infusão de Mana [V] ativa, eles reduzem 90% do dano sofrido!"
+			]
+			id: "3C00000000060001"
+			rewards: [
+				{
+					count: 1
+					id: "4D00000000060001"
+					item: "mythic_contracts:tribulation_tome"
+					type: "item"
+				}
+			]
+			subtitle: "Caçada aos titãs de R4 a R7"
+			tasks: [
+				{
+					id: "5E00000000060001"
+					title: "Juramento do Caçador de Deuses"
+					type: "checkmark"
+				}
+			]
+			title: "0. O Panteão em Ruínas"
+			x: -5.0d
+			y: 0.0d
+		}
+		{
+			dependencies: ["3C00000000060001"]
+			description: [
+				"Enfrente as entidades mitológicas de Reino IV–V: Umvuthi (o Pássaro do Sol) e Frostmaw (a Fera Glacial) de Mowzie's Mobs."
+			]
+			id: "3C00000000060002"
+			rewards: [
+				{
+					count: 2
+					id: "4D00000000060002"
+					item: "mythic_contracts:tribulation_tome"
+					type: "item"
+				}
+			]
+			subtitle: "Sol e Gelo primordiais (R4–R5)"
+			tasks: [
+				{
+					entity: "mowziesmobs:umvuthi"
+					id: "5E00000000060002"
+					type: "kill"
+					value: 1L
+				}
+				{
+					entity: "mowziesmobs:frostmaw"
+					id: "5E00000000060003"
+					type: "kill"
+					value: 1L
+				}
+			]
+			title: "1. Sol & Geada (Mowzie's)"
+			x: -2.5d
+			y: -2.0d
+		}
+		{
+			dependencies: ["3C00000000060001"]
+			description: [
+				"Derrote o soberano das noites amaldiçoadas do Born in Chaos: Lord Pumpkinhead."
+			]
+			id: "3C00000000060003"
+			rewards: [
+				{
+					count: 2
+					id: "4D00000000060003"
+					item: "mythic_contracts:subjugation_seal"
+					type: "item"
+				}
+			]
+			subtitle: "O senhor do caos urbano (R5)"
+			tasks: [
+				{
+					entity: "born_in_chaos_v1:lord_pumpkinhead"
+					id: "5E00000000060004"
+					type: "kill"
+					value: 1L
+				}
+			]
+			title: "2. Soberano do Caos"
+			x: -2.5d
+			y: 2.0d
+		}
+		{
+			dependencies: [
+				"3C00000000060002"
+				"3C00000000060003"
+			]
+			description: [
+				"Purgue os quatro Guardiões Pós-Colapso (Bosses of Mass Destruction): Night Lich, Nether Gauntlet, Void Blossom e Obsidilith."
+			]
+			id: "3C00000000060004"
+			rewards: [
+				{
+					count: 3
+					id: "4D00000000060004"
+					item: "mythic_contracts:tribulation_tome"
+					type: "item"
+				}
+			]
+			subtitle: "Os quatro pilares corrompidos (R5–R6)"
+			tasks: [
+				{
+					entity: "bosses_of_mass_destruction:lich"
+					id: "5E00000000060005"
+					type: "kill"
+					value: 1L
+				}
+				{
+					entity: "bosses_of_mass_destruction:gauntlet"
+					id: "5E00000000060006"
+					type: "kill"
+					value: 1L
+				}
+				{
+					entity: "bosses_of_mass_destruction:void_blossom"
+					id: "5E00000000060007"
+					type: "kill"
+					value: 1L
+				}
+				{
+					entity: "bosses_of_mass_destruction:obsidilith"
+					id: "5E00000000060008"
+					type: "kill"
+					value: 1L
+				}
+			]
+			title: "3. Guardiões do Colapso"
+			x: 0.0d
+			y: 0.0d
+		}
+		{
+			dependencies: ["3C00000000060004"]
+			description: [
+				"Desative a máquina de guerra divina deixada nos bunkers de 2010: The Harbinger (Cataclysm)."
+			]
+			id: "3C00000000060005"
+			rewards: [
+				{
+					count: 2
+					id: "4D00000000060005"
+					item: "mythic_contracts:tribulation_tome"
+					type: "item"
+				}
+			]
+			subtitle: "Arma cibernética da guerra antiga (R6)"
+			tasks: [
+				{
+					entity: "cataclysm:the_harbinger"
+					id: "5E00000000060009"
+					type: "kill"
+					value: 1L
+				}
+			]
+			title: "4. O Arauto de Aço"
+			x: 2.5d
+			y: -2.0d
+		}
+		{
+			dependencies: ["3C00000000060004"]
+			description: [
+				"Desperte e derrote o Ancient Remnant nas areias amaldiçoadas — o fóssil vivo ligado à era de Rá."
+			]
+			id: "3C00000000060006"
+			rewards: [
+				{
+					count: 2
+					id: "4D00000000060006"
+					item: "mythic_contracts:tribulation_tome"
+					type: "item"
+				}
+			]
+			subtitle: "Relíquia viva das areias (R6)"
+			tasks: [
+				{
+					entity: "cataclysm:ancient_remnant"
+					id: "5E0000000006000A"
+					type: "kill"
+					value: 1L
+				}
+			]
+			title: "5. Remanescente Ancestral"
+			x: 2.5d
+			y: 0.0d
+		}
+		{
+			dependencies: ["3C00000000060004"]
+			description: [
+				"Domine as profundezas abissais e as tempestades: derrote The Leviathan e Scylla (Cataclysm)."
+			]
+			id: "3C00000000060007"
+			rewards: [
+				{
+					count: 2
+					id: "4D00000000060007"
+					item: "mythic_contracts:tribulation_tome"
+					type: "item"
+				}
+			]
+			subtitle: "Fúria do abismo e da tormenta (R6–R7)"
+			tasks: [
+				{
+					entity: "cataclysm:the_leviathan"
+					id: "5E0000000006000B"
+					type: "kill"
+					value: 1L
+				}
+				{
+					entity: "cataclysm:scylla"
+					id: "5E0000000006000C"
+					type: "kill"
+					value: 1L
+				}
+			]
+			title: "6. Abismo & Tormenta"
+			x: 2.5d
+			y: 2.0d
+		}
+		{
+			dependencies: [
+				"3C00000000060005"
+				"3C00000000060006"
+				"3C00000000060007"
+			]
+			description: [
+				"Enfrente os dois campeões sombrios das dimensões rompidas: Ender Guardian e Maledictus."
+			]
+			id: "3C00000000060008"
+			rewards: [
+				{
+					count: 3
+					id: "4D00000000060008"
+					item: "mythic_contracts:subjugation_seal"
+					type: "item"
+				}
+			]
+			subtitle: "Guardiões do Vazio e da Maldição (R7)"
+			tasks: [
+				{
+					entity: "cataclysm:ender_guardian"
+					id: "5E0000000006000D"
+					type: "kill"
+					value: 1L
+				}
+				{
+					entity: "cataclysm:maledictus"
+					id: "5E0000000006000E"
+					type: "kill"
+					value: 1L
+				}
+			]
+			title: "7. Vazio & Maldição"
+			x: 5.0d
+			y: 0.0d
+		}
+		{
+			dependencies: ["3C00000000060008"]
+			description: [
+				"O duelo final do modpack: na Arena Ardente do Nether, desafie Ignis — o senhor das chamas que reduziu metrópoles a cinzas — e prove sua supremacia sobre os Deuses!"
+			]
+			id: "3C00000000060009"
+			rewards: [
+				{
+					count: 5
+					id: "4D00000000060009"
+					item: "mythic_contracts:tribulation_tome"
+					type: "item"
+				}
+				{
+					count: 3
+					id: "4D0000000006000A"
+					item: "mythic_contracts:subjugation_seal"
+					type: "item"
+				}
+				{
+					id: "4D0000000006000B"
+					type: "xp"
+					xp: 2000
+				}
+			]
+			subtitle: "O Trono de Chamas — Endgame R7"
+			tasks: [
+				{
+					entity: "cataclysm:ignis"
+					id: "5E0000000006000F"
+					type: "kill"
+					value: 1L
+				}
+			]
+			title: "8. Crepúsculo de Ignis"
+			x: 7.5d
+			y: 0.0d
+		}
+	]
+	title: "Panteão em Ruínas (Endgame)"
+}

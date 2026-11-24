@@ -1,0 +1,159 @@
+{
+	default_hide_dependency_lines: false
+	default_quest_shape: "rsquare"
+	filename: "caminho_do_corpo"
+	group: "1A00000000000002"
+	icon: "mythic_contracts:body_refinement_pill"
+	id: "2B00000000000003"
+	order_index: 2
+	quest_links: [ ]
+	quests: [
+		{
+			description: [
+				"O Caminho do Corpo tempera músculos, ossos e meridianos através de 7 Reinos (R1 a R7), concedendo Vida Máxima extra, dano físico passivo e multiplicadores massivos sob Infusão [V]."
+				""
+				"Equipes suas Técnicas Corporais na tela [U] -> Habilidades nos 3 slots (S1 em R1, S2 em R3, S3 em R5) e dispare com [ALT + G] (ciclo com [ALT + V])."
+			]
+			id: "3C00000000030001"
+			rewards: [
+				{
+					count: 1
+					id: "4D00000000030001"
+					item: "mythic_contracts:body_refinement_pill"
+					type: "item"
+				}
+			]
+			subtitle: "A disciplina da carne indestrutível"
+			tasks: [
+				{
+					id: "5E00000000030001"
+					title: "Iniciação do Corpo Murim"
+					type: "checkmark"
+				}
+			]
+			title: "1. Fundamento Corporal (R1)"
+			x: -4.0d
+			y: 0.0d
+		}
+		{
+			dependencies: ["3C00000000030001"]
+			description: [
+				"Avance todas as 3 etapas do Reino I e use um Tomo de Quebra de Reino (Clique Direito) para consolidar o Reino Corporal II."
+			]
+			id: "3C00000000030002"
+			rewards: [
+				{
+					count: 2
+					id: "4D00000000030002"
+					item: "mythic_contracts:body_refinement_pill"
+					type: "item"
+				}
+			]
+			subtitle: "Primeiro rompimento físico"
+			tasks: [
+				{
+					advancement: "mythic_contracts:body_realm_2"
+					criterion: ""
+					id: "5E00000000030002"
+					type: "advancement"
+				}
+			]
+			title: "2. Têmpera de Ferro (R2)"
+			x: -2.0d
+			y: 0.0d
+		}
+		{
+			dependencies: ["3C00000000030002"]
+			description: [
+				"Teste seu físico contra os brutamontes blindados que rondam as ruas à noite: derrote um Cavaleiro de Porta (Door Knight) e um Esqueleto Esmagador (Skeleton Thrasher)."
+			]
+			id: "3C00000000030003"
+			rewards: [
+				{
+					count: 1
+					id: "4D00000000030003"
+					item: "mythic_contracts:tribulation_tome"
+					type: "item"
+				}
+			]
+			subtitle: "Prova de força nas ruínas (R3)"
+			tasks: [
+				{
+					entity: "born_in_chaos_v1:door_knight"
+					id: "5E00000000030003"
+					type: "kill"
+					value: 1L
+				}
+				{
+					entity: "born_in_chaos_v1:skeleton_thrasher"
+					id: "5E00000000030004"
+					type: "kill"
+					value: 1L
+				}
+			]
+			title: "3. Caçador de Elites (R3)"
+			x: 0.0d
+			y: 0.0d
+		}
+		{
+			dependencies: ["3C00000000030003"]
+			description: [
+				"Encontre a câmara subterrânea do Ferrous Wroughtnaut (Mowzie's Mobs) e vença o duelo de precisão contra sua armadura impenetrável."
+			]
+			id: "3C00000000030004"
+			rewards: [
+				{
+					count: 2
+					id: "4D00000000030004"
+					item: "mythic_contracts:tribulation_tome"
+					type: "item"
+				}
+			]
+			subtitle: "Duelo contra o sentinela de aço (R4)"
+			tasks: [
+				{
+					entity: "mowziesmobs:ferrous_wroughtnaut"
+					id: "5E00000000030005"
+					type: "kill"
+					value: 1L
+				}
+			]
+			title: "4. Prova do Sentinela (R4)"
+			x: 2.0d
+			y: 0.0d
+		}
+		{
+			dependencies: ["3C00000000030004"]
+			description: [
+				"No auge do Caminho do Corpo (R6–R7), apenas um colosso forjado em Netherita está à altura: ative sua Infusão [V] para perfurar a Pressão de Reino e derrube a Netherite Monstrosity."
+			]
+			id: "3C00000000030005"
+			rewards: [
+				{
+					count: 3
+					id: "4D00000000030005"
+					item: "mythic_contracts:tribulation_tome"
+					type: "item"
+				}
+				{
+					id: "4D00000000030006"
+					type: "xp"
+					xp: 500
+				}
+			]
+			subtitle: "O ápice do físico soberano (R6–R7)"
+			tasks: [
+				{
+					entity: "cataclysm:netherite_monstrosity"
+					id: "5E00000000030006"
+					type: "kill"
+					value: 1L
+				}
+			]
+			title: "5. Corpo Soberano (R6–R7)"
+			x: 4.0d
+			y: 0.0d
+		}
+	]
+	title: "Caminho do Corpo (R1–R7)"
+}
