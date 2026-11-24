@@ -1,6 +1,6 @@
-# Mythic Contracts 2.0 — Registro Oficial de Decisões Aprovadas (Atualizações 2.1)
+# Mythic Contracts 2.0 — Registro Oficial de Decisões Aprovadas (Atualizações 2.1 & Resquícios 4 Fases)
 
-**Status:** **APROVADO PELO USUÁRIO** em `2026-11-23` ("aprovo as recomendações").  
+**Status:** **APROVADO PELO USUÁRIO** em `2026-11-23` ("aprovo as recomendações" e "Utilize o mockup 1, como arquitetura use a alternativa B e sub opção b1, o kit novo dos deuses está bom").  
 **Ambiente Alvo:** Minecraft `1.20.1`, Forge `47.3.0` (`--offline`), Java `17`, Embeddium `0.3.31`, Better Combat, TaCZ, Iron's Spells 'n Spellbooks, KubeJS, FTB Quests.
 
 ---
@@ -17,3 +17,4 @@
 | **6** | **Motor Visual & Partículas Fluidas** | **Alternativa B** | `MotionMode` paramétrico (`LINEAR`, `ORBIT_SPIRAL`, `BEZIER_FOLLOW`, `RADIAL_EASE_OUT`) em `MythicParticleBase` + **Ribbons/Arcos Nativos** em `RenderLevelStageEvent.AFTER_PARTICLES` usando `RenderType` vanilla (`HIGH`/`MEDIUM`; desabilitados automaticamente em `LOW`), com **coreografia orgânica em 5 fases** para os 4 Resquícios Divinos, Subjugação e Técnicas `R1–R7`. |
 | **7** | **Animações das Habilidades** | **Alternativa B** | Base procedural nativa Forge 1ª pessoa (`ViewportEvent.ComputeCameraAngles`, `RenderHandEvent`, `ComputeFovModifierEvent`) + **Soft-Bridge opcional `playerAnimator`** isolada por reflexão atrás de `ModList.get().isLoaded("playeranimator")` sem quebrar o build `--offline`. |
 | **8** | **Direção Sonora & Layout `[U]`** | **Direção A + Layout A** | Direção **Mitológico-Épico** (+ percussão marcial limpa) com arquivos **`.ogg` mono `44.1 kHz`** autorais (`ModSounds` + `sounds.json` + `AbstractTickableSoundInstance` para loop de Disputa + throttle de polifonia). Interface `[U]` (`368×224`) mantém as **7 abas inferiores**, adota **Master-Detail com pills de categoria** na aba `Habilidades` e **Painel Interativo de Servos** na aba `Contratos`. |
+| **9** | **Resquícios Divinos Progressivos em 4 Fases** | **Alternativa B + Sub-opção B1 + Mockup 1** | Contenção inicial dos `[G]` Resquícios em **4 Fases** com média combinada + **piso bilateral anti-rush** (`Fase I R1-1 · 0.40x`, `Fase II R2-3 / piso R2-1 · 0.75x + Passiva`, `Fase III R4-2 / piso R3-2 · 1.10x`, `Fase IV R6-1 / piso R5-1 · 1.45x · Ultimate 65%`), custo decrescente `60 → 20`, **16 habilidades (`4 Deuses × 4 Fases`)** com `G` (conjurar ativa) e **`Shift + G`** (ciclar `H1 → H4`, `CycleDivinePhaseC2SPacket`), emblema HUD `[G]` com **4 arcos externos segmentados (`13.7F..16.4F`)** e grade `2×2` clicável em `[U] → Habilidades`. |

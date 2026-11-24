@@ -4,6 +4,16 @@
     "minecraft:blaze",
     "minecraft:vex",
     "minecraft:skeleton",
-    "minecraft:wither_skeleton"
+    "minecraft:wither_skeleton",
+    { "id": "born_in_chaos_v1:bone_imp", "required": false },
+    { "id": "born_in_chaos_v1:restless_spirit", "required": false },
+    { "id": "born_in_chaos_v1:seared_spirit", "required": false },
+    { "id": "born_in_chaos_v1:spiritof_chaos", "required": false },
+    { "id": "born_in_chaos_v1:decrepit_skeleton", "required": false },
+    { "id": "born_in_chaos_v1:baby_skeleton", "required": false },
+    { "id": "born_in_chaos_v1:firelight", "required": false },
+    { "id": "cataclysm:koboleton", "required": false },
+    { "id": "cataclysm:draugr", "required": false },
+    { "id": "cataclysm:deepling", "required": false }
   ]
 }

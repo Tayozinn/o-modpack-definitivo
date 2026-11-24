@@ -26,10 +26,21 @@ public final class SubjugationBalance {
             new ResourceLocation("mythic_contracts", "throne_breaker_seal");
 
     private static final Set<String> MINI_BOSS_PATHS = Set.of(
-            "warden", "elder_guardian", "citadel_keeper"
+            "warden", "elder_guardian", "citadel_keeper",
+            "ferrous_wroughtnaut",
+            "ender_golem", "ignited_revenant", "the_prowler", "kobolediator",
+            "wadjet", "aptrgangr", "clawdian", "coralssus", "amethyst_crab",
+            "sir_pumpkinhead", "nightmare_stalker", "fallen_chaos_knight",
+            "supreme_bonescaller", "missioner", "krampus", "lifestealer"
     );
     private static final Set<String> ELITE_PATHS = Set.of(
-            "iron_golem", "ravager", "piglin_brute", "evoker", "vindicator", "blaze", "guardian", "witch"
+            "iron_golem", "ravager", "piglin_brute", "evoker", "vindicator", "blaze", "guardian", "witch",
+            "naga", "bluff", "umvuthana_raptor", "umvuthana_crane",
+            "ignited_berserker", "coral_golem", "deepling_brute", "deepling_warlock",
+            "deepling_priest", "elite_draugr", "royal_draugr", "the_watcher",
+            "skeleton_thrasher", "door_knight", "bonescaller", "dark_vortex",
+            "dire_hound_leader", "zombie_bruiser", "pumpkin_bruiser",
+            "mother_spider", "krampus_henchman", "scarlet_persecutor", "spirit_guide"
     );
 
     private SubjugationBalance() {

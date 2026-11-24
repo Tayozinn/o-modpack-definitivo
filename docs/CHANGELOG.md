@@ -1,5 +1,29 @@
 # Changelog — Mythic Contracts 2.0
 
+## [2.0.0 — Resquícios Divinos Progressivos em 4 Fases] — 2026-11-23
+### Sistema de 4 Fases Anti-Rush, Kit `4×4` (`16` Habilidades) & HUD Mockup 1
+- **Contenção Inicial & Desbloqueio Bilateral (`DivineResonanceBalance`):**
+  - Substituída a escala livre por **4 Fases** combinando pontuação média de cultivo e piso mínimo simultâneo em Corpo e Espírito (*anti-rush*): **Fase I — Centelha Selada** (`R1-1`, `0.40x`, custo base `60.0`), **Fase II — Eco Desperto** (`R2-3`, piso `R2-1`, `0.75x`, +15% custo), **Fase III — Ressonância Plena** (`R4-2`, piso `R3-2`, `1.10x`, +35% custo) e **Fase IV — Encarnação** (`R6-1`, piso `R5-1`, `1.45x`, Ultimate consumindo `65%` da barra máxima de Resistência Divina).
+- **Kit Completo de `16` Habilidades (`DivinePhaseAbility`, `UniqueSkillHandler`, `ContractGameplayEvents`):**
+  - Cada um dos 4 Deuses Caídos (*Olho de Rá*, *Ceifa da Morrígan*, *Vajra de Indra*, *Passo de Tezcatlipoca*) recebeu habilidades distintas `H1–H4`, passivas ativas na Fase II+ (`-20%` fogo para Rá, abate recuperando Vigor/HP para Morrígan, `-10%` recarga para Indra, `-25%` queda para Tezcatlipoca) e Ultimates temporizadas com estado server-side em `H4`.
+- **Controles (`Sub-opção B1`), Rede (`Protocolo "7"`) & Persistência:**
+  - `G` conjura a habilidade selecionada (`H1–H4`) e **`Shift + G`** (`CYCLE_DIVINE_PHASE_KEY`) alterna as fases desbloqueadas via `CycleDivinePhaseC2SPacket` (rate-limit de `4` ticks); seleção direta na UI via `CultivatorActionC2SPacket.Action.SELECT_DIVINE_PHASE`.
+  - Adicionado `ActiveDivinePhase` ao `SkillData`, `PlayerDataSerializer` e `SyncEnergyS2CPacket` (`PROTOCOL_VERSION = "7"`).
+- **HUD Mockup 1, `[U]` `2×2` & VFX por Fase:**
+  - `DivineRingGeometry` atualizado (`INNER_RADIUS = 10.6F..13.0F`, `PHASE_INNER_RADIUS = 13.7F..16.4F` em `4` arcos externos segmentados) e `DivineResistanceRingWidget` exibindo arcos I–IV e pill `H1–H4`.
+  - `CultivatorScreen` (`[U] → Habilidades`) agora exibe trilha de 4 nós + grade `2×2` clicável de `H1–H4`; `ClientVfxScheduler` diferencia coreografias pelas 16 formas.
+- **Qualidade:** adicionada suíte `DivinePhaseProgressionTest` e atualizados testes de geometria, balanço, datapacks, migração NBT e segurança multiplayer — **`90` testes passando em `28` suítes (`BENCHMARK_20K_TICKS_MS=45`)**.
+
+## [2.0.0 — Atualizações 2.1 (I, II e III)] — 2026-11-23
+### Integridade Espiritual, Subjugação como Habilidade & Evolução das Habilidades
+- **Atualização I — Regeneração de Integridade Espiritual (`SpiritualIntegrityService` & `spiritual_integrity_balance.json`):**
+  - Regeneração contínua em **3 estados** (`0.40x` em combate por `100t`, `1.00x` fora de combate, `2.20x` em meditação após `40t` agachado parado ou via *Respiração do Lótus Interior*; `0x` em Colapso), curva quadrática `R1–R7`, teto anti-exploit (`+50%` flat / `[0.25x, 2.25x]` percentual) e feedback discreto na HUD (`#E9D5FF`, `↑`, flash `180ms` `#F43F5E`, pulso `350ms` em `100%`).
+- **Atualização II — Subjugação por Habilidade & Disputa Espiritual (`SubjugationService` & `ActiveSubjugationSession`):**
+  - Técnica *Grilhão de Subjugação Espiritual* (`soul_subjugation`) inicia **Disputa Espiritual** autoritativa com Dominância `0% → 100%`, barra efêmera `6px` na HUD e supressão de **Pulso de Revolta** (`ALT + G` manual ou automático via Infusão `[V]`), Graus `I–IV`, limite de `1..5` servos e painel interativo em `[U] → Contratos`. O `SubjugationSealItem` permanece funcional no `R1` e atua como **Catalisador Opcional** (`-50%` custos, `+10%` HP, início em `65%`).
+- **Atualização III — `12` Técnicas de Cultivo `R1–R7`, Partículas Fluidas, Animações & Som (`ModSounds`):**
+  - `12` JSONs em `data/mythic_contracts/cultivation_skills/*.json`, slots marciais `S1–S3` (`R1`/`R3`/`R5`), atalhos `ALT + G` e `ALT + V`, `CycleMartialSlotC2SPacket` + `ActivateCultivationSkillC2SPacket` (`PROTOCOL_VERSION = "6"`), migração NBT **`v4`** (`PlayerDataMigrator`), `MotionMode` em `MythicParticleBase`, `ClientRibbonRenderer` (`AFTER_PARTICLES`), `ClientSkillAnimationController` + `PlayerAnimBridge` (*playerAnimator* via reflexão) e **`30` efeitos sonoros `.ogg` mono `44.1 kHz`** configuráveis em `ClientHudConfig`.
+- **Qualidade:** **`84` testes passando em `27` suítes (`BENCHMARK_20K_TICKS_MS=38`)**.
+
 ## [2.0.0] — Release Final (Fase 11 Concluída)
 ### Fase 11 (Empacotamento, Limpeza & Documentação de Release `2.0.0`)
 - Versão elevada de `1.0.0` (`2.0.0-alpha.*`) para **`2.0.0`** em `build.gradle` (`Specification-Version: 2`), `META-INF/mods.toml` (`displayName = "Mythic Contracts 2.0"`), `pack.toml`, `modrinth.index.json` e `SINCRONIZAR_MODPACK.bat`.

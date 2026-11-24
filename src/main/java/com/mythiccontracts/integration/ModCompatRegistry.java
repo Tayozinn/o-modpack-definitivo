@@ -23,6 +23,10 @@ public final class ModCompatRegistry {
     public static final String MOD_CURIOS = "curios";
     public static final String MOD_JADE = "jade";
     public static final String MOD_JEI = "jei";
+    public static final String MOD_CATACLYSM = "cataclysm";
+    public static final String MOD_BOMD = "bosses_of_mass_destruction";
+    public static final String MOD_MOWZIES_MOBS = "mowziesmobs";
+    public static final String MOD_BORN_IN_CHAOS = "born_in_chaos_v1";
 
     private static final Set<String> PRIMARY_TARGETS = Set.of(
             MOD_KUBEJS,
@@ -98,7 +102,15 @@ public final class ModCompatRegistry {
                 status(MOD_JADE, "Jade",
                         "Atalhos isolados no Numpad 0-5 sem sobreposição ao painel Murim"),
                 status(MOD_JEI, "Just Enough Items (JEI)",
-                        "Receitas de progressão + atalho [U] restrito ao hover de GUI")
+                        "Receitas de progressão + atalho [U] restrito ao hover de GUI"),
+                status(MOD_CATACLYSM, "L_Ender's Cataclysm",
+                        "8 Bosses R6-R7 em #high_realm_boss + 17 Mini-Bosses/Elites em #subjugatable"),
+                status(MOD_BOMD, "Bosses of Mass Destruction",
+                        "4 Bosses R4-R6 em #high_realm_boss (Night Lich e Nether Gauntlet subjugáveis)"),
+                status(MOD_MOWZIES_MOBS, "Mowzie's Mobs",
+                        "Umvuthi & Frostmaw em #high_realm_boss + Wroughtnaut e elites em #subjugatable"),
+                status(MOD_BORN_IN_CHAOS, "Born in Chaos",
+                        "Ameaças urbanas noturnas R1-R5 em #subjugatable, #low_tier_celestial_fiend e Lord Pumpkinhead")
         );
     }
 
