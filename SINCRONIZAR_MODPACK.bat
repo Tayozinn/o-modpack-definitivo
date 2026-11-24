@@ -25,7 +25,7 @@ if errorlevel 1 (
 
 :: 3. Recompila o Core Mod (mythic_contracts) se houver Java 17 disponivel
 echo.
-echo [2/4] Compilando Core Mod (mythic_contracts-2.0.0.jar)...
+echo [2/4] Compilando Core Mod (mythic_contracts-2.1.0.jar)...
 call gradlew.bat build --no-daemon
 if errorlevel 1 (
     echo [ERRO] Falha ao compilar o Core Mod Java.

@@ -1,12 +1,12 @@
 name = "O Modpack Definitivo (Fantasia Urbana 2010)"
 author = "Equipe Autoral"
-version = "2.0.0"
+version = "2.1.0"
 pack-format = "packwiz:1.1.0"
 
 [index]
 file = "index.toml"
 hash-format = "sha256"
-hash = "5361dcae81e3519f6dd77234b6b278e20fd4be358c91a42f6aeeebc423c812fb"
+hash = "67a0ef190dca29fe62eb3828a214f6c21566e58795c47957bd20649cb835781d"
 
 [versions]
 forge = "47.3.0"

@@ -1,9 +1,9 @@
 {
   "formatVersion": 1,
   "game": "minecraft",
-  "versionId": "2.0.0",
+  "versionId": "2.1.0",
   "name": "O Modpack Definitivo (Fantasia Urbana 2010)",
-  "summary": "Modpack autoral de Fantasia Urbana 2010 para Minecraft 1.20.1 (Forge 47.3.0) \u2014 Mythic Contracts 2.0, The Lost Cities, TaCZ, Iron's Spells, Better Combat, Simply Swords e FTB Quests.",
+  "summary": "Modpack autoral de Fantasia Urbana 2010 para Minecraft 1.20.1 (Forge 47.3.0) \u2014 Mythic Contracts 2.1, The Lost Cities, TaCZ, Iron's Spells, Better Combat, Simply Swords, Cataclysm, BoMD, Mowzie's Mobs, Born in Chaos e FTB Quests.",
   "files": [
     {
       "path": "mods/architectury-9.2.14-forge.jar",

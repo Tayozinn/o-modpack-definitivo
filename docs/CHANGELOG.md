@@ -1,4 +1,16 @@
-# Changelog — Mythic Contracts 2.0
+# Changelog — Mythic Contracts & O Modpack Definitivo
+
+## [2.1.0] — Release 1.0 do Modpack Completo (Etapas 2 a 6 + Core Mod 2.1)
+### Core Mod `mythic_contracts-2.1.0.jar`
+- Implementadas integralmente as 8 decisões de `CONCEPTION_DECISIONS_2.1.md`: recuperação em 3 estados da Integridade Espiritual, feedback na HUD Conceito A, Disputa de Subjugação como habilidade + catalisador `subjugation_seal`, 12 Técnicas de Cultivo `R1–R7` em 3 slots (`ALT+G` / `ALT+V`), ribbons/partículas sem shaders, animações procedurais + soft-bridge `playerAnimator` e áudios `.ogg` próprios (`ModSounds`).
+- `SubjugationBalance`, `ModCompatRegistry` e tags `#high_realm_boss` (`20`), `#subjugatable` (`94`) e `#low_tier_celestial_fiend` (`14`) expandidos para todos os novos mods de bosses/ameaças.
+
+### Expansão do Modpack (36 Mods Externos + Core Mod)
+- **Etapa 2 (Ecossistema de Bosses & Ameaças `R1–R7`):** adicionados *L_Ender's Cataclysm 3.31* (+ *Lionfish-API 3.0*), *Bosses of Mass Destruction 1.1.2* (+ *CERBON's API 1.1.0*), *Mowzie's Mobs 1.8.2* e *Born in Chaos 1.7.5* (`docs/BOSS_ECOSYSTEM_R1_R7.md`).
+- **Etapa 3 (Loot Urbano 2010 & Economia KubeJS):** injeção de loot temático em `lostcities:chests/lostcitychest` e `lostcities:chests/raildungeonchest` (`03_urban_2010_loot.js`) + 6 receitas de síntese cruzada de alto rendimento (`04_progression_economy.js`, `docs/URBAN_LOOT_AND_ECONOMY.md`).
+- **Etapa 4 (Campanha FTB Quests Completa):** expansão para **6 capítulos (`39` quests)** organizados em 2 grupos (*Crônicas Pós-Colapso 2010* e *Cultivo, Pactos & Panteão*), cobrindo Triângulo de Combate, Corpo `R1–R7`, Espírito `R1–R7`, Facções/Subjugação e Endgame (*Ignis*).
+- **Etapa 5 (Atmosfera 2010, QoL & Keybinds):** adicionados *Xaero's Minimap 26.6.0* (posicionado no topo direito em `config/xaerominimap.txt`), *Xaero's World Map 1.47.0*, *Sound Physics Remastered 1.5.1*, *AppleSkin*, *Mouse Tweaks*, *Controlling* + *Searchables* e *Clumps*, com revisão zero-conflitos em `defaultconfigs/options.txt` e `KEYBINDS_PLAN.md`.
+- **Etapa 6 (Auditoria & Release `2.1.0`):** bump de versão unificado, limpeza automática do JAR `2.0.0` obsoleto, validação completa de JUnit/JSON/SNBT/KubeJS/Servidor Dedicado e sincronização Packwiz + `.mrpack` + Prism Launcher.
 
 ## [2.0.0 — Resquícios Divinos Progressivos em 4 Fases] — 2026-11-23
 ### Sistema de 4 Fases Anti-Rush, Kit `4×4` (`16` Habilidades) & HUD Mockup 1

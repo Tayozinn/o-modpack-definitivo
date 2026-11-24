@@ -13,7 +13,7 @@ import shutil
 import zipfile
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
-JAR_NAME = "mythic_contracts-2.0.0.jar"
+JAR_NAME = "mythic_contracts-2.1.0.jar"
 
 
 def replace_core_jar(dest_dir: pathlib.Path, source_jar: pathlib.Path) -> None:

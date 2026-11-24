@@ -240,8 +240,8 @@ hash = "0e6b04ea03c95a193b564aee5c67b8912c52c1de61cd2bd43222c494e26bbbe9"
 metafile = true
 
 [[files]]
-file = "mods/mythic_contracts-2.0.0.jar"
-hash = "eff437788cc81c873458af765ad4c98b037c4544fe6b1ea1fa0d148dfa82f042"
+file = "mods/mythic_contracts-2.1.0.jar"
+hash = "815107ff4aced204614c80ffe169c46dfcbd5cd279abefeb475233f0ec60ef30"
 
 [[files]]
 file = "mods/playeranimator.pw.toml"

@@ -4,8 +4,8 @@ license="All Rights Reserved"
 
 [[mods]]
 modId="mythic_contracts"
-version="2.0.0"
-displayName="Mythic Contracts 2.0"
+version="2.1.0"
+displayName="Mythic Contracts 2.1"
 authors="MythicContracts"
 description='''
 Core mod RPG de cultivo corporal e espiritual (R1-R7), sistemas vitais dedicados, HUD dual, Interface do Cultivador [U], Resquicios Divinos com VFX client-side, datapacks v2 e integracao ao Triangulo de Combate para O Modpack Definitivo (Forge 1.20.1).
