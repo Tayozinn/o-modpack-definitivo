@@ -19,8 +19,8 @@ class DivineResonanceBalanceTest {
 
         assertEquals(DivineResonanceBalance.ManifestationTier.TIER_1, DivineResonanceBalance.getManifestationTier(novice));
         assertEquals(100.0F, DivineResonanceBalance.calculateMaxDivineResistance(novice), 0.01F);
-        assertEquals(55.0F, DivineResonanceBalance.calculateDivineSkillCost(novice), 0.01F);
-        assertEquals(0.60F, DivineResonanceBalance.getManifestationTier(novice).getPowerMultiplier(), 0.001F);
+        assertEquals(60.0F, DivineResonanceBalance.calculateDivineSkillCost(novice), 0.01F);
+        assertEquals(0.40F, DivineResonanceBalance.getManifestationTier(novice).getPowerMultiplier(), 0.001F);
 
         PlayerData mid = new PlayerData();
         CultivationService.setRealmAndStageByOrder(mid, CultivationPath.BODY, 4, 2);
@@ -47,12 +47,12 @@ class DivineResonanceBalanceTest {
         PlayerData data = new PlayerData();
         EnergyService.recalculateMaxQi(data);
 
-        // 1º uso no R1-1: 100 - 55 = 45 (sem sobrecarga)
+        // 1º uso no R1-1: 100 - 60 = 40 (sem sobrecarga)
         assertEquals(EnergyService.DivineSpendOutcome.SUCCESS, EnergyService.consumeDivineResistanceOrOverload(data));
-        assertEquals(45.0F, data.getSkills().getCurrentDivineResistance(), 0.01F);
+        assertEquals(40.0F, data.getSkills().getCurrentDivineResistance(), 0.01F);
         assertFalse(data.getSkills().isDivineOverloaded());
 
-        // 2º uso seguido: 45 - 55 -> zera e dispara Sobrecarga Divina (1200 ticks = 1 minuto)
+        // 2º uso seguido: 40 - 60 -> zera e dispara Sobrecarga Divina (1200 ticks = 1 minuto)
         assertEquals(EnergyService.DivineSpendOutcome.SUCCESS_TRIGGERED_OVERLOAD, EnergyService.consumeDivineResistanceOrOverload(data));
         assertEquals(0.0F, data.getSkills().getCurrentDivineResistance(), 0.01F);
         assertTrue(data.getSkills().isDivineOverloaded());

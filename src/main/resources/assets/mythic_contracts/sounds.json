@@ -1,0 +1,182 @@
+{
+  "skill.ra_cast": {
+    "subtitle": "subtitles.mythic_contracts.skill.ra_cast",
+    "sounds": [
+      "mythic_contracts:skill/ra_cast"
+    ]
+  },
+  "skill.ra_impact": {
+    "subtitle": "subtitles.mythic_contracts.skill.ra_impact",
+    "sounds": [
+      "mythic_contracts:skill/ra_impact"
+    ]
+  },
+  "skill.morrigan_cast": {
+    "subtitle": "subtitles.mythic_contracts.skill.morrigan_cast",
+    "sounds": [
+      "mythic_contracts:skill/morrigan_cast"
+    ]
+  },
+  "skill.morrigan_reap": {
+    "subtitle": "subtitles.mythic_contracts.skill.morrigan_reap",
+    "sounds": [
+      "mythic_contracts:skill/morrigan_reap"
+    ]
+  },
+  "skill.indra_charge": {
+    "subtitle": "subtitles.mythic_contracts.skill.indra_charge",
+    "sounds": [
+      "mythic_contracts:skill/indra_charge"
+    ]
+  },
+  "skill.indra_thunder": {
+    "subtitle": "subtitles.mythic_contracts.skill.indra_thunder",
+    "sounds": [
+      "mythic_contracts:skill/indra_thunder"
+    ]
+  },
+  "skill.tezca_step": {
+    "subtitle": "subtitles.mythic_contracts.skill.tezca_step",
+    "sounds": [
+      "mythic_contracts:skill/tezca_step"
+    ]
+  },
+  "skill.tezca_slash": {
+    "subtitle": "subtitles.mythic_contracts.skill.tezca_slash",
+    "sounds": [
+      "mythic_contracts:skill/tezca_slash"
+    ]
+  },
+  "skill.divine_overload": {
+    "subtitle": "subtitles.mythic_contracts.skill.divine_overload",
+    "sounds": [
+      "mythic_contracts:skill/divine_overload"
+    ]
+  },
+  "subjugation.clash_start": {
+    "subtitle": "subtitles.mythic_contracts.subjugation.clash_start",
+    "sounds": [
+      "mythic_contracts:subjugation/clash_start"
+    ]
+  },
+  "subjugation.clash_loop": {
+    "subtitle": "subtitles.mythic_contracts.subjugation.clash_loop",
+    "sounds": [
+      "mythic_contracts:subjugation/clash_loop"
+    ]
+  },
+  "subjugation.clash_revolt": {
+    "subtitle": "subtitles.mythic_contracts.subjugation.clash_revolt",
+    "sounds": [
+      "mythic_contracts:subjugation/clash_revolt"
+    ]
+  },
+  "subjugation.clash_suppress": {
+    "subtitle": "subtitles.mythic_contracts.subjugation.clash_suppress",
+    "sounds": [
+      "mythic_contracts:subjugation/clash_suppress"
+    ]
+  },
+  "subjugation.clash_success": {
+    "subtitle": "subtitles.mythic_contracts.subjugation.clash_success",
+    "sounds": [
+      "mythic_contracts:subjugation/clash_success"
+    ]
+  },
+  "subjugation.clash_fail": {
+    "subtitle": "subtitles.mythic_contracts.subjugation.clash_fail",
+    "sounds": [
+      "mythic_contracts:subjugation/clash_fail"
+    ]
+  },
+  "subjugation.servant_summon": {
+    "subtitle": "subtitles.mythic_contracts.subjugation.servant_summon",
+    "sounds": [
+      "mythic_contracts:subjugation/servant_summon"
+    ]
+  },
+  "tech.gale_step": {
+    "subtitle": "subtitles.mythic_contracts.tech.gale_step",
+    "sounds": [
+      "mythic_contracts:tech/gale_step"
+    ]
+  },
+  "tech.lotus_breath": {
+    "subtitle": "subtitles.mythic_contracts.tech.lotus_breath",
+    "sounds": [
+      "mythic_contracts:tech/lotus_breath"
+    ]
+  },
+  "tech.jade_guard": {
+    "subtitle": "subtitles.mythic_contracts.tech.jade_guard",
+    "sounds": [
+      "mythic_contracts:tech/jade_guard"
+    ]
+  },
+  "tech.seismic_palm": {
+    "subtitle": "subtitles.mythic_contracts.tech.seismic_palm",
+    "sounds": [
+      "mythic_contracts:tech/seismic_palm"
+    ]
+  },
+  "tech.golden_aegis": {
+    "subtitle": "subtitles.mythic_contracts.tech.golden_aegis",
+    "sounds": [
+      "mythic_contracts:tech/golden_aegis"
+    ]
+  },
+  "tech.blood_furnace": {
+    "subtitle": "subtitles.mythic_contracts.tech.blood_furnace",
+    "sounds": [
+      "mythic_contracts:tech/blood_furnace"
+    ]
+  },
+  "tech.soul_lance": {
+    "subtitle": "subtitles.mythic_contracts.tech.soul_lance",
+    "sounds": [
+      "mythic_contracts:tech/soul_lance"
+    ]
+  },
+  "tech.ether_flash": {
+    "subtitle": "subtitles.mythic_contracts.tech.ether_flash",
+    "sounds": [
+      "mythic_contracts:tech/ether_flash"
+    ]
+  },
+  "tech.spirit_domain": {
+    "subtitle": "subtitles.mythic_contracts.tech.spirit_domain",
+    "sounds": [
+      "mythic_contracts:tech/spirit_domain"
+    ]
+  },
+  "tech.undying_reversal": {
+    "subtitle": "subtitles.mythic_contracts.tech.undying_reversal",
+    "sounds": [
+      "mythic_contracts:tech/undying_reversal"
+    ]
+  },
+  "tech.heaven_sunder": {
+    "subtitle": "subtitles.mythic_contracts.tech.heaven_sunder",
+    "sounds": [
+      "mythic_contracts:tech/heaven_sunder"
+    ]
+  },
+  "spirit.integrity_full": {
+    "subtitle": "subtitles.mythic_contracts.spirit.integrity_full",
+    "sounds": [
+      "mythic_contracts:spirit/integrity_full"
+    ]
+  },
+  "spirit.integrity_shatter": {
+    "subtitle": "subtitles.mythic_contracts.spirit.integrity_shatter",
+    "sounds": [
+      "mythic_contracts:spirit/integrity_shatter"
+    ]
+  },
+  "spirit.slot_cycle": {
+    "subtitle": "subtitles.mythic_contracts.spirit.slot_cycle",
+    "sounds": [
+      "mythic_contracts:spirit/slot_cycle"
+    ]
+  }
+}

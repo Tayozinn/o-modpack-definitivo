@@ -1,0 +1,24 @@
+{
+  "id": "mythic_contracts:golden_core_aegis",
+  "display_name": "Égide do Núcleo Dourado",
+  "path_type": "SPIRIT",
+  "category": "DEFENSIVE",
+  "tier_realm": 3,
+  "hud_color": "#FBBF24",
+  "mechanic_summary": "Barreira de 6s que eleva a absorção da Integridade Espiritual para 75% e reflete 20% do dano em energia.",
+  "qi_cost": 40.0,
+  "stamina_cost": 0.0,
+  "spiritual_integrity_cost": 0.0,
+  "cooldown_ticks": 360,
+  "usable_during_shatter": false,
+  "enabled": true,
+  "unlock_requirements": {
+    "min_body_realm": 1,
+    "min_body_stage": 1,
+    "min_spirit_realm": 3,
+    "min_spirit_stage": 1,
+    "prerequisite_skill": "mythic_contracts:inner_breath_meditation",
+    "require_active_contract": false,
+    "qi_unlock_cost": 80.0
+  }
+}

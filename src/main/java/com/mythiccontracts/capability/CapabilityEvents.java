@@ -2,10 +2,15 @@ package com.mythiccontracts.capability;
 
 import com.mythiccontracts.MythicContractsMod;
 import com.mythiccontracts.contract.ContractManager;
+import com.mythiccontracts.cultivation.UniqueSkillHandler;
 import com.mythiccontracts.integration.CombatCompatService;
+import com.mythiccontracts.network.ActivateCultivationSkillC2SPacket;
 import com.mythiccontracts.network.ActivateUniqueSkillC2SPacket;
 import com.mythiccontracts.network.CultivatorActionC2SPacket;
+import com.mythiccontracts.network.CycleDivinePhaseC2SPacket;
+import com.mythiccontracts.network.CycleMartialSlotC2SPacket;
 import com.mythiccontracts.network.ToggleInfusionC2SPacket;
+import com.mythiccontracts.subjugation.SubjugationService;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
@@ -50,6 +55,8 @@ public final class CapabilityEvents {
     @SubscribeEvent
     public static void onPlayerDeath(LivingDeathEvent event) {
         if (event.getEntity() instanceof ServerPlayer serverPlayer) {
+            SubjugationService.clearPlayerSession(serverPlayer.getUUID());
+            UniqueSkillHandler.clearPlayerState(serverPlayer.getUUID());
             ModCapabilities.get(serverPlayer).ifPresent(data -> {
                 data.setManaInfusionActive(false);
                 ModCapabilities.savePersistedBackup(serverPlayer, data);
@@ -118,7 +125,12 @@ public final class CapabilityEvents {
             ToggleInfusionC2SPacket.clearRateLimit(player.getUUID());
             CultivatorActionC2SPacket.clearRateLimit(player.getUUID());
             ActivateUniqueSkillC2SPacket.clearRateLimit(player.getUUID());
+            ActivateCultivationSkillC2SPacket.clearRateLimit(player.getUUID());
+            CycleMartialSlotC2SPacket.clearRateLimit(player.getUUID());
+            CycleDivinePhaseC2SPacket.clearRateLimit(player.getUUID());
             CombatCompatService.clearPlayerState(player.getUUID());
+            SubjugationService.clearPlayerSession(player.getUUID());
+            UniqueSkillHandler.clearPlayerState(player.getUUID());
             ModCapabilities.get(player).ifPresent(data -> ModCapabilities.savePersistedBackup(player, data));
         }
     }
@@ -128,7 +140,12 @@ public final class CapabilityEvents {
         ToggleInfusionC2SPacket.clearAllRateLimits();
         CultivatorActionC2SPacket.clearAllRateLimits();
         ActivateUniqueSkillC2SPacket.clearAllRateLimits();
+        ActivateCultivationSkillC2SPacket.clearAllRateLimits();
+        CycleMartialSlotC2SPacket.clearAllRateLimits();
+        CycleDivinePhaseC2SPacket.clearAllRateLimits();
         CombatCompatService.clearAllState();
+        SubjugationService.clearAllSessions();
+        UniqueSkillHandler.clearAllStates();
     }
 
     @SubscribeEvent

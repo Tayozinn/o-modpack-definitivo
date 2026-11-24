@@ -1,0 +1,24 @@
+{
+  "id": "mythic_contracts:seismic_palm",
+  "display_name": "Palma Sísmica Quebra-Rocha",
+  "path_type": "BODY",
+  "category": "OFFENSIVE",
+  "tier_realm": 3,
+  "hud_color": "#EF4444",
+  "mechanic_summary": "Onda de choque frontal escalada por Cultivo Corporal que quebra guarda de escudos e lança inimigos.",
+  "qi_cost": 15.0,
+  "stamina_cost": 35.0,
+  "spiritual_integrity_cost": 0.0,
+  "cooldown_ticks": 200,
+  "usable_during_shatter": false,
+  "enabled": true,
+  "unlock_requirements": {
+    "min_body_realm": 3,
+    "min_body_stage": 1,
+    "min_spirit_realm": 1,
+    "min_spirit_stage": 1,
+    "prerequisite_skill": "mythic_contracts:jade_bone_guard",
+    "require_active_contract": false,
+    "qi_unlock_cost": 80.0
+  }
+}

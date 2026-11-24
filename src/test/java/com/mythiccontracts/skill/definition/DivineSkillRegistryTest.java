@@ -57,8 +57,8 @@ class DivineSkillRegistryTest {
         // Jogador R1-1 bloqueado pelos pré-requisitos R3 / R4 ao tentar equipar
         assertFalse(CultivationActionService.validateEquipRemnant(data, DivineRemnant.EYE_OF_RA).allowed());
 
-        // Custo base R1-1 é 55.0 -> 55 * 0.5 = 28.0 (arredondado de 27.5)
-        assertEquals(28.0F, DivineResonanceBalance.calculateDivineSkillCost(data), 0.01F);
+        // Custo base R1-1 é 60.0 -> 60 * 0.5 = 30.0
+        assertEquals(30.0F, DivineResonanceBalance.calculateDivineSkillCost(data), 0.01F);
 
         // Sobe para Corpo R3, Espírito R4 -> desbloqueado
         CultivationService.setRealmAndStageByOrder(data, CultivationPath.BODY, 3, 1);

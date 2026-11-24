@@ -5,6 +5,7 @@
   "display_name": "Centelha Espiritual",
   "qi_base": 100.0,
   "qi_regen_bonus": 4.0,
+  "spiritual_regen_base": 3.10,
   "infusion_drain_per_second": 2.5,
   "infusion_drain_per_hit": 3.0,
   "requirements": {

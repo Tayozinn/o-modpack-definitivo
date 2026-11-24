@@ -9,9 +9,15 @@ import com.mythiccontracts.core.service.EnergyService;
 import com.mythiccontracts.core.service.SpiritualIntegrityService;
 import com.mythiccontracts.core.service.VitalService;
 import com.mythiccontracts.cultivation.CultivationBalance;
+import com.mythiccontracts.cultivation.UniqueSkillHandler;
 import com.mythiccontracts.integration.CombatCompatService;
 import com.mythiccontracts.network.ModNetworking;
 import com.mythiccontracts.network.SpawnVisualEffectS2CPacket;
+import com.mythiccontracts.registry.ModSounds;
+import com.mythiccontracts.skill.cultivation.CultivationSkillService;
+import com.mythiccontracts.skill.remnant.DivineRemnant;
+import com.mythiccontracts.skill.remnant.DivineResonanceBalance;
+import com.mythiccontracts.subjugation.SubjugationService;
 import com.mythiccontracts.util.ModTags;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.particles.ParticleTypes;
@@ -30,6 +36,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.living.LivingAttackEvent;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
+import net.minecraftforge.event.entity.living.LivingKnockBackEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
@@ -86,8 +93,23 @@ public final class ContractGameplayEvents {
                 float prevDivine = playerData.getSkills().getCurrentDivineResistance();
                 float prevIntegrity = cult.getCurrentSpiritualIntegrity();
                 float prevStamina = cult.getCurrentStamina();
+                SpiritualIntegrityService.SpiritRegenState prevRegenState =
+                        SpiritualIntegrityService.evaluateRegenState(playerData);
 
-                EnergyService.EnergyTickResult tickResult = EnergyService.tickAllEnergy(playerData, serverPlayer.isSprinting());
+                float tempRegenPct = 0.0F;
+                if (serverPlayer.hasEffect(MobEffects.WITHER) || serverPlayer.hasEffect(MobEffects.POISON)) {
+                    tempRegenPct -= 0.25F;
+                }
+                if (serverPlayer.hasEffect(MobEffects.REGENERATION)) {
+                    tempRegenPct += 0.15F;
+                }
+                cult.setTransientSpiritRegenPctModifier(tempRegenPct);
+
+                boolean crouchingAndStill = serverPlayer.isCrouching()
+                        && serverPlayer.getDeltaMovement().horizontalDistanceSqr() < 0.0009D;
+
+                EnergyService.EnergyTickResult tickResult =
+                        EnergyService.tickAllEnergy(playerData, serverPlayer.isSprinting(), crouchingAndStill);
 
                 if (cult.getCurrentStamina() <= 0.0F && serverPlayer.isSprinting()) {
                     serverPlayer.setSprinting(false);
@@ -98,9 +120,13 @@ public final class ContractGameplayEvents {
                 float maxIntegrity = cult.getMaxSpiritualIntegrity();
                 float maxStamina = cult.getMaxStamina();
 
+                SpiritualIntegrityService.SpiritRegenState newRegenState =
+                        SpiritualIntegrityService.evaluateRegenState(playerData);
+
                 boolean forceSync = tickResult.qiDepleted()
                         || tickResult.divineOverloadEnded()
                         || tickResult.spiritShatterEnded()
+                        || prevRegenState != newRegenState
                         || (hadCooldown && data.getUniqueSkillCooldownTicks() == 0);
 
                 if (tickResult.qiDepleted()) {
@@ -151,11 +177,22 @@ public final class ContractGameplayEvents {
                     );
                 }
 
+                if (prevRegenState != SpiritualIntegrityService.SpiritRegenState.FULL
+                        && newRegenState == SpiritualIntegrityService.SpiritRegenState.FULL
+                        && prevIntegrity < maxIntegrity
+                        && cult.getCurrentSpiritualIntegrity() >= maxIntegrity) {
+                    serverPlayer.serverLevel().playSound(null, serverPlayer.getX(), serverPlayer.getY(), serverPlayer.getZ(),
+                            ModSounds.SPIRIT_INTEGRITY_FULL.get(), SoundSource.PLAYERS, 0.45F, 1.0F);
+                }
+
                 boolean energyChanging = data.isManaInfusionActive()
                         || prevQi < maxQi
                         || prevDivine < maxDivine
                         || prevIntegrity < maxIntegrity
                         || prevStamina < maxStamina
+                        || cult.getSpiritCombatCooldownTicks() > 0
+                        || cult.getMeditationBoostTicks() > 0
+                        || cult.getStillMeditationTicks() > 0
                         || serverPlayer.isSprinting()
                         || hadCooldown
                         || hadOverload
@@ -178,8 +215,43 @@ public final class ContractGameplayEvents {
                     );
                 }
 
+                if (serverPlayer.tickCount % 20 == 0) {
+                    if (cult.getBloodFurnaceTicks() > 0 && serverPlayer.getHealth() < serverPlayer.getMaxHealth()) {
+                        serverPlayer.heal(serverPlayer.getMaxHealth() * 0.0375F);
+                    }
+                    if (cult.getSpiritDomainTicks() > 0) {
+                        CultivationSkillService.applySpiritDomainPulse(serverPlayer, data);
+                    }
+                }
+
                 if (serverPlayer.tickCount % 40 == 0) {
                     ContractManager.onPlayerPeriodicTick(serverPlayer, data);
+                }
+
+                // Passiva Indra Fase II+: -10% recarga do Resquicio
+                if (serverPlayer.tickCount % 10 == 0
+                        && DivineResonanceBalance.getUnlockedPhaseCount(playerData) >= 2
+                        && UniqueSkillHandler.getEquippedRemnant(playerData) == DivineRemnant.INDRAS_VAJRA
+                        && data.getUniqueSkillCooldownTicks() > 1) {
+                    data.setUniqueSkillCooldownTicks(data.getUniqueSkillCooldownTicks() - 1);
+                }
+
+                UniqueSkillHandler.tickActiveUltimates(serverPlayer, data);
+                SubjugationService.tickPlayerSession(serverPlayer, data);
+            });
+        }
+    }
+
+    @SubscribeEvent
+    public static void onLivingKnockback(LivingKnockBackEvent event) {
+        if (event.getEntity() instanceof ServerPlayer player && !player.level().isClientSide()) {
+            ModCapabilities.getData(player).ifPresent(pData -> {
+                var cult = pData.getCultivation();
+                if (cult.getUndyingReversalTicks() > 0) {
+                    event.setStrength(0.0F);
+                    event.setCanceled(true);
+                } else if (cult.getJadeBoneGuardTicks() > 0) {
+                    event.setStrength(event.getStrength() * 0.60F);
                 }
             });
         }
@@ -205,12 +277,37 @@ public final class ContractGameplayEvents {
             return;
         }
 
-        // 1. Defesa do jogador: Integridade Espiritual absorve parcialmente danos arcanos/espirituais
+        // 1. Defesa do jogador: Técnicas Defensivas + Integridade Espiritual
         if (event.getEntity() instanceof ServerPlayer victim && !victim.level().isClientSide()) {
             SpiritualIntegrityService.SpiritualDamageCategory category =
                     SpiritualIntegrityService.classifyDamage(event.getSource());
-            if (category != SpiritualIntegrityService.SpiritualDamageCategory.NONE) {
-                ModCapabilities.getData(victim).ifPresent(victimData -> {
+            ModCapabilities.getData(victim).ifPresent(victimData -> {
+                var cult = victimData.getCultivation();
+                if (category == SpiritualIntegrityService.SpiritualDamageCategory.NONE && cult.getJadeBoneGuardTicks() > 0) {
+                    float redirect = Math.min(cult.getCurrentStamina(), event.getAmount() * 0.25F);
+                    if (redirect > 0.0F) {
+                        VitalService.consumeStamina(victimData, redirect, 10);
+                    }
+                    event.setAmount(Math.max(0.0F, (event.getAmount() - redirect) * 0.85F));
+                }
+
+                if (DivineResonanceBalance.getUnlockedPhaseCount(victimData) >= 2) {
+                    DivineRemnant eq = UniqueSkillHandler.getEquippedRemnant(victimData);
+                    if (eq == DivineRemnant.EYE_OF_RA && event.getSource().is(DamageTypeTags.IS_FIRE)) {
+                        event.setAmount(event.getAmount() * 0.80F);
+                    } else if (eq == DivineRemnant.TEZCATLIPOCA_STEP && event.getSource().is(DamageTypeTags.IS_FALL)) {
+                        event.setAmount(event.getAmount() * 0.75F);
+                    }
+                }
+
+                if (cult.getGoldenCoreAegisTicks() > 0
+                        && event.getSource().getEntity() instanceof LivingEntity attacker
+                        && attacker != victim && attacker.isAlive()) {
+                    float reflect = rawAmount * 0.20F;
+                    runBypassingInfusionHooks(() -> attacker.hurt(victim.damageSources().magic(), reflect));
+                }
+
+                if (category != SpiritualIntegrityService.SpiritualDamageCategory.NONE) {
                     SpiritualIntegrityService.SpiritualDamageResult res =
                             SpiritualIntegrityService.processIncomingDamage(victimData, event.getAmount(), category);
                     event.setAmount(res.remainingBodyDamage());
@@ -232,15 +329,15 @@ public final class ContractGameplayEvents {
                                 48.0D
                         );
                         victim.serverLevel().playSound(null, victim.getX(), victim.getY(), victim.getZ(),
-                                SoundEvents.AMETHYST_BLOCK_BREAK, SoundSource.PLAYERS, 0.9F, 0.7F);
+                                ModSounds.SPIRIT_INTEGRITY_SHATTER.get(), SoundSource.PLAYERS, 0.9F, 1.0F);
                         victim.sendSystemMessage(
                                 Component.literal("✖ [COLAPSO ESPIRITUAL] Sua Integridade Espiritual zerou! Infusão [V] e Resquícios [G] bloqueados por 20s!")
                                         .withStyle(ChatFormatting.DARK_PURPLE, ChatFormatting.BOLD)
                         );
                     }
-                    ModCapabilities.syncEnergy(victim);
-                });
-            }
+                }
+                ModCapabilities.syncEnergy(victim);
+            });
         }
 
         if (event.getSource().is(DamageTypes.THORNS)) {
@@ -270,6 +367,20 @@ public final class ContractGameplayEvents {
         try {
             ModCapabilities.get(attacker).ifPresent(data -> {
                 PlayerData pData = data.getPlayerData();
+                // H4 Morrígan Rainha dos Campos de Batalha: Wither II + 18% roubo de vida (teto 6 HP)
+                if (UniqueSkillHandler.isMorriganQueenActive(attacker.getUUID())) {
+                    target.addEffect(new MobEffectInstance(MobEffects.WITHER, 60, 1));
+                    attacker.heal(Math.min(6.0F, event.getAmount() * 0.18F));
+                }
+                // Passiva Morrígan Fase II+: abater alvos com Wither restaura Vigor e HP
+                if (DivineResonanceBalance.getUnlockedPhaseCount(pData) >= 2
+                        && UniqueSkillHandler.getEquippedRemnant(pData) == DivineRemnant.MORRIGAN_REAP
+                        && target.hasEffect(MobEffects.WITHER)
+                        && (target.getHealth() - event.getAmount()) <= 0.0F) {
+                    pData.getCultivation().setCurrentStamina(pData.getCultivation().getCurrentStamina() + 8.0F);
+                    attacker.heal(1.5F);
+                }
+
                 boolean consumedStamina = false;
                 if (channel == CombatCompatService.AttackChannel.MELEE
                         && CombatCompatService.tryConsumeMeleeStaminaWindow(attacker.getUUID(), gameTime)) {

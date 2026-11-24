@@ -48,5 +48,14 @@ public final class ModParticleProviders {
 
         event.registerSpriteSet(ModParticles.DIVINE_FRACTURE_SPARK.get(),
                 sprites -> new MythicParticleBase.Provider(sprites, 0.24F, 0.06F, 14, 0.15F, 0.02F, 0.0F, true));
+
+        event.registerSpriteSet(ModParticles.SUBJUGATION_RUNE_RING.get(),
+                sprites -> new MythicParticleBase.Provider(sprites, 0.72F, 0.96F, 18, 0.08F, 0.0F, 0.0F, true));
+        event.registerSpriteSet(ModParticles.SUBJUGATION_CHAIN_LINK.get(),
+                sprites -> new MythicParticleBase.Provider(sprites, 0.28F, 0.16F, 16, 0.14F, 0.0F, 0.0F, true));
+        event.registerSpriteSet(ModParticles.SUBJUGATION_SIGIL.get(),
+                sprites -> new MythicParticleBase.Provider(sprites, 0.80F, 0.65F, 20, 0.04F, -0.01F, 0.0F, true));
+        event.registerSpriteSet(ModParticles.QI_RIBBON_WISP.get(),
+                sprites -> new MythicParticleBase.Provider(sprites, 0.26F, 0.08F, 16, 0.0F, 0.0F, 0.0F, true));
     }
 }

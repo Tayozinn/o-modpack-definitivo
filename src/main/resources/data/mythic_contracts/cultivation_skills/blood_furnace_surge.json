@@ -1,0 +1,24 @@
+{
+  "id": "mythic_contracts:blood_furnace_surge",
+  "display_name": "Fornalha de Sangue & Jade",
+  "path_type": "BODY",
+  "category": "SUPPORT",
+  "tier_realm": 4,
+  "hud_color": "#DC2626",
+  "mechanic_summary": "Converte Vigor em recuperação de 15% da Vida Corporal máxima em 4s + 20% de velocidade de ataque.",
+  "qi_cost": 0.0,
+  "stamina_cost": 30.0,
+  "spiritual_integrity_cost": 0.0,
+  "cooldown_ticks": 480,
+  "usable_during_shatter": false,
+  "enabled": true,
+  "unlock_requirements": {
+    "min_body_realm": 4,
+    "min_body_stage": 1,
+    "min_spirit_realm": 1,
+    "min_spirit_stage": 1,
+    "prerequisite_skill": "mythic_contracts:seismic_palm",
+    "require_active_contract": false,
+    "qi_unlock_cost": 110.0
+  }
+}

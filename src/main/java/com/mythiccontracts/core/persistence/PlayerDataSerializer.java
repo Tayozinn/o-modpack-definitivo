@@ -86,6 +86,9 @@ public final class PlayerDataSerializer {
         tag.putFloat(PlayerDataSchema.TAG_MAX_SPIRITUAL_INTEGRITY, cult.getMaxSpiritualIntegrity());
         tag.putFloat(PlayerDataSchema.TAG_CURRENT_SPIRITUAL_INTEGRITY, cult.getCurrentSpiritualIntegrity());
         tag.putInt(PlayerDataSchema.TAG_SPIRIT_SHATTER_TICKS, cult.getSpiritShatterTicks());
+        tag.putInt(PlayerDataSchema.TAG_SPIRIT_COMBAT_COOLDOWN, cult.getSpiritCombatCooldownTicks());
+        tag.putInt(PlayerDataSchema.TAG_STILL_MEDITATION_TICKS, cult.getStillMeditationTicks());
+        tag.putInt(PlayerDataSchema.TAG_MEDITATION_BOOST_TICKS, cult.getMeditationBoostTicks());
         tag.putFloat(PlayerDataSchema.TAG_MAX_STAMINA, cult.getMaxStamina());
         tag.putFloat(PlayerDataSchema.TAG_CURRENT_STAMINA, cult.getCurrentStamina());
         tag.putInt(PlayerDataSchema.TAG_STAMINA_REGEN_DELAY, cult.getStaminaRegenDelayTicks());
@@ -142,6 +145,15 @@ public final class PlayerDataSerializer {
         cult.setCurrentSpiritualIntegrity(curIntegrity);
         cult.setSpiritShatterTicks(tag.contains(PlayerDataSchema.TAG_SPIRIT_SHATTER_TICKS, Tag.TAG_ANY_NUMERIC)
                 ? tag.getInt(PlayerDataSchema.TAG_SPIRIT_SHATTER_TICKS)
+                : 0);
+        cult.setSpiritCombatCooldownTicks(tag.contains(PlayerDataSchema.TAG_SPIRIT_COMBAT_COOLDOWN, Tag.TAG_ANY_NUMERIC)
+                ? tag.getInt(PlayerDataSchema.TAG_SPIRIT_COMBAT_COOLDOWN)
+                : 0);
+        cult.setStillMeditationTicks(tag.contains(PlayerDataSchema.TAG_STILL_MEDITATION_TICKS, Tag.TAG_ANY_NUMERIC)
+                ? tag.getInt(PlayerDataSchema.TAG_STILL_MEDITATION_TICKS)
+                : 0);
+        cult.setMeditationBoostTicks(tag.contains(PlayerDataSchema.TAG_MEDITATION_BOOST_TICKS, Tag.TAG_ANY_NUMERIC)
+                ? tag.getInt(PlayerDataSchema.TAG_MEDITATION_BOOST_TICKS)
                 : 0);
 
         float fallbackStamina = PlayerDataSchema.computeLegacyMaxStamina(cult.getBodyRealm(), cult.getBodyStage());
@@ -274,6 +286,15 @@ public final class PlayerDataSerializer {
         }
         tag.put(PlayerDataSchema.TAG_SKILLS_EQUIPPED, equippedList);
 
+        ListTag martialList = new ListTag();
+        for (int i = 0; i < SkillData.MAX_MARTIAL_SLOTS; i++) {
+            ResourceLocation id = skills.getMartialSkillInSlot(i);
+            martialList.add(StringTag.valueOf(id != null ? id.toString() : ""));
+        }
+        tag.put(PlayerDataSchema.TAG_SKILLS_EQUIPPED_MARTIAL, martialList);
+        tag.putInt(PlayerDataSchema.TAG_SKILLS_ACTIVE_MARTIAL_SLOT, skills.getActiveMartialSlot());
+        tag.putInt(PlayerDataSchema.TAG_SUBJUGATION_MASTERY_TIER, skills.getSubjugationMasteryTier());
+
         CompoundTag cooldownsTag = new CompoundTag();
         for (Map.Entry<ResourceLocation, Integer> entry : skills.getCooldowns().entrySet()) {
             if (entry.getValue() > 0) {
@@ -284,6 +305,7 @@ public final class PlayerDataSerializer {
         tag.putFloat(PlayerDataSchema.TAG_MAX_DIVINE_RESISTANCE, skills.getMaxDivineResistance());
         tag.putFloat(PlayerDataSchema.TAG_CURRENT_DIVINE_RESISTANCE, skills.getCurrentDivineResistance());
         tag.putInt(PlayerDataSchema.TAG_DIVINE_OVERLOAD_TICKS, skills.getDivineOverloadTicks());
+        tag.putInt(PlayerDataSchema.TAG_ACTIVE_DIVINE_PHASE, skills.getActiveDivinePhase());
         return tag;
     }
 
@@ -306,6 +328,24 @@ public final class PlayerDataSerializer {
                     skills.equipSkill(id);
                 }
             }
+        }
+        if (tag.contains(PlayerDataSchema.TAG_SKILLS_EQUIPPED_MARTIAL, Tag.TAG_LIST)) {
+            ListTag list = tag.getList(PlayerDataSchema.TAG_SKILLS_EQUIPPED_MARTIAL, Tag.TAG_STRING);
+            for (int i = 0; i < Math.min(list.size(), SkillData.MAX_MARTIAL_SLOTS); i++) {
+                String raw = list.getString(i);
+                if (raw != null && !raw.isBlank()) {
+                    ResourceLocation id = ResourceLocation.tryParse(raw);
+                    if (id != null) {
+                        skills.setMartialSkillInSlot(i, id);
+                    }
+                }
+            }
+        }
+        if (tag.contains(PlayerDataSchema.TAG_SKILLS_ACTIVE_MARTIAL_SLOT, Tag.TAG_ANY_NUMERIC)) {
+            skills.setActiveMartialSlot(tag.getInt(PlayerDataSchema.TAG_SKILLS_ACTIVE_MARTIAL_SLOT));
+        }
+        if (tag.contains(PlayerDataSchema.TAG_SUBJUGATION_MASTERY_TIER, Tag.TAG_ANY_NUMERIC)) {
+            skills.setSubjugationMasteryTier(tag.getInt(PlayerDataSchema.TAG_SUBJUGATION_MASTERY_TIER));
         }
         if (tag.contains(PlayerDataSchema.TAG_SKILLS_COOLDOWNS, Tag.TAG_COMPOUND)) {
             CompoundTag cooldownsTag = tag.getCompound(PlayerDataSchema.TAG_SKILLS_COOLDOWNS);
@@ -330,6 +370,9 @@ public final class PlayerDataSerializer {
                 ? tag.getInt(PlayerDataSchema.TAG_DIVINE_OVERLOAD_TICKS)
                 : 0;
         skills.setDivineOverloadTicks(overload);
+        if (tag.contains(PlayerDataSchema.TAG_ACTIVE_DIVINE_PHASE, Tag.TAG_ANY_NUMERIC)) {
+            skills.setActiveDivinePhase(tag.getInt(PlayerDataSchema.TAG_ACTIVE_DIVINE_PHASE));
+        }
     }
 
     private static CompoundTag writeSubjugation(SubjugationData subjugation, boolean includeServerPrivateData) {
@@ -346,6 +389,8 @@ public final class PlayerDataSerializer {
             if (record.customName() != null) {
                 recTag.putString(PlayerDataSchema.TAG_RECORD_CUSTOM_NAME, record.customName());
             }
+            recTag.putString(PlayerDataSchema.TAG_RECORD_STANCE, record.stance().name());
+            recTag.putBoolean(PlayerDataSchema.TAG_RECORD_SUMMONED, record.summoned());
             if (includeServerPrivateData && record.entitySnapshot() != null) {
                 recTag.put(PlayerDataSchema.TAG_RECORD_SNAPSHOT, record.entitySnapshot());
             }
@@ -377,10 +422,14 @@ public final class PlayerDataSerializer {
                 String customName = recTag.contains(PlayerDataSchema.TAG_RECORD_CUSTOM_NAME, Tag.TAG_STRING)
                         ? recTag.getString(PlayerDataSchema.TAG_RECORD_CUSTOM_NAME)
                         : null;
+                SubjugatedEntityRecord.ServantStance stance = recTag.contains(PlayerDataSchema.TAG_RECORD_STANCE, Tag.TAG_STRING)
+                        ? SubjugatedEntityRecord.ServantStance.parse(recTag.getString(PlayerDataSchema.TAG_RECORD_STANCE))
+                        : SubjugatedEntityRecord.ServantStance.FOLLOW;
+                boolean summoned = recTag.getBoolean(PlayerDataSchema.TAG_RECORD_SUMMONED);
                 CompoundTag snapshot = recTag.contains(PlayerDataSchema.TAG_RECORD_SNAPSHOT, Tag.TAG_COMPOUND)
                         ? recTag.getCompound(PlayerDataSchema.TAG_RECORD_SNAPSHOT)
                         : null;
-                subjugation.addRecord(new SubjugatedEntityRecord(instanceId, entityType, level, xp, customName, snapshot));
+                subjugation.addRecord(new SubjugatedEntityRecord(instanceId, entityType, level, xp, customName, snapshot, stance, summoned));
             }
         }
     }

@@ -47,13 +47,78 @@ public final class PlayerDataMigrator {
         }
         if (version == PlayerDataSchema.VERSION_V2) {
             current = migrateV2ToV3(current);
+            version = PlayerDataSchema.VERSION_V3;
+        }
+        if (version == PlayerDataSchema.VERSION_V3) {
+            current = migrateV3ToV4(current);
         }
         return current;
     }
 
+    public static CompoundTag migrateV3ToV4(CompoundTag v3) {
+        CompoundTag v4 = v3 != null ? v3.copy() : new CompoundTag();
+        v4.putInt(PlayerDataSchema.TAG_DATA_VERSION, PlayerDataSchema.CURRENT_VERSION);
+
+        CompoundTag cultTag = v4.contains(PlayerDataSchema.TAG_SECTION_CULTIVATION, Tag.TAG_COMPOUND)
+                ? v4.getCompound(PlayerDataSchema.TAG_SECTION_CULTIVATION).copy()
+                : new CompoundTag();
+        if (!cultTag.contains(PlayerDataSchema.TAG_SPIRIT_COMBAT_COOLDOWN, Tag.TAG_ANY_NUMERIC)) {
+            cultTag.putInt(PlayerDataSchema.TAG_SPIRIT_COMBAT_COOLDOWN, 0);
+        }
+        if (!cultTag.contains(PlayerDataSchema.TAG_STILL_MEDITATION_TICKS, Tag.TAG_ANY_NUMERIC)) {
+            cultTag.putInt(PlayerDataSchema.TAG_STILL_MEDITATION_TICKS, 0);
+        }
+        if (!cultTag.contains(PlayerDataSchema.TAG_MEDITATION_BOOST_TICKS, Tag.TAG_ANY_NUMERIC)) {
+            cultTag.putInt(PlayerDataSchema.TAG_MEDITATION_BOOST_TICKS, 0);
+        }
+        v4.put(PlayerDataSchema.TAG_SECTION_CULTIVATION, cultTag);
+
+        CompoundTag skillsTag = v4.contains(PlayerDataSchema.TAG_SECTION_SKILLS, Tag.TAG_COMPOUND)
+                ? v4.getCompound(PlayerDataSchema.TAG_SECTION_SKILLS).copy()
+                : new CompoundTag();
+        if (!skillsTag.contains(PlayerDataSchema.TAG_SKILLS_EQUIPPED_MARTIAL, Tag.TAG_LIST)) {
+            ListTag defaultMartial = new ListTag();
+            for (int i = 0; i < SkillData.MAX_MARTIAL_SLOTS; i++) {
+                defaultMartial.add(StringTag.valueOf(""));
+            }
+            skillsTag.put(PlayerDataSchema.TAG_SKILLS_EQUIPPED_MARTIAL, defaultMartial);
+        }
+        if (!skillsTag.contains(PlayerDataSchema.TAG_SKILLS_ACTIVE_MARTIAL_SLOT, Tag.TAG_ANY_NUMERIC)) {
+            skillsTag.putInt(PlayerDataSchema.TAG_SKILLS_ACTIVE_MARTIAL_SLOT, 0);
+        }
+        if (!skillsTag.contains(PlayerDataSchema.TAG_SUBJUGATION_MASTERY_TIER, Tag.TAG_ANY_NUMERIC)) {
+            int spiritRealm = cultTag.contains(PlayerDataSchema.LEGACY_SPIRIT_REALM, Tag.TAG_ANY_NUMERIC)
+                    ? cultTag.getInt(PlayerDataSchema.LEGACY_SPIRIT_REALM)
+                    : 1;
+            int mastery = spiritRealm >= 7 ? 4 : (spiritRealm >= 5 ? 3 : (spiritRealm >= 3 ? 2 : 1));
+            skillsTag.putInt(PlayerDataSchema.TAG_SUBJUGATION_MASTERY_TIER, mastery);
+        }
+        v4.put(PlayerDataSchema.TAG_SECTION_SKILLS, skillsTag);
+
+        CompoundTag subTag = v4.contains(PlayerDataSchema.TAG_SECTION_SUBJUGATION, Tag.TAG_COMPOUND)
+                ? v4.getCompound(PlayerDataSchema.TAG_SECTION_SUBJUGATION).copy()
+                : new CompoundTag();
+        if (subTag.contains(PlayerDataSchema.TAG_SUBJUGATION_BOUND, Tag.TAG_LIST)) {
+            ListTag bound = subTag.getList(PlayerDataSchema.TAG_SUBJUGATION_BOUND, Tag.TAG_COMPOUND).copy();
+            for (int i = 0; i < bound.size(); i++) {
+                CompoundTag rec = bound.getCompound(i);
+                if (!rec.contains(PlayerDataSchema.TAG_RECORD_STANCE, Tag.TAG_STRING)) {
+                    rec.putString(PlayerDataSchema.TAG_RECORD_STANCE, "FOLLOW");
+                }
+                if (!rec.contains(PlayerDataSchema.TAG_RECORD_SUMMONED, Tag.TAG_BYTE)) {
+                    rec.putBoolean(PlayerDataSchema.TAG_RECORD_SUMMONED, false);
+                }
+            }
+            subTag.put(PlayerDataSchema.TAG_SUBJUGATION_BOUND, bound);
+        }
+        v4.put(PlayerDataSchema.TAG_SECTION_SUBJUGATION, subTag);
+
+        return v4;
+    }
+
     public static CompoundTag migrateV2ToV3(CompoundTag v2) {
         CompoundTag v3 = v2 != null ? v2.copy() : new CompoundTag();
-        v3.putInt(PlayerDataSchema.TAG_DATA_VERSION, PlayerDataSchema.CURRENT_VERSION);
+        v3.putInt(PlayerDataSchema.TAG_DATA_VERSION, PlayerDataSchema.VERSION_V3);
 
         CompoundTag cultTag = v3.contains(PlayerDataSchema.TAG_SECTION_CULTIVATION, Tag.TAG_COMPOUND)
                 ? v3.getCompound(PlayerDataSchema.TAG_SECTION_CULTIVATION).copy()

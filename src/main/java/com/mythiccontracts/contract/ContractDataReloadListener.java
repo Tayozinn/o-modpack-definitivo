@@ -82,6 +82,8 @@ public final class ContractDataReloadListener extends SimpleJsonResourceReloadLi
         float qiRegenBonus = GsonHelper.getAsFloat(json, "qi_regen_bonus", 0.0F);
         float spiritualIntegrityBonus = GsonHelper.getAsFloat(json, "spiritual_integrity_bonus", 0.0F);
         String tabooSummary = GsonHelper.getAsString(json, "taboo_summary", "");
+        float spiritualRegenFlatBonus = GsonHelper.getAsFloat(json, "spiritual_regen_flat_bonus", 0.0F);
+        float spiritualRegenPctBonus = GsonHelper.getAsFloat(json, "spiritual_regen_pct_bonus", 0.0F);
 
         return new ContractDefinition(
                 id,
@@ -99,7 +101,9 @@ public final class ContractDataReloadListener extends SimpleJsonResourceReloadLi
                 reputationReward,
                 qiRegenBonus,
                 spiritualIntegrityBonus,
-                tabooSummary
+                tabooSummary,
+                spiritualRegenFlatBonus,
+                spiritualRegenPctBonus
         );
     }
 

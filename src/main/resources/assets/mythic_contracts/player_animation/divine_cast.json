@@ -1,0 +1,31 @@
+{
+  "format_version": "1.8.0",
+  "animations": {
+    "divine_cast": {
+      "animation_length": 0.7,
+      "bones": {
+        "torso": {
+          "rotation": {
+            "0.0": { "vector": [0, 0, 0] },
+            "0.2": { "vector": [-8, 0, 0], "easing": "easeInOutSine" },
+            "0.7": { "vector": [0, 0, 0], "easing": "easeOutSine" }
+          }
+        },
+        "right_arm": {
+          "rotation": {
+            "0.0": { "vector": [0, 0, 0] },
+            "0.22": { "vector": [-145, -18, 12], "easing": "easeOutCubic" },
+            "0.7": { "vector": [0, 0, 0], "easing": "easeInOutSine" }
+          }
+        },
+        "left_arm": {
+          "rotation": {
+            "0.0": { "vector": [0, 0, 0] },
+            "0.22": { "vector": [-145, 18, -12], "easing": "easeOutCubic" },
+            "0.7": { "vector": [0, 0, 0], "easing": "easeInOutSine" }
+          }
+        }
+      }
+    }
+  }
+}

@@ -5,6 +5,7 @@
   "display_name": "Condensação de Qi",
   "qi_base": 135.0,
   "qi_regen_bonus": 5.5,
+  "spiritual_regen_base": 5.48,
   "infusion_drain_per_second": 3.0,
   "infusion_drain_per_hit": 4.0,
   "requirements": {

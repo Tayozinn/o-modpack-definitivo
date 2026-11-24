@@ -143,7 +143,7 @@ public final class ContractManager {
         map.put(veilResonanceId, new ContractDefinition(
                 veilResonanceId,
                 "Voto de Ressonância do Véu",
-                "Harmoniza o fluxo espiritual: +2.0 Qi/s e +25 de Integridade Espiritual Máxima.",
+                "Harmoniza o fluxo espiritual: +2.0 Qi/s, +25 Int. Espiritual Máx e +10% (+0.8/s) de recuperação espiritual.",
                 EnumSet.of(FactionType.ERRANTES_DO_VEU, FactionType.NONE),
                 Set.of(),
                 List.of(),
@@ -156,7 +156,9 @@ public final class ContractManager {
                 15,
                 2.0F,
                 25.0F,
-                "Disponível aos Errantes do Véu ou Cultivadores Livres a partir do Espírito R2."
+                "Disponível aos Errantes do Véu ou Cultivadores Livres a partir do Espírito R2.",
+                0.8F,
+                0.10F
         ));
         return Collections.unmodifiableMap(map);
     }
@@ -405,6 +407,40 @@ public final class ContractManager {
             ContractDefinition def = getDefinition(id);
             if (def != null && def.spiritualIntegrityBonus() != 0.0F) {
                 total += def.spiritualIntegrityBonus();
+            }
+        }
+        return total;
+    }
+
+    public static float getTotalSpiritualRegenFlatBonus(PlayerData data) {
+        if (data == null) {
+            return 0.0F;
+        }
+        float total = 0.0F;
+        for (ResourceLocation id : data.getContracts().getActiveContractIds()) {
+            if (PaladinVowContract.ID.equals(id) && data.getContracts().isVowBroken()) {
+                continue;
+            }
+            ContractDefinition def = getDefinition(id);
+            if (def != null && def.spiritualRegenFlatBonus() != 0.0F) {
+                total += def.spiritualRegenFlatBonus();
+            }
+        }
+        return total;
+    }
+
+    public static float getTotalSpiritualRegenPctBonus(PlayerData data) {
+        if (data == null) {
+            return 0.0F;
+        }
+        float total = 0.0F;
+        for (ResourceLocation id : data.getContracts().getActiveContractIds()) {
+            if (PaladinVowContract.ID.equals(id) && data.getContracts().isVowBroken()) {
+                continue;
+            }
+            ContractDefinition def = getDefinition(id);
+            if (def != null && def.spiritualRegenPctBonus() != 0.0F) {
+                total += def.spiritualRegenPctBonus();
             }
         }
         return total;

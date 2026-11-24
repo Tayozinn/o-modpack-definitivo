@@ -3,10 +3,13 @@ package com.mythiccontracts.capability;
 import com.mythiccontracts.MythicContractsMod;
 import com.mythiccontracts.core.persistence.PlayerDataSerializer;
 import com.mythiccontracts.core.player.PlayerData;
+import com.mythiccontracts.core.service.SpiritualIntegrityService;
 import com.mythiccontracts.integration.ModAdvancements;
 import com.mythiccontracts.network.ModNetworking;
 import com.mythiccontracts.network.SyncCoreDataS2CPacket;
 import com.mythiccontracts.network.SyncEnergyS2CPacket;
+import com.mythiccontracts.subjugation.ActiveSubjugationSession;
+import com.mythiccontracts.subjugation.SubjugationService;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
@@ -109,22 +112,41 @@ public final class ModCapabilities {
         if (player == null) {
             return;
         }
-        getData(player).ifPresent(playerData -> ModNetworking.sendToPlayer(
-                new SyncEnergyS2CPacket(
-                        playerData.getCultivation().getCurrentQi(),
-                        playerData.getCultivation().getMaxQiCapacity(),
-                        playerData.getCultivation().isManaInfusionActive(),
-                        playerData.getSkills().getUniqueSkillCooldownTicks(),
-                        playerData.getSkills().getCurrentDivineResistance(),
-                        playerData.getSkills().getMaxDivineResistance(),
-                        playerData.getSkills().getDivineOverloadTicks(),
-                        playerData.getCultivation().getCurrentSpiritualIntegrity(),
-                        playerData.getCultivation().getMaxSpiritualIntegrity(),
-                        playerData.getCultivation().getSpiritShatterTicks(),
-                        playerData.getCultivation().getCurrentStamina(),
-                        playerData.getCultivation().getMaxStamina()
-                ),
-                player
-        ));
+        getData(player).ifPresent(playerData -> {
+            byte regenState = (byte) SpiritualIntegrityService.evaluateRegenState(playerData).ordinal();
+            int activeSlot = playerData.getSkills().getActiveMartialSlot();
+            ResourceLocation activeSkill = playerData.getSkills().getActiveMartialSkill();
+            int activeMartialCd = activeSkill != null ? playerData.getSkills().getCooldown(activeSkill) : 0;
+            ActiveSubjugationSession clash = SubjugationService.getActiveSession(player.getUUID());
+            boolean clashActive = clash != null;
+            float clashProgress = clash != null ? clash.getDominanceRatio() : 0.0F;
+            boolean clashRevolt = clash != null && clash.isInRevoltWindow();
+            String clashTarget = clash != null ? clash.getTargetName() : "";
+            ModNetworking.sendToPlayer(
+                    new SyncEnergyS2CPacket(
+                            playerData.getCultivation().getCurrentQi(),
+                            playerData.getCultivation().getMaxQiCapacity(),
+                            playerData.getCultivation().isManaInfusionActive(),
+                            playerData.getSkills().getUniqueSkillCooldownTicks(),
+                            playerData.getSkills().getCurrentDivineResistance(),
+                            playerData.getSkills().getMaxDivineResistance(),
+                            playerData.getSkills().getDivineOverloadTicks(),
+                            playerData.getCultivation().getCurrentSpiritualIntegrity(),
+                            playerData.getCultivation().getMaxSpiritualIntegrity(),
+                            playerData.getCultivation().getSpiritShatterTicks(),
+                            playerData.getCultivation().getCurrentStamina(),
+                            playerData.getCultivation().getMaxStamina(),
+                            regenState,
+                            activeSlot,
+                            activeMartialCd,
+                            clashActive,
+                            clashProgress,
+                            clashRevolt,
+                            clashTarget,
+                            playerData.getSkills().getActiveDivinePhase()
+                    ),
+                    player
+            );
+        });
     }
 }

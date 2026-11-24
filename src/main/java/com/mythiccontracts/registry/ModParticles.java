@@ -35,6 +35,11 @@ public final class ModParticles {
 
     public static final RegistryObject<SimpleParticleType> DIVINE_FRACTURE_SPARK = registerSimple("divine_fracture_spark");
 
+    public static final RegistryObject<SimpleParticleType> SUBJUGATION_RUNE_RING = registerSimple("subjugation_rune_ring");
+    public static final RegistryObject<SimpleParticleType> SUBJUGATION_CHAIN_LINK = registerSimple("subjugation_chain_link");
+    public static final RegistryObject<SimpleParticleType> SUBJUGATION_SIGIL = registerSimple("subjugation_sigil");
+    public static final RegistryObject<SimpleParticleType> QI_RIBBON_WISP = registerSimple("qi_ribbon_wisp");
+
     private ModParticles() {
     }
 

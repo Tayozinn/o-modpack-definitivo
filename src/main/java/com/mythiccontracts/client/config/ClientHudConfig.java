@@ -40,6 +40,8 @@ public final class ClientHudConfig {
     public static final boolean DEFAULT_ENABLE_SMOOTH_ANIMATIONS = true;
     public static final boolean DEFAULT_RENDER_3D_PLAYER_IN_GUI = true;
     public static final VisualQualityPreset DEFAULT_VISUAL_QUALITY_PRESET = VisualQualityPreset.MEDIUM;
+    public static final boolean DEFAULT_ENABLE_CUSTOM_SOUNDS = true;
+    public static final float DEFAULT_SKILL_SOUND_VOLUME = 0.85F;
 
     public static final ForgeConfigSpec SPEC;
 
@@ -68,6 +70,8 @@ public final class ClientHudConfig {
     private static final ForgeConfigSpec.BooleanValue ENABLE_SMOOTH_ANIMATIONS_VAL;
     private static final ForgeConfigSpec.BooleanValue RENDER_3D_PLAYER_IN_GUI_VAL;
     private static final ForgeConfigSpec.EnumValue<VisualQualityPreset> VISUAL_QUALITY_PRESET_VAL;
+    private static final ForgeConfigSpec.BooleanValue ENABLE_CUSTOM_SOUNDS_VAL;
+    private static final ForgeConfigSpec.DoubleValue SKILL_SOUND_VOLUME_VAL;
 
     // Cache em memória (leitura O(1) por frame sem acessar NightConfig)
     public static volatile boolean mainHudEnabled = DEFAULT_MAIN_HUD_ENABLED;
@@ -95,6 +99,8 @@ public final class ClientHudConfig {
     public static volatile boolean enableSmoothAnimations = DEFAULT_ENABLE_SMOOTH_ANIMATIONS;
     public static volatile boolean render3DPlayerInGui = DEFAULT_RENDER_3D_PLAYER_IN_GUI;
     public static volatile VisualQualityPreset visualQualityPreset = DEFAULT_VISUAL_QUALITY_PRESET;
+    public static volatile boolean enableCustomSounds = DEFAULT_ENABLE_CUSTOM_SOUNDS;
+    public static volatile float skillSoundVolume = DEFAULT_SKILL_SOUND_VOLUME;
 
     static {
         ForgeConfigSpec.Builder builder = new ForgeConfigSpec.Builder();
@@ -178,6 +184,12 @@ public final class ClientHudConfig {
         VISUAL_QUALITY_PRESET_VAL = builder
                 .comment("Preset de qualidade visual para efeitos (LOW, MEDIUM, HIGH).")
                 .defineEnum("visualQualityPreset", DEFAULT_VISUAL_QUALITY_PRESET);
+        ENABLE_CUSTOM_SOUNDS_VAL = builder
+                .comment("Ativa efeitos sonoros autorais das habilidades, subjugação e integridade espiritual.")
+                .define("enableCustomSounds", DEFAULT_ENABLE_CUSTOM_SOUNDS);
+        SKILL_SOUND_VOLUME_VAL = builder
+                .comment("Multiplicador de volume para efeitos sonoros das habilidades (0.0 a 1.5).")
+                .defineInRange("skillSoundVolume", (double) DEFAULT_SKILL_SOUND_VOLUME, 0.0D, 1.5D);
         builder.pop();
 
         SPEC = builder.build();
@@ -229,6 +241,8 @@ public final class ClientHudConfig {
         enableSmoothAnimations = ENABLE_SMOOTH_ANIMATIONS_VAL.get();
         render3DPlayerInGui = RENDER_3D_PLAYER_IN_GUI_VAL.get();
         visualQualityPreset = VISUAL_QUALITY_PRESET_VAL.get();
+        enableCustomSounds = ENABLE_CUSTOM_SOUNDS_VAL.get();
+        skillSoundVolume = Mth.clamp(SKILL_SOUND_VOLUME_VAL.get().floatValue(), 0.0F, 1.5F);
     }
 
     public static void saveIfLoaded() {
@@ -263,6 +277,8 @@ public final class ClientHudConfig {
         enableSmoothAnimations = DEFAULT_ENABLE_SMOOTH_ANIMATIONS;
         render3DPlayerInGui = DEFAULT_RENDER_3D_PLAYER_IN_GUI;
         visualQualityPreset = DEFAULT_VISUAL_QUALITY_PRESET;
+        enableCustomSounds = DEFAULT_ENABLE_CUSTOM_SOUNDS;
+        skillSoundVolume = DEFAULT_SKILL_SOUND_VOLUME;
 
         if (SPEC.isLoaded()) {
             MAIN_HUD_ENABLED_VAL.set(DEFAULT_MAIN_HUD_ENABLED);
@@ -290,6 +306,8 @@ public final class ClientHudConfig {
             ENABLE_SMOOTH_ANIMATIONS_VAL.set(DEFAULT_ENABLE_SMOOTH_ANIMATIONS);
             RENDER_3D_PLAYER_IN_GUI_VAL.set(DEFAULT_RENDER_3D_PLAYER_IN_GUI);
             VISUAL_QUALITY_PRESET_VAL.set(DEFAULT_VISUAL_QUALITY_PRESET);
+            ENABLE_CUSTOM_SOUNDS_VAL.set(DEFAULT_ENABLE_CUSTOM_SOUNDS);
+            SKILL_SOUND_VOLUME_VAL.set((double) DEFAULT_SKILL_SOUND_VOLUME);
 
             SPEC.save();
         }
@@ -465,6 +483,21 @@ public final class ClientHudConfig {
         visualQualityPreset = safe;
         if (SPEC.isLoaded()) {
             VISUAL_QUALITY_PRESET_VAL.set(safe);
+        }
+    }
+
+    public static void setEnableCustomSounds(boolean value) {
+        enableCustomSounds = value;
+        if (SPEC.isLoaded()) {
+            ENABLE_CUSTOM_SOUNDS_VAL.set(value);
+        }
+    }
+
+    public static void setSkillSoundVolume(float value) {
+        float clamped = Mth.clamp(value, 0.0F, 1.5F);
+        skillSoundVolume = clamped;
+        if (SPEC.isLoaded()) {
+            SKILL_SOUND_VOLUME_VAL.set((double) clamped);
         }
     }
 }

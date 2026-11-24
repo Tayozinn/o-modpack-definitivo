@@ -89,7 +89,7 @@ public class HudConfigScreen extends Screen {
         switch (this.activeTab) {
             case 0 -> buildMainHudTab(leftX, rightX, contentY, colW, rowH, rowStep);
             case 1 -> buildDivineRingTab(leftX, rightX, contentY, colW, rowH, rowStep);
-            case 2 -> buildVisualTab(leftX, contentY, PANEL_WIDTH - 20, rowH, 22);
+            case 2 -> buildVisualTab(leftX, rightX, contentY, colW, PANEL_WIDTH - 20, rowH, rowStep);
             default -> buildMainHudTab(leftX, rightX, contentY, colW, rowH, rowStep);
         }
 
@@ -226,7 +226,7 @@ public class HudConfigScreen extends Screen {
         ));
     }
 
-    private void buildVisualTab(int leftX, int y0, int fullW, int h, int step) {
+    private void buildVisualTab(int leftX, int rightX, int y0, int colW, int fullW, int h, int step) {
         this.addRenderableWidget(CycleButton.onOffBuilder(ClientHudConfig.enableSmoothAnimations)
                 .create(leftX, y0, fullW, h, Component.translatable("config.mythic_contracts.visual.animations"),
                         (btn, val) -> ClientHudConfig.setEnableSmoothAnimations(val)));
@@ -240,6 +240,17 @@ public class HudConfigScreen extends Screen {
                 .withInitialValue(ClientHudConfig.visualQualityPreset)
                 .create(leftX, y0 + step * 2, fullW, h, Component.translatable("config.mythic_contracts.visual.quality"),
                         (btn, val) -> ClientHudConfig.setVisualQualityPreset(val)));
+
+        this.addRenderableWidget(CycleButton.onOffBuilder(ClientHudConfig.enableCustomSounds)
+                .create(leftX, y0 + step * 3, colW, h, Component.translatable("config.mythic_contracts.visual.custom_sounds"),
+                        (btn, val) -> ClientHudConfig.setEnableCustomSounds(val)));
+
+        this.addRenderableWidget(new PercentSlider(
+                rightX, y0 + step * 3, colW, h,
+                Component.translatable("config.mythic_contracts.visual.sound_volume"),
+                0.0F, 1.5F, ClientHudConfig.skillSoundVolume,
+                ClientHudConfig::setSkillSoundVolume
+        ));
     }
 
     @Override
@@ -275,10 +286,10 @@ public class HudConfigScreen extends Screen {
                 case MEDIUM -> "config.mythic_contracts.visual.desc_medium";
                 case HIGH -> "config.mythic_contracts.visual.desc_high";
             };
-            guiGraphics.fill(this.panelX + 10, this.panelY + 114, this.panelX + PANEL_WIDTH - 10, this.panelY + 150, 0x88131C2E);
-            guiGraphics.renderOutline(this.panelX + 10, this.panelY + 114, PANEL_WIDTH - 20, 36, 0xFF283548);
+            guiGraphics.fill(this.panelX + 10, this.panelY + 125, this.panelX + PANEL_WIDTH - 10, this.panelY + 161, 0x88131C2E);
+            guiGraphics.renderOutline(this.panelX + 10, this.panelY + 125, PANEL_WIDTH - 20, 36, 0xFF283548);
             guiGraphics.drawWordWrap(this.font, Component.translatable(key),
-                    this.panelX + 16, this.panelY + 122, PANEL_WIDTH - 32, 0xFFCBD5E1);
+                    this.panelX + 16, this.panelY + 133, PANEL_WIDTH - 32, 0xFFCBD5E1);
         }
 
         // Separador acima do rodapé
@@ -324,6 +335,12 @@ public class HudConfigScreen extends Screen {
                 snap.spiritStage(),
                 snap.spiritRealmName(),
                 snap.tier(),
+                dt,
+                ClientHudConfig.enableSmoothAnimations
+        );
+        this.previewAnimState.updateSpiritualState(
+                snap.spiritRegenState(),
+                snap.spiritualRatio(),
                 dt,
                 ClientHudConfig.enableSmoothAnimations
         );

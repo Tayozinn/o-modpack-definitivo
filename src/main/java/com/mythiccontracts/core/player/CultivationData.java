@@ -32,10 +32,22 @@ public class CultivationData {
     private float maxSpiritualIntegrity = DEFAULT_MAX_SPIRITUAL_INTEGRITY;
     private float currentSpiritualIntegrity = DEFAULT_MAX_SPIRITUAL_INTEGRITY;
     private int spiritShatterTicks = 0;
+    private int spiritCombatCooldownTicks = 0;
+    private int stillMeditationTicks = 0;
+    private int meditationBoostTicks = 0;
+    private int clientSpiritRegenStateOrdinal = 4;
 
     private float maxStamina = DEFAULT_MAX_STAMINA;
     private float currentStamina = DEFAULT_MAX_STAMINA;
     private int staminaRegenDelayTicks = 0;
+
+    // Timers ativos de Técnicas de Cultivo (tiqueados no servidor; resetam ao morrer)
+    private int jadeBoneGuardTicks = 0;
+    private int goldenCoreAegisTicks = 0;
+    private int bloodFurnaceTicks = 0;
+    private int spiritDomainTicks = 0;
+    private int undyingReversalTicks = 0;
+    private float transientSpiritRegenPctModifier = 0.0F;
 
     public ResourceLocation getBodyRealmId() {
         return this.bodyRealmId;
@@ -172,6 +184,98 @@ public class CultivationData {
         this.staminaRegenDelayTicks = Math.max(0, staminaRegenDelayTicks);
     }
 
+    public int getSpiritCombatCooldownTicks() {
+        return Math.max(0, this.spiritCombatCooldownTicks);
+    }
+
+    public void setSpiritCombatCooldownTicks(int spiritCombatCooldownTicks) {
+        this.spiritCombatCooldownTicks = Math.max(0, spiritCombatCooldownTicks);
+    }
+
+    public int getStillMeditationTicks() {
+        return Math.max(0, this.stillMeditationTicks);
+    }
+
+    public void setStillMeditationTicks(int stillMeditationTicks) {
+        this.stillMeditationTicks = Math.max(0, stillMeditationTicks);
+    }
+
+    public int getMeditationBoostTicks() {
+        return Math.max(0, this.meditationBoostTicks);
+    }
+
+    public void setMeditationBoostTicks(int meditationBoostTicks) {
+        this.meditationBoostTicks = Math.max(0, meditationBoostTicks);
+    }
+
+    public int getClientSpiritRegenStateOrdinal() {
+        return Mth.clamp(this.clientSpiritRegenStateOrdinal, 0, 4);
+    }
+
+    public void setClientSpiritRegenStateOrdinal(int clientSpiritRegenStateOrdinal) {
+        this.clientSpiritRegenStateOrdinal = Mth.clamp(clientSpiritRegenStateOrdinal, 0, 4);
+    }
+
+    public int getJadeBoneGuardTicks() {
+        return Math.max(0, this.jadeBoneGuardTicks);
+    }
+
+    public void setJadeBoneGuardTicks(int jadeBoneGuardTicks) {
+        this.jadeBoneGuardTicks = Math.max(0, jadeBoneGuardTicks);
+    }
+
+    public int getGoldenCoreAegisTicks() {
+        return Math.max(0, this.goldenCoreAegisTicks);
+    }
+
+    public void setGoldenCoreAegisTicks(int goldenCoreAegisTicks) {
+        this.goldenCoreAegisTicks = Math.max(0, goldenCoreAegisTicks);
+    }
+
+    public int getBloodFurnaceTicks() {
+        return Math.max(0, this.bloodFurnaceTicks);
+    }
+
+    public void setBloodFurnaceTicks(int bloodFurnaceTicks) {
+        this.bloodFurnaceTicks = Math.max(0, bloodFurnaceTicks);
+    }
+
+    public int getSpiritDomainTicks() {
+        return Math.max(0, this.spiritDomainTicks);
+    }
+
+    public void setSpiritDomainTicks(int spiritDomainTicks) {
+        this.spiritDomainTicks = Math.max(0, spiritDomainTicks);
+    }
+
+    public int getUndyingReversalTicks() {
+        return Math.max(0, this.undyingReversalTicks);
+    }
+
+    public void setUndyingReversalTicks(int undyingReversalTicks) {
+        this.undyingReversalTicks = Math.max(0, undyingReversalTicks);
+    }
+
+    public float getTransientSpiritRegenPctModifier() {
+        return Float.isFinite(this.transientSpiritRegenPctModifier)
+                ? Mth.clamp(this.transientSpiritRegenPctModifier, -0.75F, 1.0F)
+                : 0.0F;
+    }
+
+    public void setTransientSpiritRegenPctModifier(float modifier) {
+        this.transientSpiritRegenPctModifier = Float.isFinite(modifier)
+                ? Mth.clamp(modifier, -0.75F, 1.0F)
+                : 0.0F;
+    }
+
+    public void tickCombatBuffTimers() {
+        if (this.jadeBoneGuardTicks > 0) this.jadeBoneGuardTicks--;
+        if (this.goldenCoreAegisTicks > 0) this.goldenCoreAegisTicks--;
+        if (this.bloodFurnaceTicks > 0) this.bloodFurnaceTicks--;
+        if (this.spiritDomainTicks > 0) this.spiritDomainTicks--;
+        if (this.undyingReversalTicks > 0) this.undyingReversalTicks--;
+    }
+
     public void copyFrom(CultivationData other, boolean wasDeath) {
         if (other == null) {
             return;
@@ -191,7 +295,17 @@ public class CultivationData {
                 ? getMaxSpiritualIntegrity()
                 : Mth.clamp(other.currentSpiritualIntegrity, 0.0F, getMaxSpiritualIntegrity());
         this.spiritShatterTicks = wasDeath ? 0 : other.spiritShatterTicks;
+        this.spiritCombatCooldownTicks = wasDeath ? 0 : other.spiritCombatCooldownTicks;
+        this.stillMeditationTicks = wasDeath ? 0 : other.stillMeditationTicks;
+        this.meditationBoostTicks = wasDeath ? 0 : other.meditationBoostTicks;
+        this.clientSpiritRegenStateOrdinal = wasDeath ? 4 : other.clientSpiritRegenStateOrdinal;
         this.currentStamina = wasDeath ? getMaxStamina() : Mth.clamp(other.currentStamina, 0.0F, getMaxStamina());
         this.staminaRegenDelayTicks = wasDeath ? 0 : other.staminaRegenDelayTicks;
+        this.jadeBoneGuardTicks = wasDeath ? 0 : other.jadeBoneGuardTicks;
+        this.goldenCoreAegisTicks = wasDeath ? 0 : other.goldenCoreAegisTicks;
+        this.bloodFurnaceTicks = wasDeath ? 0 : other.bloodFurnaceTicks;
+        this.spiritDomainTicks = wasDeath ? 0 : other.spiritDomainTicks;
+        this.undyingReversalTicks = wasDeath ? 0 : other.undyingReversalTicks;
+        this.transientSpiritRegenPctModifier = wasDeath ? 0.0F : other.transientSpiritRegenPctModifier;
     }
 }

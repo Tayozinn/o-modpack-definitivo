@@ -62,6 +62,18 @@ public final class CultivationHudOverlay {
                     dtSeconds,
                     ClientHudConfig.enableSmoothAnimations
             );
+            anim.updateSpiritualState(
+                    snap.spiritRegenState(),
+                    snap.spiritualRatio(),
+                    dtSeconds,
+                    ClientHudConfig.enableSmoothAnimations
+            );
+            anim.updateClashState(
+                    snap.clashActive(),
+                    snap.clashProgress(),
+                    dtSeconds,
+                    ClientHudConfig.enableSmoothAnimations
+            );
 
             if (ClientHudConfig.mainHudEnabled && !mc.options.renderDebug) {
                 MainVitalHudWidget.render(guiGraphics, mc.font, snap, anim, screenWidth, screenHeight);

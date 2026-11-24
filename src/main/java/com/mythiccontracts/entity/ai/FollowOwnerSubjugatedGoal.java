@@ -1,6 +1,8 @@
 package com.mythiccontracts.entity.ai;
 
 import com.mythiccontracts.item.SubjugationSealItem;
+import com.mythiccontracts.subjugation.SubjugationService;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.goal.Goal;
@@ -35,6 +37,10 @@ public class FollowOwnerSubjugatedGoal extends Goal {
         return this.mob.level().getPlayerByUUID(ownerUUID);
     }
 
+    private boolean isGuardStance() {
+        return "GUARD".equals(this.mob.getPersistentData().getString(SubjugationService.TAG_SERVANT_STANCE));
+    }
+
     @Override
     public boolean canUse() {
         Player foundOwner = this.findOwner();
@@ -43,6 +49,21 @@ public class FollowOwnerSubjugatedGoal extends Goal {
         }
         if (this.mob.isLeashed()) {
             return false;
+        }
+        if (this.isGuardStance()) {
+            CompoundTag pTag = this.mob.getPersistentData();
+            double gx = pTag.getDouble(SubjugationService.TAG_GUARD_X);
+            double gy = pTag.getDouble(SubjugationService.TAG_GUARD_Y);
+            double gz = pTag.getDouble(SubjugationService.TAG_GUARD_Z);
+            if (this.mob.distanceToSqr(gx, gy, gz) <= 16.0D) {
+                return false;
+            }
+            LivingEntity currentTarget = this.mob.getTarget();
+            if (currentTarget != null && currentTarget.isAlive() && this.mob.distanceToSqr(currentTarget) < 144.0D) {
+                return false;
+            }
+            this.owner = foundOwner;
+            return true;
         }
         double distSqr = this.mob.distanceToSqr(foundOwner);
         if (distSqr <= (double) (this.startDistance * this.startDistance)) {
@@ -62,6 +83,13 @@ public class FollowOwnerSubjugatedGoal extends Goal {
     public boolean canContinueToUse() {
         if (this.owner == null || !this.owner.isAlive() || this.owner.isSpectator()) {
             return false;
+        }
+        if (this.isGuardStance()) {
+            CompoundTag pTag = this.mob.getPersistentData();
+            double gx = pTag.getDouble(SubjugationService.TAG_GUARD_X);
+            double gy = pTag.getDouble(SubjugationService.TAG_GUARD_Y);
+            double gz = pTag.getDouble(SubjugationService.TAG_GUARD_Z);
+            return this.mob.distanceToSqr(gx, gy, gz) > 9.0D && !this.mob.getNavigation().isDone();
         }
         double distSqr = this.mob.distanceToSqr(this.owner);
         if (distSqr <= (double) (this.stopDistance * this.stopDistance)) {
@@ -90,6 +118,19 @@ public class FollowOwnerSubjugatedGoal extends Goal {
     @Override
     public void tick() {
         if (this.owner == null) {
+            return;
+        }
+        if (this.isGuardStance()) {
+            if (--this.timeToRecalcPath <= 0) {
+                this.timeToRecalcPath = this.adjustedTickDelay(10);
+                CompoundTag pTag = this.mob.getPersistentData();
+                this.mob.getNavigation().moveTo(
+                        pTag.getDouble(SubjugationService.TAG_GUARD_X),
+                        pTag.getDouble(SubjugationService.TAG_GUARD_Y),
+                        pTag.getDouble(SubjugationService.TAG_GUARD_Z),
+                        this.speedModifier
+                );
+            }
             return;
         }
         this.mob.getLookControl().setLookAt(this.owner, 10.0F, (float) this.mob.getMaxHeadXRot());

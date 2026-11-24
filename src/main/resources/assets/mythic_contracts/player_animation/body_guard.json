@@ -1,0 +1,24 @@
+{
+  "format_version": "1.8.0",
+  "animations": {
+    "body_guard": {
+      "animation_length": 0.6,
+      "bones": {
+        "right_arm": {
+          "rotation": {
+            "0.0": { "vector": [0, 0, 0] },
+            "0.15": { "vector": [-68, -42, 22], "easing": "easeOutCubic" },
+            "0.6": { "vector": [0, 0, 0], "easing": "easeInOutSine" }
+          }
+        },
+        "left_arm": {
+          "rotation": {
+            "0.0": { "vector": [0, 0, 0] },
+            "0.15": { "vector": [-68, 42, -22], "easing": "easeOutCubic" },
+            "0.6": { "vector": [0, 0, 0], "easing": "easeInOutSine" }
+          }
+        }
+      }
+    }
+  }
+}

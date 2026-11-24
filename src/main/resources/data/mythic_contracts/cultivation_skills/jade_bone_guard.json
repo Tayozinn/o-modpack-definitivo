@@ -1,0 +1,24 @@
+{
+  "id": "mythic_contracts:jade_bone_guard",
+  "display_name": "Guarda de Osso & Ferro",
+  "path_type": "BODY",
+  "category": "DEFENSIVE",
+  "tier_realm": 2,
+  "hud_color": "#F59E0B",
+  "mechanic_summary": "Por 4s: +6 Armadura, +40% Resistência a Repulsão e redireciona 25% do dano físico para o Vigor.",
+  "qi_cost": 0.0,
+  "stamina_cost": 30.0,
+  "spiritual_integrity_cost": 0.0,
+  "cooldown_ticks": 280,
+  "usable_during_shatter": false,
+  "enabled": true,
+  "unlock_requirements": {
+    "min_body_realm": 2,
+    "min_body_stage": 1,
+    "min_spirit_realm": 1,
+    "min_spirit_stage": 1,
+    "prerequisite_skill": "mythic_contracts:gale_meridian_step",
+    "require_active_contract": false,
+    "qi_unlock_cost": 50.0
+  }
+}

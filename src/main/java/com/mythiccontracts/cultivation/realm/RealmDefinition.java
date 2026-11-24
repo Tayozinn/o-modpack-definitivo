@@ -19,13 +19,36 @@ public record RealmDefinition(
         float qiBase,
         float qiRegenBonus,
         float infusionDrainPerSecond,
-        float infusionDrainPerHit
+        float infusionDrainPerHit,
+        float spiritualRegenBase
 ) {
+    public RealmDefinition(
+            ResourceLocation id,
+            CultivationPath path,
+            int order,
+            String displayName,
+            List<RealmStageDefinition> stages,
+            RealmRequirements requirements,
+            float qiBase,
+            float qiRegenBonus,
+            float infusionDrainPerSecond,
+            float infusionDrainPerHit
+    ) {
+        this(
+                id, path, order, displayName, stages, requirements,
+                qiBase, qiRegenBonus, infusionDrainPerSecond, infusionDrainPerHit,
+                -1.0F
+        );
+    }
+
     public RealmDefinition {
         order = Math.max(1, order);
         displayName = (displayName != null && !displayName.isBlank()) ? displayName : id.getPath();
         stages = stages != null ? Collections.unmodifiableList(stages) : List.of();
         requirements = requirements != null ? requirements : RealmRequirements.NONE;
+        if (!Float.isFinite(spiritualRegenBase)) {
+            spiritualRegenBase = -1.0F;
+        }
     }
 
     public int getStageCount() {

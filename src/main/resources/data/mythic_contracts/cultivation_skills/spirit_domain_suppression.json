@@ -1,0 +1,26 @@
+{
+  "id": "mythic_contracts:spirit_domain_suppression",
+  "display_name": "Domínio de Pressão Espiritual",
+  "path_type": "SPIRIT",
+  "category": "SUPPORT",
+  "tier_realm": 5,
+  "hud_color": "#9333EA",
+  "mechanic_summary": "Aura de 8m por 8s que reduz ataque/velocidade de inimigos menores (-25%) e fortalece servos subjugados (+25%).",
+  "qi_cost": 60.0,
+  "stamina_cost": 0.0,
+  "spiritual_integrity_cost": 0.0,
+  "cooldown_ticks": 560,
+  "usable_during_shatter": false,
+  "enabled": true,
+  "unlock_requirements": {
+    "min_body_realm": 1,
+    "min_body_stage": 1,
+    "min_spirit_realm": 5,
+    "min_spirit_stage": 1,
+    "prerequisite_skill": "mythic_contracts:soul_subjugation",
+    "require_active_contract": true,
+    "min_subjugated_count": 1,
+    "contract_or_alternative": true,
+    "qi_unlock_cost": 150.0
+  }
+}

@@ -5,6 +5,7 @@
   "display_name": "Alma Nascente",
   "qi_base": 205.0,
   "qi_regen_bonus": 8.5,
+  "spiritual_regen_base": 11.32,
   "infusion_drain_per_second": 4.0,
   "infusion_drain_per_hit": 6.0,
   "requirements": {

@@ -5,6 +5,7 @@
   "display_name": "Divindade Suprema",
   "qi_base": 310.0,
   "qi_regen_bonus": 13.0,
+  "spiritual_regen_base": 22.78,
   "infusion_drain_per_second": 5.5,
   "infusion_drain_per_hit": 9.0,
   "requirements": {

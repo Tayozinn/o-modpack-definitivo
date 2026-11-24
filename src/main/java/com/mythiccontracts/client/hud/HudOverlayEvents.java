@@ -1,6 +1,7 @@
 package com.mythiccontracts.client.hud;
 
 import com.mythiccontracts.MythicContractsMod;
+import com.mythiccontracts.client.ClientRuntimeState;
 import com.mythiccontracts.client.CultivationHudOverlay;
 import com.mythiccontracts.client.config.ClientHudConfig;
 import net.minecraft.client.Minecraft;
@@ -43,5 +44,6 @@ public final class HudOverlayEvents {
     public static void onClientLogout(ClientPlayerNetworkEvent.LoggingOut event) {
         HudAnimationState.getInstance().reset();
         CultivationHudOverlay.resetFrameClock();
+        ClientRuntimeState.reset();
     }
 }

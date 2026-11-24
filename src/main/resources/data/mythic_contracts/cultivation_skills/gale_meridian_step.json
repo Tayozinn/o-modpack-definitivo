@@ -1,0 +1,24 @@
+{
+  "id": "mythic_contracts:gale_meridian_step",
+  "display_name": "Passo do Meridiano Vendaval",
+  "path_type": "BODY",
+  "category": "MOBILITY",
+  "tier_realm": 1,
+  "hud_color": "#F87171",
+  "mechanic_summary": "Impulso tático veloz com redução de 50% de dano de queda e Velocidade I por 3s.",
+  "qi_cost": 0.0,
+  "stamina_cost": 25.0,
+  "spiritual_integrity_cost": 0.0,
+  "cooldown_ticks": 100,
+  "usable_during_shatter": false,
+  "enabled": true,
+  "unlock_requirements": {
+    "min_body_realm": 1,
+    "min_body_stage": 2,
+    "min_spirit_realm": 1,
+    "min_spirit_stage": 1,
+    "prerequisite_skill": null,
+    "require_active_contract": false,
+    "qi_unlock_cost": 30.0
+  }
+}

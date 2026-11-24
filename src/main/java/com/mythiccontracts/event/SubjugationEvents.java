@@ -7,7 +7,9 @@ import com.mythiccontracts.entity.ai.FollowOwnerSubjugatedGoal;
 import com.mythiccontracts.entity.ai.OwnerHurtByTargetSubjugatedGoal;
 import com.mythiccontracts.entity.ai.OwnerHurtTargetSubjugatedGoal;
 import com.mythiccontracts.item.SubjugationSealItem;
+import com.mythiccontracts.subjugation.SubjugationService;
 import com.mythiccontracts.util.ModTags;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
@@ -15,12 +17,15 @@ import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.ai.goal.AvoidEntityGoal;
 import net.minecraft.world.entity.ai.memory.MemoryModuleType;
 import net.minecraft.world.entity.boss.wither.WitherBoss;
+import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.monster.warden.Warden;
 import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.event.entity.EntityJoinLevelEvent;
 import net.minecraftforge.event.entity.living.LivingAttackEvent;
 import net.minecraftforge.event.entity.living.LivingChangeTargetEvent;
+import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.living.LivingEvent;
+import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
@@ -111,6 +116,37 @@ public final class SubjugationEvents {
         }
     }
 
+    @SubscribeEvent
+    public static void onServantHurtTarget(LivingHurtEvent event) {
+        if (event.getEntity().level().isClientSide()) {
+            return;
+        }
+        Entity attacker = event.getSource().getEntity();
+        UUID ownerUuid = SubjugationSealItem.getOwnerUUID(attacker);
+        if (ownerUuid == null || event.getAmount() <= 0.0F) {
+            return;
+        }
+        int grade = attacker.getPersistentData().getInt(SubjugationService.TAG_SERVANT_GRADE);
+        if (grade >= 4 && event.getEntity().level() instanceof ServerLevel serverLevel) {
+            Player owner = serverLevel.getPlayerByUUID(ownerUuid);
+            if (owner != null) {
+                boolean infusion = ModCapabilities.get(owner).map(d -> d.isManaInfusionActive()).orElse(false);
+                if (infusion) {
+                    event.setAmount(event.getAmount() * 1.20F);
+                }
+            }
+        }
+    }
+
+    @SubscribeEvent
+    public static void onServantDeath(LivingDeathEvent event) {
+        if (!event.getEntity().level().isClientSide()
+                && event.getEntity().level() instanceof ServerLevel serverLevel
+                && SubjugationSealItem.isSubjugated(event.getEntity())) {
+            SubjugationService.onWorldServantDied(serverLevel, event.getEntity());
+        }
+    }
+
     private static boolean isFriendlyFire(Entity attacker, LivingEntity victim) {
         if (attacker == null || victim == null) {
             return false;
@@ -143,6 +179,28 @@ public final class SubjugationEvents {
         }
 
         Player owner = mob.level().getPlayerByUUID(ownerUUID);
+
+        // Grau III+: regeneração passiva fora de combate
+        int grade = mob.getPersistentData().getInt(SubjugationService.TAG_SERVANT_GRADE);
+        if (grade >= 3 && mob.tickCount % 40 == 0 && mob.getTarget() == null && mob.getHealth() < mob.getMaxHealth()) {
+            mob.heal(1.5F);
+        }
+
+        // Postura Agressiva: adquire hostis próximos ao mestre/servo
+        if (owner != null && mob.tickCount % 15 == 0
+                && mob.getTarget() == null
+                && "AGGRESSIVE".equals(mob.getPersistentData().getString(SubjugationService.TAG_SERVANT_STANCE))) {
+            Monster nearbyHostile = mob.level().getEntitiesOfClass(
+                            Monster.class,
+                            mob.getBoundingBox().inflate(12.0D),
+                            m -> m.isAlive() && !SubjugationSealItem.isAlliedWithOwner(m, ownerUUID))
+                    .stream()
+                    .findFirst()
+                    .orElse(null);
+            if (nearbyHostile != null) {
+                mob.setTarget(nearbyHostile);
+            }
+        }
 
         if (mob instanceof Warden warden) {
             if (owner != null) {

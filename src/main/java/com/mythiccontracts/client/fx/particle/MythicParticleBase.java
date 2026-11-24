@@ -11,9 +11,17 @@ import net.minecraft.util.Mth;
 
 /**
  * Classe base configurável de partícula customizada via {@link TextureSheetParticle}.
- * Funciona 100% com o pipeline padrão Minecraft 1.20.1 / Embeddium 0.3.31 (zero shaders).
+ * Suporta modos paramétricos de movimento fluido ({@link MotionMode}) sem alocação por tick
+ * e permanece 100% compatível com o pipeline padrão Minecraft 1.20.1 / Embeddium 0.3.31.
  */
 public class MythicParticleBase extends TextureSheetParticle {
+
+    public enum MotionMode {
+        LINEAR,
+        ORBIT_SPIRAL,
+        BEZIER_FOLLOW,
+        RADIAL_EASE_OUT
+    }
 
     private final SpriteSet sprites;
 
@@ -25,6 +33,23 @@ public class MythicParticleBase extends TextureSheetParticle {
     private float swayFrequency = 0.35F;
     private float swayPhase = 0.0F;
     private boolean fullbright = true;
+
+    private MotionMode motionMode = MotionMode.LINEAR;
+    private double anchorX;
+    private double anchorY;
+    private double anchorZ;
+    private double ctrlX;
+    private double ctrlY;
+    private double ctrlZ;
+    private double targetX;
+    private double targetY;
+    private double targetZ;
+    private double orbitStartRadius;
+    private double orbitEndRadius;
+    private double orbitAngle;
+    private double orbitAngularSpeed;
+    private double orbitVerticalSpeed;
+    private float easePower = 2.0F;
 
     public MythicParticleBase(
             ClientLevel level,
@@ -76,7 +101,74 @@ public class MythicParticleBase extends TextureSheetParticle {
         this.bCol = Mth.clamp(b, 0.0F, 1.0F);
         this.startAlpha = Mth.clamp(startAlpha, 0.05F, 1.0F);
         this.alpha = this.startAlpha;
+        this.motionMode = MotionMode.LINEAR;
         this.setSpriteFromAge(this.sprites);
+        return this;
+    }
+
+    public MythicParticleBase configureOrbitSpiral(
+            double centerX,
+            double centerY,
+            double centerZ,
+            double startRadius,
+            double endRadius,
+            double startAngleRad,
+            double angularSpeedRad,
+            double verticalSpeedPerTick
+    ) {
+        this.motionMode = MotionMode.ORBIT_SPIRAL;
+        this.anchorX = centerX;
+        this.anchorY = centerY;
+        this.anchorZ = centerZ;
+        this.orbitStartRadius = startRadius;
+        this.orbitEndRadius = endRadius;
+        this.orbitAngle = startAngleRad;
+        this.orbitAngularSpeed = angularSpeedRad;
+        this.orbitVerticalSpeed = verticalSpeedPerTick;
+        return this;
+    }
+
+    public MythicParticleBase configureBezierFollow(
+            double startX,
+            double startY,
+            double startZ,
+            double controlX,
+            double controlY,
+            double controlZ,
+            double destX,
+            double destY,
+            double destZ
+    ) {
+        this.motionMode = MotionMode.BEZIER_FOLLOW;
+        this.anchorX = startX;
+        this.anchorY = startY;
+        this.anchorZ = startZ;
+        this.ctrlX = controlX;
+        this.ctrlY = controlY;
+        this.ctrlZ = controlZ;
+        this.targetX = destX;
+        this.targetY = destY;
+        this.targetZ = destZ;
+        return this;
+    }
+
+    public MythicParticleBase configureRadialEaseOut(
+            double originX,
+            double originY,
+            double originZ,
+            double destX,
+            double destY,
+            double destZ,
+            float easeExponent
+    ) {
+        this.motionMode = MotionMode.RADIAL_EASE_OUT;
+        this.anchorX = originX;
+        this.anchorY = originY;
+        this.anchorZ = originZ;
+        this.targetX = destX;
+        this.targetY = destY;
+        this.targetZ = destZ;
+        this.easePower = Mth.clamp(easeExponent, 1.1F, 4.0F);
         return this;
     }
 
@@ -105,19 +197,49 @@ public class MythicParticleBase extends TextureSheetParticle {
         this.oRoll = this.roll;
         this.roll += this.spinSpeed;
 
-        if (this.swayAmplitude > 0.0F) {
-            double sway = Math.cos(this.age * this.swayFrequency + this.swayPhase) * this.swayAmplitude;
-            this.xd += sway;
-            this.zd += Math.sin(this.age * this.swayFrequency + this.swayPhase) * this.swayAmplitude * 0.5D;
+        float progress = Mth.clamp((float) this.age / Math.max(1.0F, (float) this.lifetime), 0.0F, 1.0F);
+
+        switch (this.motionMode) {
+            case ORBIT_SPIRAL -> {
+                this.orbitAngle += this.orbitAngularSpeed;
+                double radius = Mth.lerp(progress, (float) this.orbitStartRadius, (float) this.orbitEndRadius);
+                double nx = this.anchorX + Math.cos(this.orbitAngle) * radius;
+                double ny = this.anchorY + this.orbitVerticalSpeed * this.age;
+                double nz = this.anchorZ + Math.sin(this.orbitAngle) * radius;
+                this.setPos(nx, ny, nz);
+            }
+            case BEZIER_FOLLOW -> {
+                double u = 1.0D - progress;
+                double uu = u * u;
+                double tt = progress * progress;
+                double twoUt = 2.0D * u * progress;
+                double nx = uu * this.anchorX + twoUt * this.ctrlX + tt * this.targetX;
+                double ny = uu * this.anchorY + twoUt * this.ctrlY + tt * this.targetY;
+                double nz = uu * this.anchorZ + twoUt * this.ctrlZ + tt * this.targetZ;
+                this.setPos(nx, ny, nz);
+            }
+            case RADIAL_EASE_OUT -> {
+                double inv = 1.0D - progress;
+                double eased = 1.0D - Math.pow(inv, this.easePower);
+                double nx = this.anchorX + (this.targetX - this.anchorX) * eased;
+                double ny = this.anchorY + (this.targetY - this.anchorY) * eased;
+                double nz = this.anchorZ + (this.targetZ - this.anchorZ) * eased;
+                this.setPos(nx, ny, nz);
+            }
+            case LINEAR -> {
+                if (this.swayAmplitude > 0.0F) {
+                    double sway = Math.cos(this.age * this.swayFrequency + this.swayPhase) * this.swayAmplitude;
+                    this.xd += sway;
+                    this.zd += Math.sin(this.age * this.swayFrequency + this.swayPhase) * this.swayAmplitude * 0.5D;
+                }
+                this.yd -= 0.04D * this.gravity;
+                this.move(this.xd, this.yd, this.zd);
+                this.xd *= this.friction;
+                this.yd *= this.friction;
+                this.zd *= this.friction;
+            }
         }
 
-        this.yd -= 0.04D * this.gravity;
-        this.move(this.xd, this.yd, this.zd);
-        this.xd *= this.friction;
-        this.yd *= this.friction;
-        this.zd *= this.friction;
-
-        float progress = Mth.clamp((float) this.age / Math.max(1.0F, (float) this.lifetime), 0.0F, 1.0F);
         this.quadSize = Mth.lerp(progress, this.startSize, this.endSize);
 
         float envelope;
@@ -153,7 +275,7 @@ public class MythicParticleBase extends TextureSheetParticle {
         private final int lifetime;
         private final float spin;
         private final float gravity;
-        private final float swayAmp;
+        private final float swayAmplitude;
         private final boolean fullbright;
 
         public Provider(
@@ -163,7 +285,7 @@ public class MythicParticleBase extends TextureSheetParticle {
                 int lifetime,
                 float spin,
                 float gravity,
-                float swayAmp,
+                float swayAmplitude,
                 boolean fullbright
         ) {
             this.sprites = sprites;
@@ -172,7 +294,7 @@ public class MythicParticleBase extends TextureSheetParticle {
             this.lifetime = lifetime;
             this.spin = spin;
             this.gravity = gravity;
-            this.swayAmp = swayAmp;
+            this.swayAmplitude = swayAmplitude;
             this.fullbright = fullbright;
         }
 
@@ -188,11 +310,21 @@ public class MythicParticleBase extends TextureSheetParticle {
                 double vz
         ) {
             MythicParticleBase particle = new MythicParticleBase(level, x, y, z, vx, vy, vz, this.sprites);
-            particle.configure(this.startSize, this.endSize, this.lifetime, vx, vy, vz,
-                    this.spin, this.gravity, 1.0F, 1.0F, 1.0F, 0.95F);
-            if (this.swayAmp > 0.0F) {
-                particle.setSway(this.swayAmp, 0.35F);
-            }
+            particle.configure(
+                    this.startSize,
+                    this.endSize,
+                    this.lifetime,
+                    vx,
+                    vy,
+                    vz,
+                    this.spin,
+                    this.gravity,
+                    1.0F,
+                    1.0F,
+                    1.0F,
+                    1.0F
+            );
+            particle.setSway(this.swayAmplitude, 0.35F);
             particle.setFullbright(this.fullbright);
             return particle;
         }

@@ -5,6 +5,7 @@ import net.minecraft.resources.ResourceLocation;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Armazena vínculos de entidades subjugadas e bônus de capacidade do jogador.
@@ -39,6 +40,48 @@ public class SubjugationData {
         if (entityType != null) {
             this.boundEntities.add(SubjugatedEntityRecord.createBasic(entityType));
         }
+    }
+
+    public SubjugatedEntityRecord findByInstanceId(UUID instanceId) {
+        if (instanceId == null) {
+            return null;
+        }
+        for (SubjugatedEntityRecord record : this.boundEntities) {
+            if (instanceId.equals(record.instanceId())) {
+                return record;
+            }
+        }
+        return null;
+    }
+
+    public boolean replaceRecord(SubjugatedEntityRecord updated) {
+        if (updated == null) {
+            return false;
+        }
+        for (int i = 0; i < this.boundEntities.size(); i++) {
+            if (updated.instanceId().equals(this.boundEntities.get(i).instanceId())) {
+                this.boundEntities.set(i, updated);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean removeByInstanceId(UUID instanceId) {
+        if (instanceId == null) {
+            return false;
+        }
+        return this.boundEntities.removeIf(rec -> instanceId.equals(rec.instanceId()));
+    }
+
+    public int countSummoned() {
+        int count = 0;
+        for (SubjugatedEntityRecord record : this.boundEntities) {
+            if (record.summoned()) {
+                count++;
+            }
+        }
+        return count;
     }
 
     public SubjugatedEntityRecord peekLastRecord() {

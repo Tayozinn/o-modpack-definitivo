@@ -5,28 +5,25 @@ import com.mythiccontracts.capability.ModCapabilities;
 import com.mythiccontracts.capability.PlayerCoreData;
 import com.mythiccontracts.faction.FactionRegistry;
 import com.mythiccontracts.network.ClientPacketHandler;
+import com.mythiccontracts.subjugation.SubjugationBalance;
+import com.mythiccontracts.subjugation.SubjugationService;
+import com.mythiccontracts.subjugation.SubjugationTier;
 import com.mythiccontracts.util.ModTags;
 import net.minecraft.ChatFormatting;
-import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.sounds.SoundEvents;
-import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -36,6 +33,13 @@ import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
 
+/**
+ * Selo de Subjugação (Opção 3 — Relíquia R1 & Catalisador Opcional de Chefes).
+ * Preserva ID, receita KubeJS e quests FTB 100% intactos:
+ * - No R1 (antes da habilidade {@code soul_subjugation}), sela diretamente como relíquia.
+ * - Com a habilidade desbloqueada, atua como Catalisador na Disputa Espiritual (-50% custo, +10% HP,
+ *   início em 65% de dominância e proteção contra Colapso Espiritual).
+ */
 public class SubjugationSealItem extends Item {
     public static final String TAG_SUBJUGATED_OWNER = "SubjugatedOwner";
     public static final String ENTITY_TAG_SUBJUGATED = "mc_subjugated";
@@ -80,7 +84,7 @@ public class SubjugationSealItem extends Item {
             return InteractionResult.FAIL;
         }
 
-        if (target.getPersistentData().hasUUID(TAG_SUBJUGATED_OWNER)) {
+        if (isSubjugated(target)) {
             if (!player.level().isClientSide()) {
                 player.displayClientMessage(Component.literal("§cEsta entidade já foi subjugada e possui um mestre."), true);
             }
@@ -96,77 +100,31 @@ public class SubjugationSealItem extends Item {
             return InteractionResult.FAIL;
         }
 
-        float threshold = FactionRegistry.getSubjugationThreshold(data.getFaction());
-        float maxHealth = Math.max(1.0F, target.getMaxHealth());
-        float healthRatio = target.getHealth() / maxHealth;
-
-        if (healthRatio > threshold) {
-            if (!player.level().isClientSide()) {
-                String currentPct = String.format(Locale.ROOT, "%.1f%%", healthRatio * 100.0F);
-                String requiredPct = String.format(Locale.ROOT, "%.0f%%", threshold * 100.0F);
-                Component msg = Component.literal(
-                        "§cA entidade resiste ao Selo! Vida atual: §e" + currentPct + " §c(Necessário: <= §6" + requiredPct + "§c)"
-                );
-                player.displayClientMessage(msg, true);
-                player.sendSystemMessage(msg);
+        if (player instanceof ServerPlayer serverPlayer) {
+            boolean hasSkill = data.getPlayerData().getSkills().hasSkillUnlocked(SubjugationService.SOUL_SUBJUGATION_ID);
+            if (hasSkill) {
+                boolean started = SubjugationService.tryStartClashWithTarget(serverPlayer, data, target, true);
+                return started ? InteractionResult.SUCCESS : InteractionResult.FAIL;
             }
-            return InteractionResult.FAIL;
-        }
 
-        if (player instanceof ServerPlayer serverPlayer && player.level() instanceof ServerLevel serverLevel) {
-            ResourceLocation entityId = ForgeRegistries.ENTITY_TYPES.getKey(target.getType());
-            if (entityId == null) {
+            // Modo Relíquia R1 (antes do desbloqueio da habilidade)
+            float threshold = SubjugationBalance.calculateEffectiveHpThreshold(data.getPlayerData(), SubjugationTier.BOSS, false);
+            float legacyThresh = FactionRegistry.getSubjugationThreshold(data.getFaction());
+            float finalThresh = Math.max(threshold, legacyThresh);
+            float healthRatio = target.getHealth() / Math.max(1.0F, target.getMaxHealth());
+            if (healthRatio > finalThresh) {
+                String currentPct = String.format(Locale.ROOT, "%.1f%%", healthRatio * 100.0F);
+                String requiredPct = String.format(Locale.ROOT, "%.0f%%", finalThresh * 100.0F);
+                player.displayClientMessage(Component.literal(
+                        "§cA entidade resiste ao Selo! Vida atual: §e" + currentPct + " §c(Necessário: <= §6" + requiredPct + "§c)"
+                ), true);
                 return InteractionResult.FAIL;
             }
-
-            data.addSubjugatedEntity(entityId);
-            String targetName = target.getType().getDescription().getString();
-
-            serverLevel.sendParticles(
-                    ParticleTypes.SOUL_FIRE_FLAME,
-                    target.getX(),
-                    target.getY() + target.getBbHeight() * 0.5D,
-                    target.getZ(),
-                    35,
-                    0.5D,
-                    0.5D,
-                    0.5D,
-                    0.05D
-            );
-            serverLevel.sendParticles(
-                    ParticleTypes.ENCHANT,
-                    target.getX(),
-                    target.getY() + target.getBbHeight() * 0.5D,
-                    target.getZ(),
-                    40,
-                    0.6D,
-                    0.6D,
-                    0.6D,
-                    0.15D
-            );
-            serverLevel.playSound(
-                    null,
-                    serverPlayer.blockPosition(),
-                    SoundEvents.END_PORTAL_FRAME_FILL,
-                    SoundSource.PLAYERS,
-                    1.0F,
-                    0.85F
-            );
-
-            target.discard();
-
-            if (!serverPlayer.getAbilities().instabuild) {
-                stack.shrink(1);
-            }
-
-            ModCapabilities.sync(serverPlayer);
-
-            serverPlayer.sendSystemMessage(
-                    Component.literal("§6[Selo de Subjugação] §e" + targetName + " §afoi subjugado e selado! Use §fShift + Clique Direito §apara invocá-lo.")
-            );
+            boolean captured = SubjugationService.tryLegacyRelicCapture(serverPlayer, data, target, stack);
+            return captured ? InteractionResult.SUCCESS : InteractionResult.FAIL;
         }
 
-        return InteractionResult.sidedSuccess(player.level().isClientSide());
+        return InteractionResult.SUCCESS;
     }
 
     @Override
@@ -176,97 +134,31 @@ public class SubjugationSealItem extends Item {
             return InteractionResultHolder.pass(stack);
         }
 
-        if (player instanceof ServerPlayer serverPlayer && level instanceof ServerLevel serverLevel) {
+        if (player instanceof ServerPlayer serverPlayer) {
             PlayerCoreData data = ModCapabilities.get(serverPlayer).orElse(null);
-            if (data == null || data.peekLastSubjugatedEntity() == null) {
+            if (data == null || data.getPlayerData().getSubjugation().getBoundEntities().isEmpty()) {
                 serverPlayer.displayClientMessage(
                         Component.literal("§cVocê não possui nenhuma entidade selada armazenada."),
                         true
                 );
                 return InteractionResultHolder.fail(stack);
             }
-
-            ResourceLocation entityId = data.popLastSubjugatedEntity();
-            EntityType<?> type = ForgeRegistries.ENTITY_TYPES.getValue(entityId);
-            if (type == null) {
-                ModCapabilities.sync(serverPlayer);
-                serverPlayer.sendSystemMessage(Component.literal("§cFalha ao localizar o tipo de entidade selada: " + entityId));
-                return InteractionResultHolder.fail(stack);
-            }
-
-            Entity created = type.create(serverLevel);
-            if (created == null) {
-                data.addSubjugatedEntity(entityId);
-                ModCapabilities.sync(serverPlayer);
-                return InteractionResultHolder.fail(stack);
-            }
-
-            Vec3 look = serverPlayer.getLookAngle();
-            Vec3 horizontal = new Vec3(look.x, 0.0D, look.z);
-            if (horizontal.lengthSqr() < 1.0E-4D) {
-                horizontal = new Vec3(0.0D, 0.0D, 1.0D);
-            } else {
-                horizontal = horizontal.normalize();
-            }
-
-            double spawnX = serverPlayer.getX() + horizontal.x * 2.5D;
-            double spawnY = serverPlayer.getY();
-            double spawnZ = serverPlayer.getZ() + horizontal.z * 2.5D;
-
-            created.moveTo(spawnX, spawnY, spawnZ, serverPlayer.getYRot(), 0.0F);
-            created.getPersistentData().putUUID(TAG_SUBJUGATED_OWNER, serverPlayer.getUUID());
-            created.addTag(ENTITY_TAG_SUBJUGATED);
-            created.setCustomName(Component.literal(
-                    "§6[Subjugado de " + serverPlayer.getName().getString() + "] " + created.getType().getDescription().getString()
-            ));
-            created.setCustomNameVisible(true);
-
-            if (created instanceof Mob mob) {
-                mob.setPersistenceRequired();
-                mob.setTarget(null);
-            }
-
-            serverLevel.addFreshEntity(created);
-
-            serverLevel.sendParticles(
-                    ParticleTypes.SOUL_FIRE_FLAME,
-                    spawnX,
-                    spawnY + 1.0D,
-                    spawnZ,
-                    40,
-                    0.6D,
-                    0.8D,
-                    0.6D,
-                    0.06D
-            );
-            serverLevel.playSound(
-                    null,
-                    serverPlayer.blockPosition(),
-                    SoundEvents.END_PORTAL_FRAME_FILL,
-                    SoundSource.PLAYERS,
-                    1.0F,
-                    1.2F
-            );
-
-            ModCapabilities.sync(serverPlayer);
-
-            serverPlayer.sendSystemMessage(
-                    Component.literal("§6[Selo de Subjugação] §aVocê invocou seu servo subjugado: §e" + created.getType().getDescription().getString() + "§a!")
-            );
+            boolean ok = SubjugationService.summonLastStoredServant(serverPlayer, data);
+            return ok ? InteractionResultHolder.success(stack) : InteractionResultHolder.fail(stack);
         }
 
-        return InteractionResultHolder.sidedSuccess(stack, level.isClientSide());
+        return InteractionResultHolder.pass(stack);
     }
 
     @Override
     public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag isAdvanced) {
-        tooltipComponents.add(Component.literal("Clique Direito em um Boss enfraquecido para selá-lo.")
+        tooltipComponents.add(Component.literal("Catalisador & Relíquia de Subjugação Espiritual.")
                 .withStyle(ChatFormatting.GRAY));
-        tooltipComponents.add(Component.literal("• Limite Padrão: <= 15% de Vida")
+        tooltipComponents.add(Component.literal("• R1 (Sem Habilidade): Sela alvos enfraquecidos.")
                 .withStyle(ChatFormatting.GOLD));
-        tooltipComponents.add(Component.literal("• Quebradores de Tronos: <= 25% de Vida")
-                .withStyle(ChatFormatting.RED));
-        tooltipComponents.add(Component.literal("Shift + Clique Direito para invocar a última entidade selada.")
+        tooltipComponents.add(Component.literal("• Catalisador (Com Habilidade): -50% custo, +10% limiar HP, 65% início e protege contra Colapso!")
+                .withStyle(ChatFormatting.LIGHT_PURPLE));
+        tooltipComponents.add(Component.literal("Shift + Clique Direito para invocar um servo selado.")
                 .withStyle(ChatFormatting.AQUA));
 
         if (level != null && level.isClientSide()) {
@@ -276,25 +168,10 @@ public class SubjugationSealItem extends Item {
             );
             if (clientData != null) {
                 FactionType activeFaction = clientData.getFaction();
-                float threshold = FactionRegistry.getSubjugationThreshold(activeFaction);
-                boolean boosted = threshold > 0.16F;
-                String activeThreshold = String.format(Locale.ROOT, "%.0f%% (%s)",
-                        threshold * 100.0F, activeFaction.getDisplayName());
-                tooltipComponents.add(Component.literal("• Seu Limite Ativo: <= " + activeThreshold)
-                        .withStyle(boosted ? ChatFormatting.LIGHT_PURPLE : ChatFormatting.YELLOW));
-
-                List<ResourceLocation> sealed = clientData.getSubjugatedEntities();
-                ResourceLocation lastEntityId = clientData.peekLastSubjugatedEntity();
-                if (sealed.isEmpty() || lastEntityId == null) {
-                    tooltipComponents.add(Component.literal("• Entidades Seladas: 0 (Nenhuma)")
-                            .withStyle(ChatFormatting.DARK_GRAY));
-                } else {
-                    EntityType<?> type = ForgeRegistries.ENTITY_TYPES.getValue(lastEntityId);
-                    String entityName = type != null ? type.getDescription().getString() : lastEntityId.toString();
-                    tooltipComponents.add(Component.literal("• Entidades Seladas: " + sealed.size()
-                                    + " (Próxima: " + entityName + ")")
-                            .withStyle(ChatFormatting.GREEN));
-                }
+                int cap = SubjugationBalance.calculateMaxBoundCapacity(clientData.getPlayerData());
+                int count = clientData.getSubjugationEntitiesCountSafe();
+                tooltipComponents.add(Component.literal("• Servos Vinculados: " + count + "/" + cap + " (" + activeFaction.getDisplayName() + ")")
+                        .withStyle(ChatFormatting.GREEN));
             }
         }
     }

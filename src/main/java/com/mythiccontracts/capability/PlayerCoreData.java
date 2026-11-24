@@ -130,6 +130,10 @@ public class PlayerCoreData {
         return this.playerData.getSubjugation().getBoundEntityTypes();
     }
 
+    public int getSubjugationEntitiesCountSafe() {
+        return this.playerData.getSubjugation().getBoundEntities().size();
+    }
+
     public void addSubjugatedEntity(ResourceLocation entityId) {
         this.playerData.getSubjugation().addEntityType(entityId);
     }

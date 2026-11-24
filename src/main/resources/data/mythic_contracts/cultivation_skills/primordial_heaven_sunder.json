@@ -1,0 +1,26 @@
+{
+  "id": "mythic_contracts:primordial_heaven_sunder",
+  "display_name": "Ruptura do Céu Primordial",
+  "path_type": "HYBRID",
+  "category": "SUPREME",
+  "tier_realm": 7,
+  "hud_color": "#FBBF24",
+  "mechanic_summary": "Golpe supremo em cone (10m) somando 2.5x poder Corporal + 2.5x poder Espiritual, perfurando 100% da Pressão de Reino.",
+  "qi_cost": 90.0,
+  "stamina_cost": 70.0,
+  "spiritual_integrity_cost": 35.0,
+  "cooldown_ticks": 1200,
+  "usable_during_shatter": false,
+  "enabled": true,
+  "unlock_requirements": {
+    "min_body_realm": 7,
+    "min_body_stage": 1,
+    "min_spirit_realm": 7,
+    "min_spirit_stage": 1,
+    "prerequisite_skill": "mythic_contracts:ether_flash_strike",
+    "require_active_contract": true,
+    "min_reputation": 50,
+    "contract_or_alternative": true,
+    "qi_unlock_cost": 240.0
+  }
+}

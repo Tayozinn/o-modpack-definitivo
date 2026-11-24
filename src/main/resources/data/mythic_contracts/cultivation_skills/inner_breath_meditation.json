@@ -1,0 +1,24 @@
+{
+  "id": "mythic_contracts:inner_breath_meditation",
+  "display_name": "Respiração do Lótus Interior",
+  "path_type": "SPIRIT",
+  "category": "SUPPORT",
+  "tier_realm": 1,
+  "hud_color": "#C084FC",
+  "mechanic_summary": "Ativa estado de Meditação instantâneo (+150% regen espiritual e Qi fora de combate por 6s) e limpa lentidão.",
+  "qi_cost": 0.0,
+  "stamina_cost": 0.0,
+  "spiritual_integrity_cost": 0.0,
+  "cooldown_ticks": 280,
+  "usable_during_shatter": false,
+  "enabled": true,
+  "unlock_requirements": {
+    "min_body_realm": 1,
+    "min_body_stage": 1,
+    "min_spirit_realm": 1,
+    "min_spirit_stage": 2,
+    "prerequisite_skill": null,
+    "require_active_contract": false,
+    "qi_unlock_cost": 30.0
+  }
+}

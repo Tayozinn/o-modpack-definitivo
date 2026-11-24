@@ -1,0 +1,16 @@
+{
+  "combat_cooldown_ticks": 100,
+  "combat_mult": 0.40,
+  "out_of_combat_mult": 1.00,
+  "meditation_mult": 2.20,
+  "meditation_still_ticks": 40,
+  "base_regen_r1": 3.10,
+  "linear_realm_scale": 2.20,
+  "quadratic_realm_scale": 0.18,
+  "stage_scale": 0.65,
+  "max_flat_bonus_ratio": 0.50,
+  "min_pct_mult": 0.25,
+  "max_pct_bonus_cap": 2.25,
+  "interrupt_on_combat_damage": true,
+  "enable_meditation_bonus": true
+}

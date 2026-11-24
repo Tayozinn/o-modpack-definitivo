@@ -122,6 +122,25 @@ public final class DivineResistanceRingWidget {
                         guiGraphics.fill(x0, rowY, x1, rowY + 1, activeCol));
             }
 
+            // 2B. 4 Arcos Externos Segmentados das Fases I–IV (Mockup 1)
+            int remnantCol = overloaded ? 0xFF991B1B : snap.equippedRemnant().getHudColor();
+            int unlockedPhases = Mth.clamp(snap.unlockedDivinePhases(), 1, 4);
+            int activePhase = Mth.clamp(snap.activeDivinePhase(), 0, unlockedPhases - 1);
+            for (int seg = 0; seg < DivineRingGeometry.SEGMENT_COUNT; seg++) {
+                int segColor;
+                if (seg >= unlockedPhases) {
+                    segColor = HudLayoutMath.withScaledAlpha(0x771E293B, opacity);
+                } else if (seg == activePhase) {
+                    int bright = pulseColor(remnantCol, 0xFFFFFFFF, 0.25F * pulse);
+                    segColor = HudLayoutMath.withScaledAlpha(bright, Math.min(1.0F, opacity + 0.12F));
+                } else {
+                    segColor = HudLayoutMath.withScaledAlpha(remnantCol, opacity * 0.42F);
+                }
+                final int finalSegCol = segColor;
+                DivineRingGeometry.forEachSegmentSpan(seg, (rowY, x0, x1) ->
+                        guiGraphics.fill(x0, rowY, x1, rowY + 1, finalSegCol));
+            }
+
             // 3. Ícone central 18x18 do Resquício Divino
             ResourceLocation emblemTex = getEmblemTexture(snap.equippedRemnant());
             if (overloaded) {
@@ -155,16 +174,16 @@ public final class DivineResistanceRingWidget {
             guiGraphics.renderOutline(keyPillX, keyPillY, keyPillW, 8, overloaded ? 0xFFEF4444 : 0xFF64748B);
             drawCenteredScaledString(guiGraphics, font, keyLabel, keyPillX + keyPillW * 0.5F, keyPillY + 1.5F, 0.60F, 0xFFF1F5F9, true);
 
-            // 6. Pill compacta do numeral da Camada [I-IV] na borda inferior central
-            String tierText = snap.tier().getNumeral();
-            int tierTextW = Math.round(font.width(tierText) * 0.62F);
-            int tierPillW = Math.max(10, tierTextW + 4);
+            // 6. Pill compacta da Fase selecionada + Camada desbloqueada (ex: H2·II) na borda inferior
+            String phaseBadge = "H" + (activePhase + 1) + "·" + snap.tier().getNumeral();
+            int tierTextW = Math.round(font.width(phaseBadge) * 0.56F);
+            int tierPillW = Math.max(14, tierTextW + 4);
             int tierPillX = (OUTER_DIAMETER - tierPillW) / 2;
             int tierPillY = 27;
             int tierColor = overloaded ? 0xFFEF4444 : snap.equippedRemnant().getHudColor();
             guiGraphics.fill(tierPillX, tierPillY, tierPillX + tierPillW, tierPillY + 8, HudLayoutMath.withScaledAlpha(0xE60B0F17, opacity));
             guiGraphics.renderOutline(tierPillX, tierPillY, tierPillW, 8, HudLayoutMath.withScaledAlpha(tierColor, 0.9F));
-            drawCenteredScaledString(guiGraphics, font, tierText, 17.0F, tierPillY + 1.5F, 0.62F, tierColor, true);
+            drawCenteredScaledString(guiGraphics, font, phaseBadge, 17.0F, tierPillY + 1.5F, 0.56F, tierColor, true);
 
             // 7. Leitura numérica compacta abaixo do anel (opcional)
             if (showNumbers) {

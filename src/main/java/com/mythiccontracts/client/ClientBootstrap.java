@@ -1,5 +1,6 @@
 package com.mythiccontracts.client;
 
+import com.mythiccontracts.client.fx.PlayerAnimBridge;
 import com.mythiccontracts.client.screen.HudConfigScreen;
 import net.minecraftforge.client.ConfigScreenHandler;
 import net.minecraftforge.fml.ModLoadingContext;
@@ -11,6 +12,10 @@ import net.minecraftforge.fml.ModLoadingContext;
 public final class ClientBootstrap {
 
     private ClientBootstrap() {
+    }
+
+    public static void initClient() {
+        PlayerAnimBridge.init();
     }
 
     public static void registerConfigScreen() {

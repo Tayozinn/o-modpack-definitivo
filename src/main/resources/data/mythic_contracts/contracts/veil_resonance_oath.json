@@ -1,6 +1,6 @@
 {
   "display_name": "Voto de Ressonância do Véu",
-  "description": "Harmoniza o fluxo espiritual: +2.0 Qi/s e +25 de Integridade Espiritual Máxima.",
+  "description": "Harmoniza o fluxo espiritual: +2.0 Qi/s, +25 de Integridade Espiritual Máxima e +10% (+0.8/s) de recuperação espiritual.",
   "allowed_factions": [
     "errantes_do_veu",
     "none"
@@ -16,5 +16,7 @@
   "reputation_reward": 15,
   "qi_regen_bonus": 2.0,
   "spiritual_integrity_bonus": 25.0,
+  "spiritual_regen_flat_bonus": 0.8,
+  "spiritual_regen_pct_bonus": 0.10,
   "taboo_summary": "Disponível aos Errantes do Véu ou Cultivadores Livres a partir do Espírito R2."
 }

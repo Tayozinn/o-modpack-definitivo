@@ -5,6 +5,7 @@
   "display_name": "Núcleo Dourado",
   "qi_base": 170.0,
   "qi_regen_bonus": 7.0,
+  "spiritual_regen_base": 8.22,
   "infusion_drain_per_second": 3.5,
   "infusion_drain_per_hit": 5.0,
   "requirements": {

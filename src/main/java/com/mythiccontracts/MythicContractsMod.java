@@ -7,6 +7,7 @@ import com.mythiccontracts.integration.ModCompatRegistry;
 import com.mythiccontracts.network.ModNetworking;
 import com.mythiccontracts.registry.ModItems;
 import com.mythiccontracts.registry.ModParticles;
+import com.mythiccontracts.registry.ModSounds;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -28,10 +29,14 @@ public class MythicContractsMod {
 
         ModItems.register(modEventBus);
         ModParticles.register(modEventBus);
+        ModSounds.register(modEventBus);
         modEventBus.addListener(this::commonSetup);
 
         ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, ClientHudConfig.SPEC);
-        DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> ClientBootstrap.registerConfigScreen());
+        DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> {
+            ClientBootstrap.registerConfigScreen();
+            ClientBootstrap.initClient();
+        });
 
         MinecraftForge.EVENT_BUS.register(this);
     }

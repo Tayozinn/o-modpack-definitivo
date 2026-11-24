@@ -9,8 +9,11 @@ import com.mythiccontracts.core.player.PlayerData;
 import com.mythiccontracts.core.player.SkillData;
 import com.mythiccontracts.core.player.SubjugatedEntityRecord;
 import com.mythiccontracts.event.ContractGameplayEvents;
+import com.mythiccontracts.network.ActivateCultivationSkillC2SPacket;
 import com.mythiccontracts.network.ActivateUniqueSkillC2SPacket;
 import com.mythiccontracts.network.CultivatorActionC2SPacket;
+import com.mythiccontracts.network.CycleDivinePhaseC2SPacket;
+import com.mythiccontracts.network.CycleMartialSlotC2SPacket;
 import com.mythiccontracts.network.SyncEnergyS2CPacket;
 import com.mythiccontracts.network.ToggleInfusionC2SPacket;
 import io.netty.buffer.Unpooled;
@@ -31,6 +34,9 @@ class MultiplayerSecurityAndHardeningTest {
         ToggleInfusionC2SPacket.clearAllRateLimits();
         CultivatorActionC2SPacket.clearAllRateLimits();
         ActivateUniqueSkillC2SPacket.clearAllRateLimits();
+        ActivateCultivationSkillC2SPacket.clearAllRateLimits();
+        CycleMartialSlotC2SPacket.clearAllRateLimits();
+        CycleDivinePhaseC2SPacket.clearAllRateLimits();
     }
 
     @Test
@@ -98,6 +104,14 @@ class MultiplayerSecurityAndHardeningTest {
         rawPoisonedBuf.writeVarInt(20);
         rawPoisonedBuf.writeFloat(Float.NEGATIVE_INFINITY);
         rawPoisonedBuf.writeFloat(Float.NaN);
+        rawPoisonedBuf.writeByte(99);
+        rawPoisonedBuf.writeVarInt(99);
+        rawPoisonedBuf.writeVarInt(-5);
+        rawPoisonedBuf.writeBoolean(true);
+        rawPoisonedBuf.writeFloat(Float.NaN);
+        rawPoisonedBuf.writeBoolean(true);
+        rawPoisonedBuf.writeUtf("CorruptedTargetName", 48);
+        rawPoisonedBuf.writeByte(99);
 
         SyncEnergyS2CPacket decoded = new SyncEnergyS2CPacket(rawPoisonedBuf);
         assertEquals(0, rawPoisonedBuf.readableBytes());
@@ -169,6 +183,30 @@ class MultiplayerSecurityAndHardeningTest {
 
         ActivateUniqueSkillC2SPacket.clearRateLimit(playerA);
         assertTrue(ActivateUniqueSkillC2SPacket.tryAcquireRateLimit(playerA, 306L));
+
+        // ActivateCultivationSkillC2SPacket (5 ticks)
+        assertTrue(ActivateCultivationSkillC2SPacket.tryAcquireRateLimit(playerA, 400L));
+        assertFalse(ActivateCultivationSkillC2SPacket.tryAcquireRateLimit(playerA, 403L));
+        assertTrue(ActivateCultivationSkillC2SPacket.tryAcquireRateLimit(playerB, 403L));
+        assertTrue(ActivateCultivationSkillC2SPacket.tryAcquireRateLimit(playerA, 405L));
+        ActivateCultivationSkillC2SPacket.clearRateLimit(playerA);
+        assertTrue(ActivateCultivationSkillC2SPacket.tryAcquireRateLimit(playerA, 405L));
+
+        // CycleMartialSlotC2SPacket (5 ticks)
+        assertTrue(CycleMartialSlotC2SPacket.tryAcquireRateLimit(playerA, 500L));
+        assertFalse(CycleMartialSlotC2SPacket.tryAcquireRateLimit(playerA, 502L));
+        assertTrue(CycleMartialSlotC2SPacket.tryAcquireRateLimit(playerB, 502L));
+        assertTrue(CycleMartialSlotC2SPacket.tryAcquireRateLimit(playerA, 505L));
+        CycleMartialSlotC2SPacket.clearRateLimit(playerA);
+        assertTrue(CycleMartialSlotC2SPacket.tryAcquireRateLimit(playerA, 505L));
+
+        // CycleDivinePhaseC2SPacket (4 ticks)
+        assertTrue(CycleDivinePhaseC2SPacket.tryAcquireRateLimit(playerA, 600L));
+        assertFalse(CycleDivinePhaseC2SPacket.tryAcquireRateLimit(playerA, 602L));
+        assertTrue(CycleDivinePhaseC2SPacket.tryAcquireRateLimit(playerB, 602L));
+        assertTrue(CycleDivinePhaseC2SPacket.tryAcquireRateLimit(playerA, 604L));
+        CycleDivinePhaseC2SPacket.clearRateLimit(playerA);
+        assertTrue(CycleDivinePhaseC2SPacket.tryAcquireRateLimit(playerA, 604L));
     }
 
     @Test

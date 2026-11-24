@@ -14,6 +14,7 @@ import com.mythiccontracts.client.hud.HudRenderSnapshot;
 import com.mythiccontracts.contract.ContractDefinition;
 import com.mythiccontracts.contract.ContractManager;
 import com.mythiccontracts.core.player.PlayerData;
+import com.mythiccontracts.core.player.SkillData;
 import com.mythiccontracts.core.player.SubjugatedEntityRecord;
 import com.mythiccontracts.core.service.SpiritualIntegrityService;
 import com.mythiccontracts.core.service.VitalService;
@@ -29,9 +30,20 @@ import com.mythiccontracts.cultivation.realm.RealmStageDefinition;
 import com.mythiccontracts.network.CultivatorActionC2SPacket;
 import com.mythiccontracts.network.ModNetworking;
 import com.mythiccontracts.registry.ModItems;
+import com.mythiccontracts.skill.cultivation.CultivationSkillCategory;
+import com.mythiccontracts.skill.cultivation.CultivationSkillDefinition;
+import com.mythiccontracts.skill.cultivation.CultivationSkillRegistry;
+import com.mythiccontracts.skill.cultivation.CultivationSkillService;
+import com.mythiccontracts.skill.cultivation.SkillPathType;
+import com.mythiccontracts.skill.cultivation.SkillUnlockRequirements;
+import com.mythiccontracts.skill.definition.DivineSkillDefinition;
+import com.mythiccontracts.skill.definition.DivineSkillRegistry;
+import com.mythiccontracts.skill.remnant.DivinePhaseAbility;
 import com.mythiccontracts.skill.remnant.DivineRemnant;
 import com.mythiccontracts.skill.remnant.DivineResonanceBalance;
 import com.mythiccontracts.skill.remnant.DivineResonanceBalance.ManifestationTier;
+import com.mythiccontracts.subjugation.SubjugationBalance;
+import com.mythiccontracts.subjugation.SubjugationService;
 import net.minecraft.Util;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractButton;
@@ -53,9 +65,11 @@ import net.minecraftforge.registries.ForgeRegistries;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -86,10 +100,35 @@ public class CultivatorScreen extends Screen {
     private static final ResourceLocation EMBLEM_TEZCATLIPOCA =
             new ResourceLocation(MythicContractsMod.MOD_ID, "textures/gui/remnant_tezcatlipoca_step.png");
 
+    private enum SkillFilterPill {
+        ALL("Todos"),
+        REMNANTS("Resquícios"),
+        BODY("Corpo"),
+        SPIRIT("Espírito"),
+        SUBJUGATION("Subjugação");
+
+        final String label;
+
+        SkillFilterPill(String label) {
+            this.label = label;
+        }
+    }
+
+    private record SkillListEntry(
+            ResourceLocation id,
+            boolean isDivineRemnant,
+            @Nullable DivineRemnant remnant,
+            @Nullable CultivationSkillDefinition tech
+    ) {
+    }
+
     private CultivatorTab activeTab = CultivatorTab.OVERVIEW;
     private boolean show3DModel = false;
     private int contractScrollOffset = 0;
     private int sealScrollOffset = 0;
+    private int skillScrollOffset = 0;
+    private SkillFilterPill activeSkillFilter = SkillFilterPill.ALL;
+    private ResourceLocation selectedSkillId = DivineRemnant.EYE_OF_RA.getId();
 
     private int panelX;
     private int panelY;
@@ -103,7 +142,9 @@ public class CultivatorScreen extends Screen {
     private Button progressActionBtn;
     @Nullable
     private Button toggleInfusionBtn;
-    private final Button[] equipRemnantBtns = new Button[DivineRemnant.values().length];
+    @Nullable
+    private Button detailPrimaryActionBtn;
+    private final Button[] equipSlotBtns = new Button[SkillData.MAX_MARTIAL_SLOTS];
 
     public CultivatorScreen() {
         super(Component.translatable("screen.mythic_contracts.cultivator.title"));
@@ -119,9 +160,10 @@ public class CultivatorScreen extends Screen {
         this.toggleViewModeBtn = null;
         this.progressActionBtn = null;
         this.toggleInfusionBtn = null;
+        this.detailPrimaryActionBtn = null;
         this.actionModeBreakthrough = false;
-        for (int i = 0; i < this.equipRemnantBtns.length; i++) {
-            this.equipRemnantBtns[i] = null;
+        for (int i = 0; i < this.equipSlotBtns.length; i++) {
+            this.equipSlotBtns[i] = null;
         }
 
         // Botões do cabeçalho superior direito: [⚙ HUD] e [X]
@@ -178,27 +220,32 @@ public class CultivatorScreen extends Screen {
             }
             case SKILLS -> {
                 this.toggleInfusionBtn = Button.builder(
-                                Component.translatable("screen.mythic_contracts.cultivator.action.toggle_infusion"),
+                                Component.literal("Infusão [V]"),
                                 b -> ModNetworking.sendToServer(new CultivatorActionC2SPacket(CultivatorActionC2SPacket.Action.TOGGLE_INFUSION)))
-                        .bounds(contentX + 252, contentY + 11, 96, 18)
+                        .bounds(contentX + 4, contentY + 4, 86, 15)
                         .build();
                 this.addRenderableWidget(this.toggleInfusionBtn);
 
-                DivineRemnant[] remnants = DivineRemnant.values();
-                for (int i = 0; i < remnants.length; i++) {
-                    final DivineRemnant remnant = remnants[i];
-                    int col = i % 2;
-                    int row = i / 2;
-                    int cardX = contentX + 2 + col * 178;
-                    int cardY = contentY + 44 + row * 63;
-                    Button equipBtn = Button.builder(
-                                    Component.translatable("screen.mythic_contracts.cultivator.action.equip"),
+                this.detailPrimaryActionBtn = Button.builder(
+                                Component.literal("Equipar [G]"),
+                                b -> handleDetailPrimaryAction())
+                        .bounds(contentX + 164, contentY + 148, 184, 15)
+                        .build();
+                this.addRenderableWidget(this.detailPrimaryActionBtn);
+
+                for (int i = 0; i < SkillData.MAX_MARTIAL_SLOTS; i++) {
+                    final int slotIdx = i;
+                    Button slotBtn = Button.builder(
+                                    Component.literal("Slot S" + (i + 1)),
                                     b -> ModNetworking.sendToServer(new CultivatorActionC2SPacket(
-                                            CultivatorActionC2SPacket.Action.EQUIP_REMNANT, remnant.getId())))
-                            .bounds(cardX + 112, cardY + 43, 58, 13)
+                                            CultivatorActionC2SPacket.Action.EQUIP_MARTIAL_SKILL,
+                                            this.selectedSkillId,
+                                            slotIdx)))
+                            .bounds(contentX + 164 + i * 62, contentY + 148, 60, 15)
                             .build();
-                    this.equipRemnantBtns[i] = equipBtn;
-                    this.addRenderableWidget(equipBtn);
+                    slotBtn.visible = false;
+                    this.equipSlotBtns[i] = slotBtn;
+                    this.addRenderableWidget(slotBtn);
                 }
             }
             default -> {
@@ -227,6 +274,7 @@ public class CultivatorScreen extends Screen {
             this.activeTab = tab;
             this.contractScrollOffset = 0;
             this.sealScrollOffset = 0;
+            this.skillScrollOffset = 0;
             this.rebuildWidgets();
         }
     }
@@ -371,30 +419,13 @@ public class CultivatorScreen extends Screen {
 
         if (this.toggleInfusionBtn != null && this.activeTab == CultivatorTab.SKILLS) {
             boolean shattered = pData.getCultivation().isSpiritShattered();
-            String msg = snap.infusionActive()
-                    ? Component.translatable("screen.mythic_contracts.cultivator.action.disable_infusion").getString()
-                    : Component.translatable("screen.mythic_contracts.cultivator.action.enable_infusion").getString();
-            this.toggleInfusionBtn.setMessage(Component.literal(msg));
+            String state = snap.infusionActive() ? "ON" : "OFF";
+            this.toggleInfusionBtn.setMessage(Component.literal("[V] Infusão: " + state));
             this.toggleInfusionBtn.active = !shattered && (snap.infusionActive() || snap.currentQi() >= 5.0F);
         }
 
         if (this.activeTab == CultivatorTab.SKILLS) {
-            DivineRemnant[] remnants = DivineRemnant.values();
-            DivineRemnant equipped = UniqueSkillHandler.getEquippedRemnant(pData);
-            for (int i = 0; i < remnants.length; i++) {
-                Button btn = this.equipRemnantBtns[i];
-                if (btn == null) {
-                    continue;
-                }
-                DivineRemnant r = remnants[i];
-                if (r == equipped) {
-                    btn.setMessage(Component.translatable("screen.mythic_contracts.cultivator.action.equipped"));
-                    btn.active = false;
-                } else {
-                    btn.setMessage(Component.translatable("screen.mythic_contracts.cultivator.action.equip"));
-                    btn.active = CultivationActionService.validateEquipRemnant(pData, r).allowed();
-                }
-            }
+            updateSkillDetailControls(pData);
         }
     }
 
@@ -913,71 +944,381 @@ public class CultivatorScreen extends Screen {
     }
 
     // -------------------------------------------------------------------------
-    // ABA 4 — HABILIDADES & 4 RESQUÍCIOS DIVINOS
+    // ABA 4 — MASTER-DETAIL HABILIDADES (4 RESQUÍCIOS [G] + 12 TÉCNICAS S1–S3)
     // -------------------------------------------------------------------------
+    private List<SkillListEntry> getFilteredSkillEntries() {
+        List<SkillListEntry> list = new ArrayList<>();
+        if (this.activeSkillFilter == SkillFilterPill.ALL || this.activeSkillFilter == SkillFilterPill.REMNANTS) {
+            for (DivineRemnant rem : DivineRemnant.values()) {
+                list.add(new SkillListEntry(rem.getId(), true, rem, null));
+            }
+        }
+        if (this.activeSkillFilter != SkillFilterPill.REMNANTS) {
+            for (CultivationSkillDefinition def : CultivationSkillRegistry.getAllSkills()) {
+                boolean match = switch (this.activeSkillFilter) {
+                    case ALL -> true;
+                    case BODY -> def.pathType() == SkillPathType.BODY || def.pathType() == SkillPathType.HYBRID;
+                    case SPIRIT -> def.pathType() == SkillPathType.SPIRIT || def.pathType() == SkillPathType.HYBRID;
+                    case SUBJUGATION -> def.category() == CultivationSkillCategory.DOMAIN
+                            || SubjugationService.SOUL_SUBJUGATION_ID.equals(def.id());
+                    default -> false;
+                };
+                if (match) {
+                    list.add(new SkillListEntry(def.id(), false, null, def));
+                }
+            }
+        }
+        return list;
+    }
+
+    private void handleDetailPrimaryAction() {
+        if (this.minecraft == null || this.minecraft.player == null || this.selectedSkillId == null) {
+            return;
+        }
+        Optional<DivineRemnant> remOpt = DivineRemnant.parse(this.selectedSkillId.toString());
+        if (remOpt.isPresent()) {
+            ModNetworking.sendToServer(new CultivatorActionC2SPacket(
+                    CultivatorActionC2SPacket.Action.EQUIP_REMNANT, this.selectedSkillId));
+        } else {
+            ModNetworking.sendToServer(new CultivatorActionC2SPacket(
+                    CultivatorActionC2SPacket.Action.UNLOCK_SKILL, this.selectedSkillId));
+        }
+    }
+
+    private void updateSkillDetailControls(PlayerData pData) {
+        if (this.selectedSkillId == null) {
+            this.selectedSkillId = DivineRemnant.EYE_OF_RA.getId();
+        }
+        Optional<DivineRemnant> remOpt = DivineRemnant.parse(this.selectedSkillId.toString());
+        if (remOpt.isPresent()) {
+            DivineRemnant r = remOpt.get();
+            DivineRemnant equipped = UniqueSkillHandler.getEquippedRemnant(pData);
+            if (this.detailPrimaryActionBtn != null) {
+                this.detailPrimaryActionBtn.visible = true;
+                if (r == equipped) {
+                    this.detailPrimaryActionBtn.setMessage(Component.literal("✓ Equipado · Shift+G p/ Fases"));
+                    this.detailPrimaryActionBtn.active = false;
+                } else {
+                    this.detailPrimaryActionBtn.setMessage(Component.literal("Equipar no Slot [G]"));
+                    this.detailPrimaryActionBtn.active = CultivationActionService.validateEquipRemnant(pData, r).allowed();
+                }
+            }
+            for (Button btn : this.equipSlotBtns) {
+                if (btn != null) {
+                    btn.visible = false;
+                }
+            }
+            return;
+        }
+
+        CultivationSkillDefinition def = CultivationSkillRegistry.getSkill(this.selectedSkillId);
+        if (def == null) {
+            return;
+        }
+        boolean unlocked = pData.getSkills().hasSkillUnlocked(def.id());
+        if (!unlocked) {
+            if (this.detailPrimaryActionBtn != null) {
+                this.detailPrimaryActionBtn.visible = true;
+                float cost = def.requirements().qiUnlockCost();
+                String label = cost > 0.0F
+                        ? String.format(Locale.ROOT, "Desbloquear (%.0f Qi)", cost)
+                        : "Desbloquear Técnica";
+                this.detailPrimaryActionBtn.setMessage(Component.literal(label));
+                this.detailPrimaryActionBtn.active = CultivationSkillService.validateUnlock(pData, def).allowed();
+            }
+            for (Button btn : this.equipSlotBtns) {
+                if (btn != null) {
+                    btn.visible = false;
+                }
+            }
+        } else {
+            if (this.detailPrimaryActionBtn != null) {
+                this.detailPrimaryActionBtn.visible = false;
+            }
+            int unlockedSlots = CultivationSkillService.getUnlockedMartialSlotCount(pData);
+            for (int i = 0; i < this.equipSlotBtns.length; i++) {
+                Button slotBtn = this.equipSlotBtns[i];
+                if (slotBtn == null) {
+                    continue;
+                }
+                slotBtn.visible = true;
+                ResourceLocation inSlot = pData.getSkills().getMartialSkillInSlot(i);
+                boolean already = def.id().equals(inSlot);
+                if (i >= unlockedSlots) {
+                    slotBtn.setMessage(Component.literal("🔒 S" + (i + 1)));
+                    slotBtn.active = false;
+                } else if (already) {
+                    slotBtn.setMessage(Component.literal("✓ S" + (i + 1)));
+                    slotBtn.active = false;
+                } else {
+                    slotBtn.setMessage(Component.literal("Eq. S" + (i + 1)));
+                    slotBtn.active = pData.getSkills().getCooldown(def.id()) <= 0;
+                }
+            }
+        }
+    }
+
     private void renderSkillsTab(GuiGraphics g, int x, int y, PlayerData pData, HudRenderSnapshot snap) {
-        // Card Superior: Infusão de Mana / Qi [V]
-        drawCard(g, x + 2, y + 2, 352, 38, snap.infusionActive() ? 0xFF22D3EE : 0xFF475569);
-        String infStatus = snap.infusionActive() ? "ATIVA" : "DESLIGADA";
-        int statusCol = snap.infusionActive() ? 0xFF22D3EE : 0xFF94A3B8;
-        drawScaledString(g, "Infusão de Mana / Qi [V] · ", x + 8, y + 6, 0.80F, 0xFFF1F5F9, true);
-        drawScaledString(g, infStatus, x + 132, y + 6, 0.80F, statusCol, true);
+        // 1. Barra Superior de Slots Equipados (y+2 .. y+22)
+        drawCard(g, x + 2, y + 2, 352, 19, 0xFF334155);
+        SkillData skills = pData.getSkills();
+        int unlockedSlots = CultivationSkillService.getUnlockedMartialSlotCount(pData);
 
-        float infMult = CultivationBalance.calculateBodyInfusionMultiplier(pData);
-        float infFlat = CultivationBalance.calculateSpiritInfusionFlatBonus(pData);
-        float drainSec = CultivationBalance.calculateInfusionDrainPerSecond(snap.spiritRealm());
-        float drainHit = CultivationBalance.calculateInfusionDrainPerHit(pData);
-        drawScaledString(g, String.format(Locale.ROOT, "Bônus: +%.0f%% Dano + %.1f Plano · Dreno: %.1f Qi/s + %.1f/golpe",
-                infMult * 100.0F, infFlat, drainSec, drainHit), x + 8, y + 17, 0.68F, 0xFFCBD5E1, false);
-        drawScaledString(g, "Perfura a Pressão de Reino (-90%) contra Chefes de Alto Reino.",
-                x + 8, y + 27, 0.64F, 0xFF93C5FD, false);
+        DivineRemnant eqRemnant = UniqueSkillHandler.getEquippedRemnant(pData);
+        boolean remSelected = eqRemnant.getId().equals(this.selectedSkillId);
+        int remChipX = x + 94;
+        g.fill(remChipX, y + 4, remChipX + 64, y + 19, remSelected ? 0x66452710 : 0x880B0F17);
+        g.renderOutline(remChipX, y + 4, 64, 15, remSelected ? 0xFFFBBF24 : eqRemnant.getHudColor());
+        drawScaledString(g, "G:" + truncate(eqRemnant.getDisplayName(), 9), remChipX + 3, y + 8, 0.58F, 0xFFFEF3C7, true);
 
-        // Grade 2x2: Os 4 Resquícios Divinos [G]
-        DivineRemnant equipped = UniqueSkillHandler.getEquippedRemnant(pData);
-        ManifestationTier tier = snap.tier();
-        float cost = DivineResonanceBalance.calculateDivineSkillCost(pData);
-        DivineRemnant[] all = DivineRemnant.values();
+        for (int s = 0; s < SkillData.MAX_MARTIAL_SLOTS; s++) {
+            int sx = x + 160 + s * 64;
+            boolean slotLocked = s >= unlockedSlots;
+            boolean isActiveSlot = skills.getActiveMartialSlot() == s;
+            ResourceLocation inSlot = skills.getMartialSkillInSlot(s);
+            boolean sel = inSlot != null && inSlot.equals(this.selectedSkillId);
+            int border = slotLocked ? 0xFF334155 : (sel ? 0xFFFBBF24 : (isActiveSlot ? 0xFF22D3EE : 0xFF475569));
+            g.fill(sx, y + 4, sx + 62, y + 19, isActiveSlot && !slotLocked ? 0x550C3448 : 0x880B0F17);
+            g.renderOutline(sx, y + 4, 62, 15, border);
 
-        for (int i = 0; i < all.length; i++) {
-            DivineRemnant rem = all[i];
-            int col = i % 2;
-            int row = i / 2;
-            int cx = x + 2 + col * 178;
-            int cy = y + 44 + row * 63;
-            boolean isEq = rem == equipped;
+            String text;
+            int col;
+            if (slotLocked) {
+                text = "S" + (s + 1) + ":🔒R" + (s == 1 ? 3 : 5);
+                col = 0xFF64748B;
+            } else if (inSlot == null) {
+                text = "S" + (s + 1) + ": Vazio";
+                col = 0xFF94A3B8;
+            } else {
+                text = "S" + (s + 1) + ":" + truncate(CultivationSkillRegistry.getDisplayName(inSlot), 7);
+                col = isActiveSlot ? 0xFF67E8F9 : 0xFFE2E8F0;
+            }
+            drawScaledString(g, text, sx + 3, y + 8, 0.58F, col, false);
+        }
 
-            drawCard(g, cx, cy, 174, 60, isEq ? rem.getHudColor() : 0xFF334155);
+        // 2. Pills de Filtro (y+23 .. y+37)
+        SkillFilterPill[] pills = SkillFilterPill.values();
+        for (int i = 0; i < pills.length; i++) {
+            SkillFilterPill pill = pills[i];
+            int px = x + 2 + i * 71;
+            boolean active = pill == this.activeSkillFilter;
+            g.fill(px, y + 23, px + 69, y + 36, active ? 0xAA1E3A5F : 0x880D121D);
+            g.renderOutline(px, y + 23, 69, 13, active ? 0xFF38BDF8 : 0xFF334155);
+            drawCenteredScaledString(g, pill.label, px + 34.5F, y + 26.5F, 0.62F, active ? 0xFFF8FAFC : 0xFF94A3B8, active);
+        }
+
+        // 3. Coluna Esquerda: Lista Scrollable (x+2 .. x+154, w=152, y+39 .. y+168)
+        int lx = x + 2;
+        int lw = 152;
+        drawCard(g, lx, y + 39, lw, 129, 0xFF475569);
+        List<SkillListEntry> entries = getFilteredSkillEntries();
+        int lTop = y + 41;
+        int lBot = y + 166;
+        g.enableScissor(lx + 2, lTop, lx + lw - 2, lBot);
+        try {
+            int rowY = lTop + 1 - this.skillScrollOffset;
+            for (SkillListEntry entry : entries) {
+                boolean selected = entry.id().equals(this.selectedSkillId);
+                String name;
+                String statusIcon;
+                String rightBadge;
+                int iconCol;
+                int nameCol;
+
+                if (entry.isDivineRemnant() && entry.remnant() != null) {
+                    DivineRemnant rem = entry.remnant();
+                    boolean isEq = rem == eqRemnant;
+                    name = rem.getDisplayName();
+                    statusIcon = isEq ? "★" : "✓";
+                    rightBadge = "[G]";
+                    iconCol = isEq ? 0xFFFBBF24 : 0xFF34D399;
+                    nameCol = isEq ? 0xFFFEF3C7 : 0xFFE2E8F0;
+                } else if (entry.tech() != null) {
+                    CultivationSkillDefinition tech = entry.tech();
+                    boolean unlocked = skills.hasSkillUnlocked(tech.id());
+                    int eqSlot = skills.findMartialSlot(tech.id());
+                    boolean unlockable = !unlocked && CultivationSkillService.validateUnlock(pData, tech).allowed();
+                    name = tech.displayName();
+                    if (eqSlot >= 0) {
+                        statusIcon = "★";
+                        iconCol = 0xFFFBBF24;
+                        rightBadge = "[S" + (eqSlot + 1) + "]";
+                        nameCol = 0xFFF8FAFC;
+                    } else if (unlocked) {
+                        statusIcon = "✓";
+                        iconCol = 0xFF34D399;
+                        rightBadge = "R" + tech.tierRealm();
+                        nameCol = 0xFFE2E8F0;
+                    } else if (unlockable) {
+                        statusIcon = "✦";
+                        iconCol = 0xFF22D3EE;
+                        rightBadge = "R" + tech.tierRealm();
+                        nameCol = 0xFFCFFAFE;
+                    } else {
+                        statusIcon = "🔒";
+                        iconCol = 0xFF64748B;
+                        rightBadge = "R" + tech.tierRealm();
+                        nameCol = 0xFF64748B;
+                    }
+                } else {
+                    continue;
+                }
+
+                g.fill(lx + 4, rowY, lx + lw - 4, rowY + 18, selected ? 0xAA1E293B : 0x66090D16);
+                g.renderOutline(lx + 4, rowY, lw - 8, 18, selected ? 0xFFFBBF24 : 0xFF283548);
+                drawScaledString(g, statusIcon, lx + 7, rowY + 5, 0.65F, iconCol, true);
+                drawScaledString(g, truncate(name, 16), lx + 17, rowY + 5, 0.64F, nameCol, selected);
+                drawRightScaledString(g, rightBadge, lx + lw - 7, rowY + 5, 0.58F, 0xFF94A3B8, false);
+                rowY += 20;
+            }
+        } finally {
+            g.disableScissor();
+        }
+
+        // 4. Coluna Direita: Detalhe da Habilidade Selecionada (x+158 .. x+354, w=196)
+        int rx = x + 158;
+        int rw = 196;
+        renderSkillDetailCard(g, rx, y + 39, rw, 129, pData, snap);
+    }
+
+    private void renderSkillDetailCard(
+            GuiGraphics g, int rx, int ry, int rw, int rh, PlayerData pData, HudRenderSnapshot snap
+    ) {
+        Optional<DivineRemnant> remOpt = this.selectedSkillId != null
+                ? DivineRemnant.parse(this.selectedSkillId.toString())
+                : Optional.empty();
+        if (remOpt.isPresent()) {
+            DivineRemnant rem = remOpt.get();
+            DivineSkillDefinition def = DivineSkillRegistry.getForRemnant(rem);
+            ManifestationTier unlockedTier = DivineResonanceBalance.getManifestationTier(pData);
+            int unlockedCount = unlockedTier.ordinal() + 1;
+            boolean isEq = rem == UniqueSkillHandler.getEquippedRemnant(pData);
+            int activePhase = isEq
+                    ? Mth.clamp(pData.getSkills().getActiveDivinePhase(), 0, unlockedCount - 1)
+                    : 0;
+            DivinePhaseAbility selectedAb = DivinePhaseAbility.get(rem, activePhase);
+
+            drawCard(g, rx, ry, rw, rh, rem.getHudColor());
             g.setColor(1.0F, 1.0F, 1.0F, 1.0F);
-            g.blit(getRemnantTexture(rem), cx + 5, cy + 5, 0.0F, 0.0F, 18, 18, 18, 18);
+            g.blit(getRemnantTexture(rem), rx + 6, ry + 4, 0.0F, 0.0F, 16, 16, 16, 16);
+            drawScaledString(g, rem.getDisplayName(), rx + 25, ry + 4, 0.75F, rem.getHudColor(), true);
+            drawScaledString(g, "Fase " + unlockedTier.getNumeral() + "/IV · " + unlockedTier.getTitle(),
+                    rx + 25, ry + 13, 0.54F, 0xFF94A3B8, false);
 
-            drawScaledString(g, rem.getDisplayName(), cx + 26, cy + 5, 0.78F, rem.getHudColor(), true);
-            drawScaledString(g, rem.getDeityOrigin(), cx + 26, cy + 14, 0.62F, 0xFF94A3B8, false);
-            drawScaledString(g, String.format(Locale.ROOT, "Camada %s (%.2fx) · Custo %.0f",
-                    tier.getNumeral(), tier.getPowerMultiplier(), cost), cx + 5, cy + 25, 0.62F, 0xFFFDE68A, false);
+            float phaseCost = DivineResonanceBalance.calculateDivinePhaseSkillCost(pData, activePhase);
+            int cdTicks = Math.max(20, Math.round(CultivationBalance.calculateUniqueSkillCooldownTicks(snap.spiritRealm())
+                    * def.cooldownMultiplier() * selectedAb.cooldownMultiplier()));
+            drawRightScaledString(g, String.format(Locale.ROOT, "RD %.0f · %.1fs", phaseCost, cdTicks / 20.0F),
+                    rx + rw - 6, ry + 5, 0.52F, 0xFFFDE68A, false);
 
-            String summary = CultivatorMeridianMetrics.getRemnantProfile(rem).mechanicSummary();
-            drawScaledWrappedText(g, summary, cx + 5, cy + 34, 104, 0.58F, 0xFFCBD5E1);
+            // Trilha horizontal de 4 fases (I R1-1 -- II R2-3 -- III R4-2 -- IV R6-1)
+            String[] nodeReq = { "R1-1", "R2-3", "R4-2", "R6-1" };
+            int lineY = ry + 26;
+            g.fill(rx + 20, lineY, rx + rw - 20, lineY + 1, 0xFF334155);
+            for (int n = 0; n < 4; n++) {
+                int nx = rx + 20 + n * 52;
+                boolean nUnlocked = n < unlockedCount;
+                boolean nActive = isEq && n == activePhase;
+                if (n > 0 && nUnlocked) {
+                    g.fill(nx - 52, lineY, nx, lineY + 1, rem.getHudColor());
+                }
+                g.fill(nx - 5, lineY - 4, nx + 5, lineY + 5, nUnlocked ? 0xFF1E293B : 0xFF0F172A);
+                g.renderOutline(nx - 5, lineY - 4, 10, 9, nActive ? 0xFFFBBF24 : (nUnlocked ? rem.getHudColor() : 0xFF475569));
+                drawCenteredScaledString(g, String.valueOf(n + 1), nx, lineY - 2, 0.52F, nUnlocked ? 0xFFFEF3C7 : 0xFF64748B, nUnlocked);
+                drawCenteredScaledString(g, nodeReq[n], nx, lineY + 6, 0.48F, nUnlocked ? 0xFFCBD5E1 : 0xFF64748B, false);
+            }
+
+            // Grade 2x2 de cards clicáveis H1-H4
+            List<DivinePhaseAbility> allPhases = DivinePhaseAbility.getAllFor(rem);
+            for (int idx = 0; idx < 4; idx++) {
+                DivinePhaseAbility ab = allPhases.get(idx);
+                int col = idx % 2;
+                int row = idx / 2;
+                int cx = rx + 6 + col * 94;
+                int cy = ry + 39 + row * 23;
+                int cw = 90;
+                int ch = 21;
+                boolean pUnlocked = idx < unlockedCount;
+                boolean pSelected = isEq && idx == activePhase;
+
+                int bg = pSelected ? 0xAA292014 : (pUnlocked ? 0x88131A26 : 0x660A0D14);
+                int border = pSelected ? 0xFFFBBF24 : (pUnlocked ? rem.getHudColor() : 0xFF334155);
+                g.fill(cx, cy, cx + cw, cy + ch, bg);
+                g.renderOutline(cx, cy, cw, ch, HudAlpha(border, pUnlocked ? 0.90F : 0.45F));
+
+                String header = ab.code() + " · " + truncate(ab.displayName(), 13);
+                drawScaledString(g, header, cx + 3, cy + 3, 0.53F,
+                        pSelected ? 0xFFFEF3C7 : (pUnlocked ? 0xFFE2E8F0 : 0xFF64748B), pSelected);
+
+                String sub = !pUnlocked
+                        ? ("🔒 " + nodeReq[idx])
+                        : (pSelected ? "[Ativa no G]" : (isEq ? "Clique p/ usar [G]" : "Desbloqueada"));
+                int subCol = !pUnlocked ? 0xFF64748B : (pSelected ? 0xFFFDE68A : 0xFF38BDF8);
+                drawScaledString(g, sub, cx + 3, cy + 12, 0.49F, subCol, false);
+            }
+
+            // Resumo da habilidade em foco
+            drawScaledWrappedText(g, selectedAb.code() + ": " + selectedAb.summary(),
+                    rx + 6, ry + 86, rw - 12, 0.51F, 0xFFCBD5E1);
+            return;
+        }
+
+        CultivationSkillDefinition tech = CultivationSkillRegistry.getSkill(this.selectedSkillId);
+        if (tech == null) {
+            drawCard(g, rx, ry, rw, rh, 0xFF475569);
+            return;
+        }
+        drawCard(g, rx, ry, rw, rh, tech.hudColor());
+        drawScaledString(g, tech.displayName(), rx + 6, ry + 5, 0.74F, tech.hudColor(), true);
+        String meta = tech.pathType().getDisplayName() + " · " + tech.category().getDisplayName() + " · R" + tech.tierRealm();
+        if (SubjugationService.SOUL_SUBJUGATION_ID.equals(tech.id())) {
+            meta += " (Grau " + SubjugationBalance.calculateMasteryGrade(pData) + ")";
+        }
+        drawScaledString(g, meta, rx + 6, ry + 15, 0.58F, 0xFF94A3B8, false);
+
+        String costLine = SubjugationService.SOUL_SUBJUGATION_ID.equals(tech.id())
+                ? "Custo: 30-180 Qi + IE · Alcance: " + (int) SubjugationBalance.calculateEffectiveReach(SubjugationBalance.calculateMasteryGrade(pData)) + "m"
+                : String.format(Locale.ROOT, "Custo: %.0f Qi · %.0f Vigor · %.0f IE · CD %.0fs",
+                        tech.qiCost(), tech.staminaCost(), tech.spiritualIntegrityCost(), tech.cooldownTicks() / 20.0F);
+        drawScaledString(g, costLine, rx + 6, ry + 26, 0.56F, 0xFFFDE68A, false);
+
+        drawScaledWrappedText(g, tech.mechanicSummary(), rx + 6, ry + 37, rw - 12, 0.56F, 0xFFE2E8F0);
+
+        SkillUnlockRequirements req = tech.requirements();
+        int bodyR = CultivationService.getCurrentRealm(pData, CultivationPath.BODY).order();
+        int spiritR = CultivationService.getCurrentRealm(pData, CultivationPath.SPIRIT).order();
+        boolean bodyOk = bodyR >= req.minBodyRealm();
+        boolean spiritOk = spiritR >= req.minSpiritRealm();
+        String reqStr = String.format(Locale.ROOT, "Req: [%s] Corpo R%d  [%s] Esp. R%d",
+                bodyOk ? "✓" : "✖", req.minBodyRealm(), spiritOk ? "✓" : "✖", req.minSpiritRealm());
+        drawScaledString(g, reqStr, rx + 6, ry + 86, 0.56F, (bodyOk && spiritOk) ? 0xFF34D399 : 0xFFFCA5A5, false);
+
+        if (req.prerequisiteSkill() != null) {
+            boolean preOk = pData.getSkills().hasSkillUnlocked(req.prerequisiteSkill());
+            drawScaledString(g, (preOk ? "[✓] Pré: " : "[✖] Pré: ")
+                            + truncate(CultivationSkillRegistry.getDisplayName(req.prerequisiteSkill()), 22),
+                    rx + 6, ry + 96, 0.55F, preOk ? 0xFF34D399 : 0xFFFCA5A5, false);
         }
     }
 
     // -------------------------------------------------------------------------
-    // ABA 5 — CONTRATOS & SELOS SUBJUGADOS
+    // ABA 5 — CONTRATOS & PAINEL INTERATIVO DE SERVOS SUBJUGADOS
     // -------------------------------------------------------------------------
     private void renderContractsTab(
             GuiGraphics g, int x, int y, PlayerCoreData coreData, PlayerData pData
     ) {
         int lx = x + 2;
-        int lw = 212;
-        int rx = x + 218;
-        int rw = 136;
+        int lw = 180;
+        int rx = x + 186;
+        int rw = 168;
         int h = 166;
 
         // Painel Esquerdo: Contratos Ativos
         drawCard(g, lx, y + 2, lw, h, 0xFF785A28);
         Set<ResourceLocation> contracts = pData.getContracts().getActiveContractIds();
-        drawScaledString(g, "Contratos Ativos (" + contracts.size() + ")", lx + 6, y + 7, 0.78F, 0xFFFDE68A, true);
+        drawScaledString(g, "Contratos (" + contracts.size() + ")", lx + 6, y + 7, 0.78F, 0xFFFDE68A, true);
         if (coreData.isVowBroken()) {
-            drawRightScaledString(g, "VOTO QUEBRADO", lx + lw - 6, y + 7, 0.66F, 0xFFEF4444, true);
+            drawRightScaledString(g, "VOTO QUEBRADO", lx + lw - 6, y + 7, 0.62F, 0xFFEF4444, true);
         }
 
         int listTop = y + 19;
@@ -986,7 +1327,7 @@ public class CultivatorScreen extends Screen {
         try {
             if (contracts.isEmpty()) {
                 drawScaledWrappedText(g, "Nenhum contrato ativo no momento. Contratos concedem bônus e impõem regras ou tabus ligados à sua facção.",
-                        lx + 8, listTop + 8, lw - 16, 0.68F, 0xFF94A3B8);
+                        lx + 8, listTop + 8, lw - 16, 0.64F, 0xFF94A3B8);
             } else {
                 int cy = listTop + 2 - this.contractScrollOffset;
                 for (ResourceLocation id : contracts) {
@@ -994,23 +1335,27 @@ public class CultivatorScreen extends Screen {
                     String name = def != null ? def.displayName() : id.toString();
                     String desc = def != null ? def.description() : "Contrato registrado via datapack.";
                     boolean hasTaboo = def != null && (def.breakOnAttackVillager() || !def.tabooSummary().isBlank());
-                    boolean hasV2Bonus = def != null && (def.qiRegenBonus() > 0.0F || def.spiritualIntegrityBonus() > 0.0F);
-                    int cardH = (hasTaboo ? 52 : 41) + (hasV2Bonus ? 9 : 0);
+                    boolean hasV2Bonus = def != null && (def.qiRegenBonus() > 0.0F || def.spiritualIntegrityBonus() > 0.0F
+                            || def.spiritualRegenPctBonus() > 0.0F);
+                    int cardH = (hasTaboo ? 54 : 44) + (hasV2Bonus ? 9 : 0);
 
-                    g.fill(lx + 6, cy, lx + lw - 6, cy + cardH, 0x880B0F17);
-                    g.renderOutline(lx + 6, cy, lw - 12, cardH, (def != null && def.breakOnAttackVillager()) ? 0xAAEF4444 : 0xAA64748B);
-                    drawScaledString(g, name, lx + 10, cy + 4, 0.75F, 0xFFFEF3C7, true);
-                    drawScaledWrappedText(g, desc, lx + 10, cy + 14, lw - 20, 0.60F, 0xFFCBD5E1);
-                    int extraY = cy + 39;
+                    g.fill(lx + 5, cy, lx + lw - 5, cy + cardH, 0x880B0F17);
+                    g.renderOutline(lx + 5, cy, lw - 10, cardH, (def != null && def.breakOnAttackVillager()) ? 0xAAEF4444 : 0xAA64748B);
+                    drawScaledString(g, name, lx + 8, cy + 4, 0.72F, 0xFFFEF3C7, true);
+                    drawScaledWrappedText(g, desc, lx + 8, cy + 14, lw - 16, 0.56F, 0xFFCBD5E1);
+                    int extraY = cy + 40;
                     if (hasV2Bonus) {
                         StringBuilder v2 = new StringBuilder();
                         if (def.qiRegenBonus() > 0.0F) {
-                            v2.append(String.format(Locale.ROOT, "+%.1f Qi/s  ", def.qiRegenBonus()));
+                            v2.append(String.format(Locale.ROOT, "+%.1f Qi/s ", def.qiRegenBonus()));
                         }
                         if (def.spiritualIntegrityBonus() > 0.0F) {
-                            v2.append(String.format(Locale.ROOT, "+%.0f Int.Esp", def.spiritualIntegrityBonus()));
+                            v2.append(String.format(Locale.ROOT, "+%.0f Int ", def.spiritualIntegrityBonus()));
                         }
-                        drawScaledString(g, v2.toString().trim(), lx + 10, extraY, 0.60F, 0xFF67E8F9, false);
+                        if (def.spiritualRegenPctBonus() > 0.0F) {
+                            v2.append(String.format(Locale.ROOT, "+%.0f%% Reg", def.spiritualRegenPctBonus() * 100.0F));
+                        }
+                        drawScaledString(g, v2.toString().trim(), lx + 8, extraY, 0.56F, 0xFF67E8F9, false);
                         extraY += 10;
                     }
                     if (hasTaboo) {
@@ -1018,7 +1363,7 @@ public class CultivatorScreen extends Screen {
                                 ? "⚠ " + def.tabooSummary()
                                 : "⚠ TABU: Quebra ao atacar aldeões!";
                         int tabooCol = def.breakOnAttackVillager() ? 0xFFFCA5A5 : 0xFFFDE68A;
-                        drawScaledString(g, tabooMsg, lx + 10, extraY, 0.58F, tabooCol, true);
+                        drawScaledString(g, truncate(tabooMsg, 31), lx + 8, extraY, 0.54F, tabooCol, true);
                     }
                     cy += cardH + 4;
                 }
@@ -1027,37 +1372,67 @@ public class CultivatorScreen extends Screen {
             g.disableScissor();
         }
 
-        // Painel Direito: Selos Subjugados
+        // Painel Direito: Servos Subjugados Interativos
         drawCard(g, rx, y + 2, rw, h, 0xFFA855F7);
         List<SubjugatedEntityRecord> bound = pData.getSubjugation().getBoundEntities();
-        drawScaledString(g, "Selos Subjugados (" + bound.size() + ")", rx + 6, y + 7, 0.74F, 0xFFC084FC, true);
+        int maxBound = SubjugationBalance.calculateMaxBoundCapacity(pData);
+        int activeCount = pData.getSubjugation().countSummoned();
+        int maxActive = SubjugationBalance.calculateMaxActiveSummons(pData);
+        int grade = SubjugationBalance.calculateMasteryGrade(pData);
 
-        boolean throneBreaker = coreData.getFaction() == FactionType.QUEBRADORES_DE_TRONOS;
-        String ruleText = throneBreaker ? "Captura: <= 25% HP (Bônus Facção)" : "Captura: <= 15% HP (Padrão)";
-        drawScaledString(g, ruleText, rx + 6, y + 17, 0.58F, throneBreaker ? 0xFFD8B4FE : 0xFF94A3B8, false);
+        drawScaledString(g, "Servos (" + bound.size() + "/" + maxBound + ") · G" + grade,
+                rx + 6, y + 6, 0.72F, 0xFFC084FC, true);
+        drawScaledString(g, "Em campo: " + activeCount + "/" + maxActive + " · Clique para comandar",
+                rx + 6, y + 16, 0.55F, 0xFF94A3B8, false);
 
-        int sTop = y + 27;
+        int sTop = y + 26;
         int sBot = y + h - 4;
         g.enableScissor(rx + 3, sTop, rx + rw - 3, sBot);
         try {
             if (bound.isEmpty()) {
-                drawScaledWrappedText(g, "Nenhuma entidade vinculada. Enfraqueça alvos subjugáveis e use o Selo de Subjugação.",
-                        rx + 7, sTop + 8, rw - 14, 0.64F, 0xFF94A3B8);
+                drawScaledWrappedText(g, "Nenhum servo vinculado. Enfraqueça alvos e use Subjugação [ALT+G] ou o Selo.",
+                        rx + 7, sTop + 8, rw - 14, 0.62F, 0xFF94A3B8);
             } else {
                 int sy = sTop + 2 - this.sealScrollOffset;
                 for (int i = 0; i < bound.size(); i++) {
                     SubjugatedEntityRecord rec = bound.get(i);
                     String label = resolveEntityDisplayName(rec);
-                    g.fill(rx + 6, sy, rx + rw - 6, sy + 18, 0x880B0F17);
-                    g.renderOutline(rx + 6, sy, rw - 12, 18, 0x887E22CE);
-                    drawScaledString(g, (i + 1) + ". " + label, rx + 9, sy + 3, 0.66F, 0xFFE9D5FF, true);
-                    drawRightScaledString(g, "Nv." + rec.level(), rx + rw - 9, sy + 9, 0.58F, 0xFF94A3B8, false);
-                    sy += 21;
+                    boolean summoned = rec.summoned();
+                    g.fill(rx + 5, sy, rx + rw - 5, sy + 31, 0x880B0F17);
+                    g.renderOutline(rx + 5, sy, rw - 10, 31, summoned ? 0xFF34D399 : 0x887E22CE);
+
+                    drawScaledString(g, (summoned ? "● " : "○ ") + truncate(label, 14), rx + 8, sy + 3, 0.64F,
+                            summoned ? 0xFF6EE7B7 : 0xFFE9D5FF, true);
+                    drawRightScaledString(g, "Nv." + rec.level(), rx + rw - 8, sy + 3, 0.56F, 0xFF94A3B8, false);
+
+                    // Linha 2: Postura + 3 botões compactos (Inv/Rec, Post., Lib.)
+                    drawScaledString(g, rec.stance().getShortTag(), rx + 8, sy + 16, 0.58F, 0xFF38BDF8, true);
+
+                    drawMiniButton(g, rx + rw - 98, sy + 14, 31, 13,
+                            summoned ? "Rec" : "Inv", summoned ? 0xFF06B6D4 : 0xFF34D399);
+                    drawMiniButton(g, rx + rw - 65, sy + 14, 30, 13,
+                            "Post", grade >= 2 ? 0xFFC084FC : 0xFF475569);
+                    drawMiniButton(g, rx + rw - 33, sy + 14, 25, 13,
+                            "Lib", 0xFFEF4444);
+                    sy += 34;
                 }
             }
         } finally {
             g.disableScissor();
         }
+    }
+
+    private void drawMiniButton(GuiGraphics g, int x, int y, int w, int h, String label, int borderCol) {
+        g.fill(x, y, x + w, y + h, 0xCC111827);
+        g.renderOutline(x, y, w, h, borderCol);
+        drawCenteredScaledString(g, label, x + w * 0.5F, y + 3.0F, 0.55F, 0xFFF1F5F9, false);
+    }
+
+    private static String truncate(String s, int maxLen) {
+        if (s == null) {
+            return "";
+        }
+        return s.length() <= maxLen ? s : s.substring(0, Math.max(1, maxLen - 1)) + "…";
     }
 
     // -------------------------------------------------------------------------
@@ -1149,17 +1524,152 @@ public class CultivatorScreen extends Screen {
     }
 
     @Override
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        if (super.mouseClicked(mouseX, mouseY, button)) {
+            return true;
+        }
+        if (button != 0 || this.minecraft == null || this.minecraft.player == null) {
+            return false;
+        }
+        int contentX = this.panelX + 6;
+        int contentY = this.panelY + 23;
+        PlayerData pData = ModCapabilities.getData(this.minecraft.player).orElse(null);
+        if (pData == null) {
+            return false;
+        }
+
+        if (this.activeTab == CultivatorTab.SKILLS) {
+            // 1. Clique nos chips de slots equipados no topo
+            if (mouseY >= contentY + 4 && mouseY <= contentY + 19) {
+                if (mouseX >= contentX + 94 && mouseX <= contentX + 158) {
+                    this.selectedSkillId = UniqueSkillHandler.getEquippedRemnant(pData).getId();
+                    return true;
+                }
+                for (int s = 0; s < SkillData.MAX_MARTIAL_SLOTS; s++) {
+                    int sx = contentX + 160 + s * 64;
+                    if (mouseX >= sx && mouseX <= sx + 62) {
+                        ResourceLocation inSlot = pData.getSkills().getMartialSkillInSlot(s);
+                        if (inSlot != null) {
+                            this.selectedSkillId = inSlot;
+                        }
+                        return true;
+                    }
+                }
+            }
+
+            // 2. Clique nas pills de filtro
+            if (mouseY >= contentY + 23 && mouseY <= contentY + 36) {
+                SkillFilterPill[] pills = SkillFilterPill.values();
+                for (int i = 0; i < pills.length; i++) {
+                    int px = contentX + 2 + i * 71;
+                    if (mouseX >= px && mouseX <= px + 69) {
+                        this.activeSkillFilter = pills[i];
+                        this.skillScrollOffset = 0;
+                        List<SkillListEntry> entries = getFilteredSkillEntries();
+                        if (!entries.isEmpty()) {
+                            boolean stillPresent = entries.stream().anyMatch(e -> e.id().equals(this.selectedSkillId));
+                            if (!stillPresent) {
+                                this.selectedSkillId = entries.get(0).id();
+                            }
+                        }
+                        return true;
+                    }
+                }
+            }
+
+            // 3. Clique na lista de habilidades à esquerda
+            int lx = contentX + 2;
+            int lw = 152;
+            int lTop = contentY + 41;
+            int lBot = contentY + 166;
+            if (mouseX >= lx + 4 && mouseX <= lx + lw - 4 && mouseY >= lTop && mouseY <= lBot) {
+                List<SkillListEntry> entries = getFilteredSkillEntries();
+                int rowY = lTop + 1 - this.skillScrollOffset;
+                for (SkillListEntry entry : entries) {
+                    if (mouseY >= rowY && mouseY <= rowY + 18) {
+                        this.selectedSkillId = entry.id();
+                        return true;
+                    }
+                    rowY += 20;
+                }
+            }
+
+            // 4. Clique nos cards H1-H4 do Resquício Divino na direita
+            Optional<DivineRemnant> remOpt = this.selectedSkillId != null
+                    ? DivineRemnant.parse(this.selectedSkillId.toString())
+                    : Optional.empty();
+            if (remOpt.isPresent()) {
+                int rx = contentX + 158;
+                int ry = contentY + 39;
+                for (int idx = 0; idx < 4; idx++) {
+                    int cx = rx + 6 + (idx % 2) * 94;
+                    int cy = ry + 39 + (idx / 2) * 23;
+                    if (mouseX >= cx && mouseX <= cx + 90 && mouseY >= cy && mouseY <= cy + 21) {
+                        ModNetworking.sendToServer(new CultivatorActionC2SPacket(
+                                CultivatorActionC2SPacket.Action.SELECT_DIVINE_PHASE,
+                                remOpt.get().getId(),
+                                idx
+                        ));
+                        return true;
+                    }
+                }
+            }
+        } else if (this.activeTab == CultivatorTab.CONTRACTS) {
+            int rx = contentX + 186;
+            int rw = 168;
+            int sTop = contentY + 26;
+            int sBot = contentY + 162;
+            if (mouseX >= rx + 5 && mouseX <= rx + rw - 5 && mouseY >= sTop && mouseY <= sBot) {
+                List<SubjugatedEntityRecord> bound = pData.getSubjugation().getBoundEntities();
+                int sy = sTop + 2 - this.sealScrollOffset;
+                for (SubjugatedEntityRecord rec : bound) {
+                    if (mouseY >= sy + 14 && mouseY <= sy + 27) {
+                        if (mouseX >= rx + rw - 98 && mouseX <= rx + rw - 67) {
+                            ModNetworking.sendToServer(new CultivatorActionC2SPacket(
+                                    rec.summoned()
+                                            ? CultivatorActionC2SPacket.Action.RECALL_SERVANT
+                                            : CultivatorActionC2SPacket.Action.SUMMON_SERVANT,
+                                    rec.instanceId()));
+                            return true;
+                        }
+                        if (mouseX >= rx + rw - 65 && mouseX <= rx + rw - 35) {
+                            ModNetworking.sendToServer(new CultivatorActionC2SPacket(
+                                    CultivatorActionC2SPacket.Action.CYCLE_SERVANT_STANCE,
+                                    rec.instanceId()));
+                            return true;
+                        }
+                        if (mouseX >= rx + rw - 33 && mouseX <= rx + rw - 8) {
+                            ModNetworking.sendToServer(new CultivatorActionC2SPacket(
+                                    CultivatorActionC2SPacket.Action.RELEASE_SERVANT,
+                                    rec.instanceId()));
+                            return true;
+                        }
+                    }
+                    sy += 34;
+                }
+            }
+        }
+        return false;
+    }
+
+    @Override
     public boolean mouseScrolled(double mouseX, double mouseY, double delta) {
+        int step = delta > 0 ? -16 : 16;
+        if (this.activeTab == CultivatorTab.SKILLS) {
+            List<SkillListEntry> entries = getFilteredSkillEntries();
+            int maxScroll = Math.max(0, entries.size() * 20 - 120);
+            this.skillScrollOffset = Mth.clamp(this.skillScrollOffset + step, 0, maxScroll);
+            return true;
+        }
         if (this.activeTab == CultivatorTab.CONTRACTS && this.minecraft != null && this.minecraft.player != null) {
-            int step = delta > 0 ? -16 : 16;
             PlayerData pData = ModCapabilities.getData(this.minecraft.player).orElse(null);
             if (pData != null) {
-                int splitX = this.panelX + 6 + 216;
+                int splitX = this.panelX + 6 + 184;
                 if (mouseX < splitX) {
-                    int maxScroll = Math.max(0, pData.getContracts().getActiveContractIds().size() * 54 - 140);
+                    int maxScroll = Math.max(0, pData.getContracts().getActiveContractIds().size() * 58 - 140);
                     this.contractScrollOffset = Mth.clamp(this.contractScrollOffset + step, 0, maxScroll);
                 } else {
-                    int maxScroll = Math.max(0, pData.getSubjugation().getBoundEntities().size() * 21 - 130);
+                    int maxScroll = Math.max(0, pData.getSubjugation().getBoundEntities().size() * 34 - 130);
                     this.sealScrollOffset = Mth.clamp(this.sealScrollOffset + step, 0, maxScroll);
                 }
                 return true;

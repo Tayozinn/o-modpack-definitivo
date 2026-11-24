@@ -1,0 +1,31 @@
+{
+  "format_version": "1.8.0",
+  "animations": {
+    "martial_strike": {
+      "animation_length": 0.5,
+      "bones": {
+        "torso": {
+          "rotation": {
+            "0.0": { "vector": [0, 0, 0] },
+            "0.12": { "vector": [10, 28, 0], "easing": "easeOutCubic" },
+            "0.5": { "vector": [0, 0, 0], "easing": "easeInOutSine" }
+          }
+        },
+        "right_arm": {
+          "rotation": {
+            "0.0": { "vector": [0, 0, 0] },
+            "0.12": { "vector": [-92, 16, -24], "easing": "easeOutCubic" },
+            "0.5": { "vector": [0, 0, 0], "easing": "easeInOutSine" }
+          }
+        },
+        "left_arm": {
+          "rotation": {
+            "0.0": { "vector": [0, 0, 0] },
+            "0.12": { "vector": [-35, -18, 12], "easing": "easeOutSine" },
+            "0.5": { "vector": [0, 0, 0], "easing": "easeInOutSine" }
+          }
+        }
+      }
+    }
+  }
+}

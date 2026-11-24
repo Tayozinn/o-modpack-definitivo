@@ -3,10 +3,18 @@ package com.mythiccontracts.network;
 import com.mythiccontracts.capability.ModCapabilities;
 import com.mythiccontracts.cultivation.progression.CultivationActionService;
 import com.mythiccontracts.cultivation.realm.CultivationPath;
+import com.mythiccontracts.registry.ModSounds;
+import com.mythiccontracts.skill.cultivation.CultivationSkillService;
+import com.mythiccontracts.skill.remnant.DivinePhaseAbility;
 import com.mythiccontracts.skill.remnant.DivineRemnant;
+import com.mythiccontracts.skill.remnant.DivineResonanceBalance;
+import com.mythiccontracts.subjugation.SubjugationService;
+import net.minecraft.ChatFormatting;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundSource;
 import net.minecraftforge.network.NetworkEvent;
 import org.jetbrains.annotations.Nullable;
 
@@ -27,7 +35,14 @@ public class CultivatorActionC2SPacket {
         ADVANCE_BODY_STAGE,
         ADVANCE_SPIRIT_STAGE,
         BREAKTHROUGH_BODY,
-        BREAKTHROUGH_SPIRIT
+        BREAKTHROUGH_SPIRIT,
+        UNLOCK_SKILL,
+        EQUIP_MARTIAL_SKILL,
+        SUMMON_SERVANT,
+        RECALL_SERVANT,
+        CYCLE_SERVANT_STANCE,
+        RELEASE_SERVANT,
+        SELECT_DIVINE_PHASE
     }
 
     public static final long MIN_ACTION_INTERVAL_TICKS = 8L;
@@ -36,19 +51,43 @@ public class CultivatorActionC2SPacket {
     private final Action action;
     @Nullable
     private final ResourceLocation targetId;
+    private final int slotIndex;
+    @Nullable
+    private final UUID entityInstanceId;
 
     public CultivatorActionC2SPacket(Action action) {
-        this(action, null);
+        this(action, null, -1, null);
     }
 
     public CultivatorActionC2SPacket(Action action, @Nullable ResourceLocation targetId) {
+        this(action, targetId, -1, null);
+    }
+
+    public CultivatorActionC2SPacket(Action action, @Nullable ResourceLocation targetId, int slotIndex) {
+        this(action, targetId, slotIndex, null);
+    }
+
+    public CultivatorActionC2SPacket(Action action, @Nullable UUID entityInstanceId) {
+        this(action, null, -1, entityInstanceId);
+    }
+
+    public CultivatorActionC2SPacket(
+            Action action,
+            @Nullable ResourceLocation targetId,
+            int slotIndex,
+            @Nullable UUID entityInstanceId
+    ) {
         this.action = action != null ? action : Action.TOGGLE_INFUSION;
         this.targetId = targetId;
+        this.slotIndex = slotIndex;
+        this.entityInstanceId = entityInstanceId;
     }
 
     public CultivatorActionC2SPacket(FriendlyByteBuf buf) {
         this.action = buf.readEnum(Action.class);
         this.targetId = buf.readBoolean() ? buf.readResourceLocation() : null;
+        this.slotIndex = buf.readVarInt();
+        this.entityInstanceId = buf.readBoolean() ? buf.readUUID() : null;
     }
 
     public void toBytes(FriendlyByteBuf buf) {
@@ -56,6 +95,11 @@ public class CultivatorActionC2SPacket {
         buf.writeBoolean(this.targetId != null);
         if (this.targetId != null) {
             buf.writeResourceLocation(this.targetId);
+        }
+        buf.writeVarInt(this.slotIndex);
+        buf.writeBoolean(this.entityInstanceId != null);
+        if (this.entityInstanceId != null) {
+            buf.writeUUID(this.entityInstanceId);
         }
     }
 
@@ -66,6 +110,15 @@ public class CultivatorActionC2SPacket {
     @Nullable
     public ResourceLocation getTargetId() {
         return this.targetId;
+    }
+
+    public int getSlotIndex() {
+        return this.slotIndex;
+    }
+
+    @Nullable
+    public UUID getEntityInstanceId() {
+        return this.entityInstanceId;
     }
 
     public static boolean tryAcquireRateLimit(UUID playerUuid, long gameTime) {
@@ -121,6 +174,65 @@ public class CultivatorActionC2SPacket {
                             sender, data, CultivationPath.BODY, true);
                     case BREAKTHROUGH_SPIRIT -> CultivationActionService.executeBreakthrough(
                             sender, data, CultivationPath.SPIRIT, true);
+                    case UNLOCK_SKILL -> {
+                        if (this.targetId != null) {
+                            CultivationSkillService.executeUnlockSkill(sender, data, this.targetId);
+                        }
+                    }
+                    case EQUIP_MARTIAL_SKILL -> {
+                        if (this.targetId != null) {
+                            CultivationSkillService.executeEquipMartialSkill(sender, data, this.targetId, this.slotIndex);
+                        }
+                    }
+                    case SUMMON_SERVANT -> {
+                        if (this.entityInstanceId != null) {
+                            SubjugationService.summonServantById(sender, data, this.entityInstanceId);
+                        }
+                    }
+                    case RECALL_SERVANT -> {
+                        if (this.entityInstanceId != null) {
+                            SubjugationService.recallServantById(sender, data, this.entityInstanceId);
+                        }
+                    }
+                    case CYCLE_SERVANT_STANCE -> {
+                        if (this.entityInstanceId != null) {
+                            SubjugationService.cycleServantStance(sender, data, this.entityInstanceId);
+                        }
+                    }
+                    case RELEASE_SERVANT -> {
+                        if (this.entityInstanceId != null) {
+                            SubjugationService.releaseServantById(sender, data, this.entityInstanceId);
+                        }
+                    }
+                    case SELECT_DIVINE_PHASE -> {
+                        if (this.targetId != null) {
+                            DivineRemnant.parse(this.targetId.toString()).ifPresent(remnant -> {
+                                var pData = data.getPlayerData();
+                                if (!DivineResonanceBalance.isPhaseUnlocked(pData, this.slotIndex)) {
+                                    sender.displayClientMessage(
+                                            Component.literal("🔒 Fase bloqueada! Requisito: "
+                                                            + DivineResonanceBalance.getPhaseUnlockLabel(this.slotIndex))
+                                                    .withStyle(ChatFormatting.YELLOW),
+                                            true
+                                    );
+                                    return;
+                                }
+                                pData.getSkills().setPrimaryEquippedSkill(remnant.getId());
+                                pData.getSkills().setActiveDivinePhase(this.slotIndex);
+                                DivinePhaseAbility ab = DivinePhaseAbility.get(remnant, this.slotIndex);
+                                sender.serverLevel().playSound(null, sender.getX(), sender.getY(), sender.getZ(),
+                                        ModSounds.SPIRIT_SLOT_CYCLE.get(), SoundSource.PLAYERS, 0.70F, 1.15F);
+                                sender.displayClientMessage(
+                                        Component.literal("✦ [" + remnant.getDisplayName() + "] "
+                                                        + ab.code() + " · " + ab.displayName() + " equipada ([G])!")
+                                                .withStyle(ChatFormatting.GOLD),
+                                        true
+                                );
+                                ModCapabilities.sync(sender);
+                                ModCapabilities.syncEnergy(sender);
+                            });
+                        }
+                    }
                 }
             });
         });

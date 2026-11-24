@@ -1,5 +1,6 @@
 package com.mythiccontracts.client.hud;
 
+import com.mythiccontracts.core.service.SpiritualIntegrityService.SpiritRegenState;
 import com.mythiccontracts.skill.remnant.DivineResonanceBalance.ManifestationTier;
 import net.minecraft.util.Mth;
 
@@ -8,7 +9,8 @@ import java.util.UUID;
 
 /**
  * Estado cliente determinístico para animações da HUD (interpolação exponencial, barra fantasma de dano,
- * micro-tremor de impacto, brilho de cura, pulso de alerta, auto-fade de Vigor e banner de evolução).
+ * micro-tremor de impacto, brilho de cura, pulso de alerta, auto-fade de Vigor, banner de evolução
+ * e estado visual discreto da recuperação de Integridade Espiritual).
  * Totalmente desacoplado de OpenGL/Minecraft para testes unitários determinísticos.
  */
 public final class HudAnimationState {
@@ -20,6 +22,8 @@ public final class HudAnimationState {
     public static final float DAMAGE_SHAKE_DURATION = 0.15F;
     public static final float BANNER_DURATION = 2.60F;
     public static final float BORDER_FLASH_DURATION = 1.20F;
+    public static final float SPIRIT_COMBAT_FLASH_DURATION = 0.18F;
+    public static final float SPIRIT_FULL_PULSE_DURATION = 0.35F;
 
     private static final HudAnimationState INSTANCE = new HudAnimationState();
 
@@ -116,6 +120,7 @@ public final class HudAnimationState {
     private final BarTrack qiTrack = new BarTrack();
     private final BarTrack staminaTrack = new BarTrack();
     private final BarTrack divineResistanceTrack = new BarTrack();
+    private final BarTrack clashDominanceTrack = new BarTrack();
 
     private boolean initialized = false;
     private UUID lastPlayerId = null;
@@ -135,7 +140,13 @@ public final class HudAnimationState {
     private float bannerRemainingSeconds = 0.0F;
     private float borderFlashSeconds = 0.0F;
 
+    private SpiritRegenState lastSpiritRegenState = SpiritRegenState.FULL;
+    private float spiritShimmerPhase = 0.0F;
+    private float spiritCombatFlashSeconds = 0.0F;
+    private float spiritFullPulseSeconds = 0.0F;
+
     public HudAnimationState() {
+        this.clashDominanceTrack.snapTo(0.0F);
     }
 
     public static HudAnimationState getInstance() {
@@ -188,11 +199,27 @@ public final class HudAnimationState {
             this.staminaFullSeconds = 0.0F;
             this.bannerRemainingSeconds = 0.0F;
             this.borderFlashSeconds = 0.0F;
+            this.lastSpiritRegenState = clampedSpirit >= 0.999F ? SpiritRegenState.FULL : SpiritRegenState.RECOVERING;
+            this.spiritShimmerPhase = 0.0F;
+            this.spiritCombatFlashSeconds = 0.0F;
+            this.spiritFullPulseSeconds = 0.0F;
             return;
         }
 
         float prevBodyTarget = this.bodyHealthTrack.getTargetRatio();
         float prevSpiritTarget = this.spiritualIntegrityTrack.getTargetRatio();
+
+        if (animationsEnabled && (prevSpiritTarget - clampedSpirit) >= 0.005F) {
+            this.spiritCombatFlashSeconds = SPIRIT_COMBAT_FLASH_DURATION;
+        } else {
+            this.spiritCombatFlashSeconds = Math.max(0.0F, this.spiritCombatFlashSeconds - dt);
+        }
+
+        if (animationsEnabled && prevSpiritTarget < 0.999F && clampedSpirit >= 0.999F) {
+            this.spiritFullPulseSeconds = SPIRIT_FULL_PULSE_DURATION;
+        } else {
+            this.spiritFullPulseSeconds = Math.max(0.0F, this.spiritFullPulseSeconds - dt);
+        }
 
         if (animationsEnabled && ((prevBodyTarget - clampedBody) >= 0.15F || (prevSpiritTarget - clampedSpirit) >= 0.15F)) {
             this.damageShakeSeconds = DAMAGE_SHAKE_DURATION;
@@ -240,6 +267,48 @@ public final class HudAnimationState {
         this.lastTierOrdinal = safeTier.ordinal();
     }
 
+    public void updateSpiritualState(
+            SpiritRegenState state,
+            float spiritualRatio,
+            float dtSeconds,
+            boolean animationsEnabled
+    ) {
+        SpiritRegenState safeState = state != null ? state : SpiritRegenState.FULL;
+        float dt = Mth.clamp(dtSeconds, 0.0F, MAX_DT_SECONDS);
+        if (!animationsEnabled) {
+            this.spiritShimmerPhase = 0.0F;
+            this.spiritCombatFlashSeconds = 0.0F;
+            this.spiritFullPulseSeconds = 0.0F;
+            this.lastSpiritRegenState = safeState;
+            return;
+        }
+
+        if (safeState == SpiritRegenState.COMBAT_SLOW && this.lastSpiritRegenState != SpiritRegenState.COMBAT_SLOW) {
+            this.spiritCombatFlashSeconds = SPIRIT_COMBAT_FLASH_DURATION;
+        }
+        if (safeState == SpiritRegenState.MEDITATING) {
+            this.spiritShimmerPhase = (this.spiritShimmerPhase + dt * 1.8F) % 1.0F;
+        } else if (safeState == SpiritRegenState.RECOVERING) {
+            this.spiritShimmerPhase = (this.spiritShimmerPhase + dt * 1.0F) % 1.0F;
+        } else {
+            this.spiritShimmerPhase = 0.0F;
+        }
+        if (this.lastSpiritRegenState != SpiritRegenState.FULL
+                && safeState == SpiritRegenState.FULL
+                && spiritualRatio >= 0.999F) {
+            this.spiritFullPulseSeconds = SPIRIT_FULL_PULSE_DURATION;
+        }
+        this.lastSpiritRegenState = safeState;
+    }
+
+    public void updateClashState(boolean clashActive, float clashProgress, float dtSeconds, boolean animationsEnabled) {
+        if (!clashActive) {
+            this.clashDominanceTrack.snapTo(0.0F);
+            return;
+        }
+        this.clashDominanceTrack.update(Mth.clamp(clashProgress, 0.0F, 1.0F), dtSeconds, animationsEnabled, false);
+    }
+
     private void triggerBanner(String text, int color) {
         this.bannerText = text;
         this.bannerColor = color;
@@ -265,11 +334,16 @@ public final class HudAnimationState {
         this.bannerText = "";
         this.bannerRemainingSeconds = 0.0F;
         this.borderFlashSeconds = 0.0F;
+        this.lastSpiritRegenState = SpiritRegenState.FULL;
+        this.spiritShimmerPhase = 0.0F;
+        this.spiritCombatFlashSeconds = 0.0F;
+        this.spiritFullPulseSeconds = 0.0F;
         this.bodyHealthTrack.snapTo(1.0F);
         this.spiritualIntegrityTrack.snapTo(1.0F);
         this.qiTrack.snapTo(1.0F);
         this.staminaTrack.snapTo(1.0F);
         this.divineResistanceTrack.snapTo(1.0F);
+        this.clashDominanceTrack.snapTo(0.0F);
     }
 
     public BarTrack getBodyHealthTrack() {
@@ -290,6 +364,10 @@ public final class HudAnimationState {
 
     public BarTrack getDivineResistanceTrack() {
         return this.divineResistanceTrack;
+    }
+
+    public BarTrack getClashDominanceTrack() {
+        return this.clashDominanceTrack;
     }
 
     public float getElapsedSeconds() {
@@ -330,5 +408,17 @@ public final class HudAnimationState {
 
     public float getBorderFlashSeconds() {
         return this.borderFlashSeconds;
+    }
+
+    public float getSpiritShimmerPhase() {
+        return this.spiritShimmerPhase;
+    }
+
+    public float getSpiritCombatFlashSeconds() {
+        return this.spiritCombatFlashSeconds;
+    }
+
+    public float getSpiritFullPulseSeconds() {
+        return this.spiritFullPulseSeconds;
     }
 }

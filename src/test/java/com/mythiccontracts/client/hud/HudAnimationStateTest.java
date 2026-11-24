@@ -105,5 +105,41 @@ class HudAnimationStateTest {
         state.reset();
         assertEquals(0.0F, state.getBannerRemainingSeconds(), 0.001F);
         assertEquals("", state.getBannerText());
+        assertEquals(0.0F, state.getClashDominanceTrack().getDisplayedRatio(), 0.001F);
+    }
+
+    @Test
+    void tracksSpiritShimmerCombatFlashFullPulseAndClashBarInterpolation() {
+        HudAnimationState state = new HudAnimationState();
+        UUID id = UUID.randomUUID();
+        state.updateSnapshot(id, 1.0F, 0.50F, 1.0F, 1.0F, 1.0F,
+                1, 1, "Corpo Mortal", 1, 1, "Centelha Espiritual", ManifestationTier.TIER_1, 0.05F, true);
+
+        // Shimmer avanca mais rapido em meditacao do que em recuperacao comum
+        state.updateSpiritualState(com.mythiccontracts.core.service.SpiritualIntegrityService.SpiritRegenState.RECOVERING,
+                0.50F, 0.10F, true);
+        float recoveringPhase = state.getSpiritShimmerPhase();
+        assertTrue(recoveringPhase > 0.0F);
+
+        state.updateSpiritualState(com.mythiccontracts.core.service.SpiritualIntegrityService.SpiritRegenState.MEDITATING,
+                0.60F, 0.10F, true);
+        assertTrue(state.getSpiritShimmerPhase() > recoveringPhase);
+
+        // Entrada em COMBAT_SLOW dispara flash de borda 0.18s
+        state.updateSpiritualState(com.mythiccontracts.core.service.SpiritualIntegrityService.SpiritRegenState.COMBAT_SLOW,
+                0.60F, 0.05F, true);
+        assertEquals(HudAnimationState.SPIRIT_COMBAT_FLASH_DURATION, state.getSpiritCombatFlashSeconds(), 0.001F);
+
+        // Ao atingir 100% (FULL), dispara pulso unico 0.35s
+        state.updateSpiritualState(com.mythiccontracts.core.service.SpiritualIntegrityService.SpiritRegenState.FULL,
+                1.00F, 0.05F, true);
+        assertEquals(HudAnimationState.SPIRIT_FULL_PULSE_DURATION, state.getSpiritFullPulseSeconds(), 0.001F);
+
+        // Barra efemera de Disputa interpola suavemente e zera quando encerra
+        state.updateClashState(true, 0.65F, 0.05F, true);
+        float mid = state.getClashDominanceTrack().getDisplayedRatio();
+        assertTrue(mid > 0.0F && mid < 0.65F, "Clash ratio should interpolate toward 0.65, got " + mid);
+        state.updateClashState(false, 0.0F, 0.05F, true);
+        assertEquals(0.0F, state.getClashDominanceTrack().getDisplayedRatio(), 0.0001F);
     }
 }

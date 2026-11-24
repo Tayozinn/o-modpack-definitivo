@@ -14,24 +14,28 @@ public final class PlayerDataSchema {
 
     public static final int VERSION_V1 = 1;
     public static final int VERSION_V2 = 2;
-    public static final int CURRENT_VERSION = 3;
+    public static final int VERSION_V3 = 3;
+    public static final int CURRENT_VERSION = 4;
 
     public static final String TAG_DATA_VERSION = "DataVersion";
 
-    // Sub-blocos v2/v3
+    // Sub-blocos v2/v3/v4
     public static final String TAG_SECTION_CULTIVATION = "Cultivation";
     public static final String TAG_SECTION_FACTION = "Faction";
     public static final String TAG_SECTION_CONTRACTS = "Contracts";
     public static final String TAG_SECTION_SKILLS = "Skills";
     public static final String TAG_SECTION_SUBJUGATION = "Subjugation";
 
-    // Cultivation v2/v3
+    // Cultivation v2/v3/v4
     public static final String TAG_BODY_REALM_ID = "BodyRealmId";
     public static final String TAG_SPIRIT_REALM_ID = "SpiritRealmId";
     public static final String TAG_MAX_QI_CAPACITY = "MaxQiCapacity";
     public static final String TAG_MAX_SPIRITUAL_INTEGRITY = "MaxSpiritualIntegrity";
     public static final String TAG_CURRENT_SPIRITUAL_INTEGRITY = "CurrentSpiritualIntegrity";
     public static final String TAG_SPIRIT_SHATTER_TICKS = "SpiritShatterTicks";
+    public static final String TAG_SPIRIT_COMBAT_COOLDOWN = "SpiritCombatCooldownTicks";
+    public static final String TAG_STILL_MEDITATION_TICKS = "StillMeditationTicks";
+    public static final String TAG_MEDITATION_BOOST_TICKS = "MeditationBoostTicks";
     public static final String TAG_MAX_STAMINA = "MaxStamina";
     public static final String TAG_CURRENT_STAMINA = "CurrentStamina";
     public static final String TAG_STAMINA_REGEN_DELAY = "StaminaRegenDelayTicks";
@@ -49,15 +53,19 @@ public final class PlayerDataSchema {
     public static final String TAG_CONTRACT_VIOLATIONS = "ViolationCount";
     public static final String TAG_CONTRACTS_BROKEN_HISTORY = "BrokenHistory";
 
-    // Skills v2
+    // Skills v2/v4
     public static final String TAG_SKILLS_UNLOCKED = "Unlocked";
     public static final String TAG_SKILLS_EQUIPPED = "Equipped";
+    public static final String TAG_SKILLS_EQUIPPED_MARTIAL = "EquippedMartial";
+    public static final String TAG_SKILLS_ACTIVE_MARTIAL_SLOT = "ActiveMartialSlot";
+    public static final String TAG_SUBJUGATION_MASTERY_TIER = "SubjugationMasteryTier";
     public static final String TAG_SKILLS_COOLDOWNS = "Cooldowns";
     public static final String TAG_MAX_DIVINE_RESISTANCE = "MaxDivineResistance";
     public static final String TAG_CURRENT_DIVINE_RESISTANCE = "CurrentDivineResistance";
     public static final String TAG_DIVINE_OVERLOAD_TICKS = "DivineOverloadTicks";
+    public static final String TAG_ACTIVE_DIVINE_PHASE = "ActiveDivinePhase";
 
-    // Subjugation v2
+    // Subjugation v2/v4
     public static final String TAG_SUBJUGATION_CAPACITY_BONUS = "MaxCapacityBonus";
     public static final String TAG_SUBJUGATION_BOUND = "BoundEntities";
     public static final String TAG_RECORD_INSTANCE_ID = "InstanceId";
@@ -66,6 +74,8 @@ public final class PlayerDataSchema {
     public static final String TAG_RECORD_EXPERIENCE = "Experience";
     public static final String TAG_RECORD_CUSTOM_NAME = "CustomName";
     public static final String TAG_RECORD_SNAPSHOT = "Snapshot";
+    public static final String TAG_RECORD_STANCE = "Stance";
+    public static final String TAG_RECORD_SUMMONED = "Summoned";
 
     // Chaves legadas v1 (mantidas para migração)
     public static final String LEGACY_FACTION = "Faction";

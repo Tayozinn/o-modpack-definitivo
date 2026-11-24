@@ -110,6 +110,9 @@ public final class RealmReloadListener extends SimpleJsonResourceReloadListener 
         float qiRegenBonus = GsonHelper.getAsFloat(json, "qi_regen_bonus", defaultQiRegenBonus(path, order));
         float drainPerSec = GsonHelper.getAsFloat(json, "infusion_drain_per_second", defaultDrainPerSec(path, order));
         float drainPerHit = GsonHelper.getAsFloat(json, "infusion_drain_per_hit", defaultDrainPerHit(path, order));
+        float spiritualRegenBase = json.has("spiritual_regen_base")
+                ? Math.max(0.0F, GsonHelper.getAsFloat(json, "spiritual_regen_base", -1.0F))
+                : -1.0F;
 
         return new RealmDefinition(
                 id,
@@ -121,7 +124,8 @@ public final class RealmReloadListener extends SimpleJsonResourceReloadListener 
                 qiBase,
                 qiRegenBonus,
                 drainPerSec,
-                drainPerHit
+                drainPerHit,
+                spiritualRegenBase
         );
     }
 

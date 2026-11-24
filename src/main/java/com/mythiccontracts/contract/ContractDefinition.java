@@ -13,7 +13,7 @@ import java.util.UUID;
 
 /**
  * Definição Data-Driven de um Contrato Mítico (carregada de {@code data/<ns>/contracts/<id>.json}).
- * Suporta campos v2 opcionais de requisitos (reino/reputação) e bônus vitais passivos.
+ * Suporta requisitos (reino/reputação) e bônus vitais/regenerativos passivos.
  */
 public record ContractDefinition(
         ResourceLocation id,
@@ -31,7 +31,9 @@ public record ContractDefinition(
         int reputationReward,
         float qiRegenBonus,
         float spiritualIntegrityBonus,
-        String tabooSummary
+        String tabooSummary,
+        float spiritualRegenFlatBonus,
+        float spiritualRegenPctBonus
 ) {
     public static final String MODIFIER_NAME_PREFIX = "mythic_contracts.contract.";
 
@@ -47,22 +49,35 @@ public record ContractDefinition(
             boolean breakOnAttackVillager
     ) {
         this(
-                id,
-                displayName,
-                description,
-                allowedFactions,
-                forbiddenFactions,
-                attributeModifiers,
-                periodicAbsorptionHearts,
-                periodicRegenAmplifier,
-                breakOnAttackVillager,
-                1,
-                1,
-                0,
-                0,
-                0.0F,
-                0.0F,
-                ""
+                id, displayName, description, allowedFactions, forbiddenFactions,
+                attributeModifiers, periodicAbsorptionHearts, periodicRegenAmplifier, breakOnAttackVillager,
+                1, 1, 0, 0, 0.0F, 0.0F, "", 0.0F, 0.0F
+        );
+    }
+
+    public ContractDefinition(
+            ResourceLocation id,
+            String displayName,
+            String description,
+            Set<FactionType> allowedFactions,
+            Set<FactionType> forbiddenFactions,
+            List<AttributeEntry> attributeModifiers,
+            double periodicAbsorptionHearts,
+            int periodicRegenAmplifier,
+            boolean breakOnAttackVillager,
+            int minBodyRealm,
+            int minSpiritRealm,
+            int minReputation,
+            int reputationReward,
+            float qiRegenBonus,
+            float spiritualIntegrityBonus,
+            String tabooSummary
+    ) {
+        this(
+                id, displayName, description, allowedFactions, forbiddenFactions,
+                attributeModifiers, periodicAbsorptionHearts, periodicRegenAmplifier, breakOnAttackVillager,
+                minBodyRealm, minSpiritRealm, minReputation, reputationReward,
+                qiRegenBonus, spiritualIntegrityBonus, tabooSummary, 0.0F, 0.0F
         );
     }
 
@@ -73,6 +88,12 @@ public record ContractDefinition(
         minBodyRealm = Math.max(1, minBodyRealm);
         minSpiritRealm = Math.max(1, minSpiritRealm);
         tabooSummary = tabooSummary != null ? tabooSummary : "";
+        if (!Float.isFinite(spiritualRegenFlatBonus)) {
+            spiritualRegenFlatBonus = 0.0F;
+        }
+        if (!Float.isFinite(spiritualRegenPctBonus)) {
+            spiritualRegenPctBonus = 0.0F;
+        }
     }
 
     public boolean isAllowedForFaction(FactionType faction) {

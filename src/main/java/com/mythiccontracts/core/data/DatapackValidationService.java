@@ -9,6 +9,8 @@ import com.mythiccontracts.cultivation.realm.RealmDefinition;
 import com.mythiccontracts.cultivation.realm.RealmRegistry;
 import com.mythiccontracts.faction.FactionDefinition;
 import com.mythiccontracts.faction.FactionRegistry;
+import com.mythiccontracts.skill.cultivation.CultivationSkillDefinition;
+import com.mythiccontracts.skill.cultivation.CultivationSkillRegistry;
 import com.mythiccontracts.skill.definition.DivineSkillDefinition;
 import com.mythiccontracts.skill.definition.DivineSkillRegistry;
 import net.minecraft.resources.ResourceLocation;
@@ -134,6 +136,21 @@ public final class DatapackValidationService {
             if (skill.minSpiritRealm() > maxSpiritOrder) {
                 warnings.add("Habilidade '" + skill.id() + "' exige Espírito R" + skill.minSpiritRealm()
                         + ", acima do máximo carregado (R" + maxSpiritOrder + ").");
+            }
+        }
+
+        // 5. Técnicas de Cultivo R1–R7: custos, cooldowns e pré-requisitos encadeados
+        for (CultivationSkillDefinition tech : CultivationSkillRegistry.getAllSkills()) {
+            if (tech.id() == null) {
+                errors.add("Técnica de cultivo com ID nulo registrada.");
+                continue;
+            }
+            if (tech.cooldownTicks() < 20) {
+                errors.add("Técnica '" + tech.id() + "' possui cooldown_ticks inválido (< 20).");
+            }
+            ResourceLocation prereq = tech.requirements().prerequisiteSkill();
+            if (prereq != null && CultivationSkillRegistry.getSkill(prereq) == null) {
+                warnings.add("Técnica '" + tech.id() + "' referencia pré-requisito inexistente: '" + prereq + "'.");
             }
         }
 

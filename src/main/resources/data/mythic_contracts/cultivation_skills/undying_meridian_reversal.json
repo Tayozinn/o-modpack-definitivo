@@ -1,0 +1,24 @@
+{
+  "id": "mythic_contracts:undying_meridian_reversal",
+  "display_name": "Reversão dos Meridianos Imortais",
+  "path_type": "HYBRID",
+  "category": "DEFENSIVE",
+  "tier_realm": 6,
+  "hud_color": "#E879F9",
+  "mechanic_summary": "Usável mesmo em Colapso Espiritual: purga a fratura da alma, restaura 40% de Integridade e concede imunidade a repulsão por 3s.",
+  "qi_cost": 50.0,
+  "stamina_cost": 50.0,
+  "spiritual_integrity_cost": 0.0,
+  "cooldown_ticks": 900,
+  "usable_during_shatter": true,
+  "enabled": true,
+  "unlock_requirements": {
+    "min_body_realm": 6,
+    "min_body_stage": 1,
+    "min_spirit_realm": 6,
+    "min_spirit_stage": 1,
+    "prerequisite_skill": "mythic_contracts:golden_core_aegis",
+    "require_active_contract": false,
+    "qi_unlock_cost": 180.0
+  }
+}

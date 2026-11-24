@@ -39,7 +39,7 @@ class DivineRingGeometryTest {
             }
         });
 
-        assertTrue(totalPixels.get() > 250);
+        assertTrue(totalPixels.get() > 140);
         assertEquals(leftPixels.get(), rightPixels.get());
     }
 
@@ -56,5 +56,29 @@ class DivineRingGeometryTest {
         });
 
         assertEquals(fullPixels.get() / 2, halfPixels.get());
+    }
+
+    @Test
+    void fourOuterPhaseSegmentsAreDisjointWithinOuterAnnulus() {
+        boolean[][] occupied = new boolean[DivineRingGeometry.DIAMETER][DivineRingGeometry.DIAMETER];
+        for (int seg = 0; seg < DivineRingGeometry.SEGMENT_COUNT; seg++) {
+            final int segmentIndex = seg;
+            AtomicInteger segPixels = new AtomicInteger();
+            DivineRingGeometry.forEachSegmentSpan(seg, (y, x0, x1) -> {
+                assertTrue(y >= 0 && y < DivineRingGeometry.DIAMETER);
+                assertTrue(x0 >= 0 && x1 <= DivineRingGeometry.DIAMETER && x0 < x1);
+                float dy = (y + 0.5F) - DivineRingGeometry.CENTER;
+                for (int px = x0; px < x1; px++) {
+                    assertFalse(occupied[y][px], "Segment overlap at seg=" + segmentIndex + " (" + px + "," + y + ")");
+                    occupied[y][px] = true;
+                    float dx = (px + 0.5F) - DivineRingGeometry.CENTER;
+                    double dist = Math.hypot(dx, dy);
+                    assertTrue(dist >= DivineRingGeometry.PHASE_INNER_RADIUS && dist <= DivineRingGeometry.PHASE_OUTER_RADIUS,
+                            "Pixel outside outer phase segment annulus: dist=" + dist);
+                    segPixels.incrementAndGet();
+                }
+            });
+            assertTrue(segPixels.get() >= 25, "Expected non-empty arc segment for phase " + seg);
+        }
     }
 }

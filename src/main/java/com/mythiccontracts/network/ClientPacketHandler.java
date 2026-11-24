@@ -2,6 +2,7 @@ package com.mythiccontracts.network;
 
 import com.mythiccontracts.capability.ModCapabilities;
 import com.mythiccontracts.capability.PlayerCoreData;
+import com.mythiccontracts.client.ClientRuntimeState;
 import com.mythiccontracts.client.fx.ClientVfxScheduler;
 import com.mythiccontracts.core.player.PlayerData;
 import net.minecraft.client.Minecraft;
@@ -36,8 +37,19 @@ public final class ClientPacketHandler {
             float maxSpiritualIntegrity,
             int spiritShatterTicks,
             float currentStamina,
-            float maxStamina
+            float maxStamina,
+            byte spiritRegenStateOrdinal,
+            int activeMartialSlot,
+            int activeMartialCooldownTicks,
+            boolean clashActive,
+            float clashProgress,
+            boolean clashRevoltWindow,
+            String clashTargetName,
+            int activeDivinePhase
     ) {
+        ClientRuntimeState.updateEnergyRuntime(
+                activeMartialCooldownTicks, clashActive, clashProgress, clashRevoltWindow, clashTargetName
+        );
         Player localPlayer = Minecraft.getInstance().player;
         if (localPlayer != null) {
             ModCapabilities.getData(localPlayer).ifPresent(playerData -> {
@@ -48,14 +60,17 @@ public final class ClientPacketHandler {
                 cult.setMaxSpiritualIntegrity(maxSpiritualIntegrity);
                 cult.setCurrentSpiritualIntegrity(currentSpiritualIntegrity);
                 cult.setSpiritShatterTicks(spiritShatterTicks);
+                cult.setClientSpiritRegenStateOrdinal(spiritRegenStateOrdinal);
                 cult.setMaxStamina(maxStamina);
                 cult.setCurrentStamina(currentStamina);
 
                 var skills = playerData.getSkills();
                 skills.setUniqueSkillCooldownTicks(uniqueSkillCooldownTicks);
+                skills.setActiveMartialSlot(activeMartialSlot);
                 skills.setMaxDivineResistance(maxDivineResistance);
                 skills.setCurrentDivineResistance(currentDivineResistance);
                 skills.setDivineOverloadTicks(divineOverloadTicks);
+                skills.setActiveDivinePhase(activeDivinePhase);
             });
         }
     }

@@ -1,0 +1,25 @@
+{
+  "id": "mythic_contracts:soul_subjugation",
+  "display_name": "Grilhão de Subjugação Espiritual",
+  "path_type": "SPIRIT",
+  "category": "DOMAIN",
+  "tier_realm": 2,
+  "hud_color": "#A855F7",
+  "mechanic_summary": "Inicia a Disputa de Subjugação no alvo enfraquecido (reaproveita Selo como catalisador) ou invoca/recolhe servo.",
+  "qi_cost": 30.0,
+  "stamina_cost": 15.0,
+  "spiritual_integrity_cost": 0.0,
+  "cooldown_ticks": 200,
+  "usable_during_shatter": false,
+  "enabled": true,
+  "unlock_requirements": {
+    "min_body_realm": 1,
+    "min_body_stage": 1,
+    "min_spirit_realm": 2,
+    "min_spirit_stage": 1,
+    "prerequisite_skill": null,
+    "require_active_contract": false,
+    "realm_bypass_factions": ["quebradores_de_tronos"],
+    "qi_unlock_cost": 40.0
+  }
+}

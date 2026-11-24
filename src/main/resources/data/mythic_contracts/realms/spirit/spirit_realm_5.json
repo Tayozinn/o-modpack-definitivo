@@ -5,6 +5,7 @@
   "display_name": "Domínio Etéreo",
   "qi_base": 240.0,
   "qi_regen_bonus": 10.0,
+  "spiritual_regen_base": 14.78,
   "infusion_drain_per_second": 4.5,
   "infusion_drain_per_hit": 7.0,
   "requirements": {

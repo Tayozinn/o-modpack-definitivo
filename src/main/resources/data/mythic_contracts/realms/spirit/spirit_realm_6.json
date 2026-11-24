@@ -5,6 +5,7 @@
   "display_name": "Ascensão Celestial",
   "qi_base": 275.0,
   "qi_regen_bonus": 11.5,
+  "spiritual_regen_base": 18.60,
   "infusion_drain_per_second": 5.0,
   "infusion_drain_per_hit": 8.0,
   "requirements": {

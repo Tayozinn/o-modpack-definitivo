@@ -87,6 +87,10 @@ public final class EnergyService {
      * Se a barra zerar neste uso, a habilidade ainda é disparada mas dispara Sobrecarga Divina (60s).
      */
     public static DivineSpendOutcome consumeDivineResistanceOrOverload(PlayerData playerData) {
+        return consumeDivineResistanceOrOverload(playerData, 0);
+    }
+
+    public static DivineSpendOutcome consumeDivineResistanceOrOverload(PlayerData playerData, int phaseIndex) {
         if (playerData == null) {
             return DivineSpendOutcome.BLOCKED_OVERLOAD;
         }
@@ -100,7 +104,7 @@ public final class EnergyService {
             return DivineSpendOutcome.BLOCKED_OVERLOAD;
         }
 
-        float cost = DivineResonanceBalance.calculateDivineSkillCost(playerData);
+        float cost = DivineResonanceBalance.calculateDivinePhaseSkillCost(playerData, phaseIndex);
         float remaining = skills.getCurrentDivineResistance() - cost;
         if (remaining <= 0.0F) {
             skills.setCurrentDivineResistance(0.0F);
@@ -121,6 +125,10 @@ public final class EnergyService {
     }
 
     public static EnergyTickResult tickAllEnergy(PlayerData playerData, boolean sprinting) {
+        return tickAllEnergy(playerData, sprinting, false);
+    }
+
+    public static EnergyTickResult tickAllEnergy(PlayerData playerData, boolean sprinting, boolean crouchingAndStill) {
         if (playerData == null) {
             return new EnergyTickResult(false, false, false);
         }
@@ -128,6 +136,7 @@ public final class EnergyService {
 
         // 1. Qi (Infusão V)
         CultivationData cult = playerData.getCultivation();
+        cult.tickCombatBuffTimers();
         RealmDefinition spiritRealm = CultivationService.getCurrentRealm(playerData, CultivationPath.SPIRIT);
         int spiritStageNum = CultivationService.getCurrentStageNumber(playerData, CultivationPath.SPIRIT);
 
@@ -147,6 +156,9 @@ public final class EnergyService {
             float regenPerSecond = spiritRealm.qiRegenBonus()
                     + 0.5F * Math.max(0, spiritStageNum - 1)
                     + ContractManager.getTotalQiRegenBonus(playerData);
+            if (cult.getMeditationBoostTicks() > 0 && cult.getSpiritCombatCooldownTicks() <= 0) {
+                regenPerSecond *= 2.5F;
+            }
             cult.setCurrentQi(prevQi + (Math.max(0.5F, regenPerSecond) / 20.0F));
         }
 
@@ -172,7 +184,7 @@ public final class EnergyService {
         VitalService.tickStamina(playerData, sprinting, false);
 
         // 4. Integridade Espiritual — capacidade já recalculada no topo do tick
-        boolean spiritShatterEnded = SpiritualIntegrityService.tickSpiritualIntegrity(playerData, false);
+        boolean spiritShatterEnded = SpiritualIntegrityService.tickSpiritualIntegrity(playerData, false, crouchingAndStill);
 
         return new EnergyTickResult(qiDepleted, overloadEnded, spiritShatterEnded);
     }

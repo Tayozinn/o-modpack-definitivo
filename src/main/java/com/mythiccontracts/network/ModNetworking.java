@@ -13,7 +13,7 @@ import net.minecraftforge.network.simple.SimpleChannel;
 import java.util.Optional;
 
 public final class ModNetworking {
-    public static final String PROTOCOL_VERSION = "5";
+    public static final String PROTOCOL_VERSION = "7";
     public static final SimpleChannel CHANNEL = NetworkRegistry.newSimpleChannel(
             new ResourceLocation(MythicContractsMod.MOD_ID, "main"),
             () -> PROTOCOL_VERSION,
@@ -89,6 +89,33 @@ public final class ModNetworking {
                 SpawnVisualEffectS2CPacket::new,
                 SpawnVisualEffectS2CPacket::handle,
                 Optional.of(NetworkDirection.PLAY_TO_CLIENT)
+        );
+
+        CHANNEL.registerMessage(
+                nextId(),
+                ActivateCultivationSkillC2SPacket.class,
+                ActivateCultivationSkillC2SPacket::toBytes,
+                ActivateCultivationSkillC2SPacket::new,
+                ActivateCultivationSkillC2SPacket::handle,
+                Optional.of(NetworkDirection.PLAY_TO_SERVER)
+        );
+
+        CHANNEL.registerMessage(
+                nextId(),
+                CycleMartialSlotC2SPacket.class,
+                CycleMartialSlotC2SPacket::toBytes,
+                CycleMartialSlotC2SPacket::new,
+                CycleMartialSlotC2SPacket::handle,
+                Optional.of(NetworkDirection.PLAY_TO_SERVER)
+        );
+
+        CHANNEL.registerMessage(
+                nextId(),
+                CycleDivinePhaseC2SPacket.class,
+                CycleDivinePhaseC2SPacket::toBytes,
+                CycleDivinePhaseC2SPacket::new,
+                CycleDivinePhaseC2SPacket::handle,
+                Optional.of(NetworkDirection.PLAY_TO_SERVER)
         );
     }
 

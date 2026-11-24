@@ -3,15 +3,20 @@ package com.mythiccontracts.client.hud;
 import com.mythiccontracts.capability.FactionType;
 import com.mythiccontracts.capability.PlayerCoreData;
 import com.mythiccontracts.client.ClientKeyEvents;
+import com.mythiccontracts.client.ClientRuntimeState;
 import com.mythiccontracts.core.player.CultivationData;
 import com.mythiccontracts.core.player.PlayerData;
 import com.mythiccontracts.core.player.SkillData;
+import com.mythiccontracts.core.service.SpiritualIntegrityService.SpiritRegenState;
 import com.mythiccontracts.cultivation.UniqueSkillHandler;
 import com.mythiccontracts.cultivation.progression.CultivationService;
 import com.mythiccontracts.cultivation.realm.CultivationPath;
+import com.mythiccontracts.skill.cultivation.CultivationSkillRegistry;
 import com.mythiccontracts.skill.remnant.DivineRemnant;
 import com.mythiccontracts.skill.remnant.DivineResonanceBalance;
 import com.mythiccontracts.skill.remnant.DivineResonanceBalance.ManifestationTier;
+import com.mythiccontracts.subjugation.SubjugationBalance;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Player;
 
@@ -48,8 +53,59 @@ public record HudRenderSnapshot(
         ManifestationTier tier,
         int subjugatedCount,
         String infusionKeyLabel,
-        String skillKeyLabel
+        String skillKeyLabel,
+        SpiritRegenState spiritRegenState,
+        int maxSubjugatedCapacity,
+        String activeMartialSkillName,
+        int activeMartialSlot,
+        int activeMartialCooldownTicks,
+        String martialKeyLabel,
+        boolean clashActive,
+        float clashProgress,
+        boolean clashRevoltWindow,
+        String clashTargetName,
+        int activeDivinePhase,
+        int unlockedDivinePhases
 ) {
+
+    public HudRenderSnapshot(
+            FactionType faction,
+            boolean infusionActive,
+            int bodyRealm,
+            int bodyStage,
+            String bodyRealmName,
+            int spiritRealm,
+            int spiritStage,
+            String spiritRealmName,
+            float health,
+            float maxHealth,
+            float absorption,
+            float spiritualIntegrity,
+            float maxSpiritualIntegrity,
+            int spiritShatterTicks,
+            float currentQi,
+            float maxQi,
+            float currentStamina,
+            float maxStamina,
+            float currentDivineResistance,
+            float maxDivineResistance,
+            int divineOverloadTicks,
+            int uniqueSkillCooldownTicks,
+            DivineRemnant equippedRemnant,
+            ManifestationTier tier,
+            int subjugatedCount,
+            String infusionKeyLabel,
+            String skillKeyLabel
+    ) {
+        this(
+                faction, infusionActive, bodyRealm, bodyStage, bodyRealmName, spiritRealm, spiritStage, spiritRealmName,
+                health, maxHealth, absorption, spiritualIntegrity, maxSpiritualIntegrity, spiritShatterTicks,
+                currentQi, maxQi, currentStamina, maxStamina, currentDivineResistance, maxDivineResistance,
+                divineOverloadTicks, uniqueSkillCooldownTicks, equippedRemnant, tier, subjugatedCount,
+                infusionKeyLabel, skillKeyLabel,
+                SpiritRegenState.FULL, 1, "", 0, 0, "ALT+G", false, 0.0F, false, "", 0, 1
+        );
+    }
 
     public float bodyHealthRatio() {
         return Mth.clamp(this.health / Math.max(1.0F, this.maxHealth), 0.0F, 1.0F);
@@ -79,6 +135,22 @@ public record HudRenderSnapshot(
         String infKey = shortKeyLabel(ClientKeyEvents.MANA_INFUSION_KEY.getTranslatedKeyMessage().getString(), "V");
         String skillKey = shortKeyLabel(ClientKeyEvents.UNIQUE_SKILL_KEY.getTranslatedKeyMessage().getString(), "G");
 
+        SpiritRegenState regenState = cult.isSpiritShattered()
+                ? SpiritRegenState.BLOCKED_SHATTER
+                : SpiritRegenState.fromOrdinal(cult.getClientSpiritRegenStateOrdinal());
+        int maxBound = SubjugationBalance.calculateMaxBoundCapacity(playerData);
+
+        ResourceLocation activeMartialId = skills.getActiveMartialSkill();
+        String martialName = activeMartialId != null ? CultivationSkillRegistry.getDisplayName(activeMartialId) : "";
+        String martialKey = ClientKeyEvents.CULTIVATION_SKILL_KEY.getTranslatedKeyMessage().getString().trim();
+        if (martialKey.isEmpty() || martialKey.length() > 7) {
+            martialKey = "ALT+G";
+        }
+
+        ManifestationTier unlockedTier = DivineResonanceBalance.getManifestationTier(playerData);
+        int unlockedPhases = unlockedTier.ordinal() + 1;
+        int activePhase = Mth.clamp(skills.getActiveDivinePhase(), 0, unlockedPhases - 1);
+
         return new HudRenderSnapshot(
                 data.getFaction() != null ? data.getFaction() : FactionType.NONE,
                 data.isManaInfusionActive(),
@@ -103,10 +175,22 @@ public record HudRenderSnapshot(
                 skills.getDivineOverloadTicks(),
                 skills.getUniqueSkillCooldownTicks(),
                 UniqueSkillHandler.getEquippedRemnant(playerData),
-                DivineResonanceBalance.getManifestationTier(playerData),
+                unlockedTier,
                 data.getSubjugatedEntities().size(),
                 infKey,
-                skillKey
+                skillKey,
+                regenState,
+                maxBound,
+                martialName,
+                skills.getActiveMartialSlot(),
+                ClientRuntimeState.getActiveMartialCooldownTicks(),
+                martialKey.toUpperCase(Locale.ROOT),
+                ClientRuntimeState.isClashActive(),
+                ClientRuntimeState.getClashProgress(),
+                ClientRuntimeState.isClashRevoltWindow(),
+                ClientRuntimeState.getClashTargetName(),
+                activePhase,
+                unlockedPhases
         );
     }
 
@@ -136,9 +220,21 @@ public record HudRenderSnapshot(
                 0,
                 DivineRemnant.EYE_OF_RA,
                 ManifestationTier.TIER_3,
-                3,
+                2,
                 "V",
-                "G"
+                "G",
+                SpiritRegenState.RECOVERING,
+                2,
+                "Palma Sísmica",
+                0,
+                0,
+                "ALT+G",
+                false,
+                0.0F,
+                false,
+                "",
+                1,
+                3
         );
     }
 

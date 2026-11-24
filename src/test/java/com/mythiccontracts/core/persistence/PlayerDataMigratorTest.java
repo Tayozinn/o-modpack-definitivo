@@ -161,7 +161,65 @@ class PlayerDataMigratorTest {
         assertEquals(155.0F, data.getCultivation().getCurrentStamina(), 0.01F);
         assertEquals(111.0F, data.getCultivation().getCurrentQi(), 0.01F);
 
-        CompoundTag savedV3 = PlayerDataSerializer.writeFull(data);
-        assertEquals(3, savedV3.getInt(PlayerDataSchema.TAG_DATA_VERSION));
+        CompoundTag savedV4 = PlayerDataSerializer.writeFull(data);
+        assertEquals(PlayerDataSchema.CURRENT_VERSION, savedV4.getInt(PlayerDataSchema.TAG_DATA_VERSION));
+    }
+
+    @Test
+    void migratesV3TagToV4AndPreservesMartialSlotsMasteryAndServantStance() {
+        CompoundTag v3 = new CompoundTag();
+        v3.putInt(PlayerDataSchema.TAG_DATA_VERSION, PlayerDataSchema.VERSION_V3);
+        v3.put(PlayerDataSchema.TAG_SECTION_CULTIVATION, PlayerDataSerializer.writeFull(new PlayerData())
+                .getCompound(PlayerDataSchema.TAG_SECTION_CULTIVATION));
+
+        PlayerData migrated = new PlayerData();
+        PlayerDataSerializer.read(v3, migrated);
+        assertEquals(1, migrated.getSkills().getSubjugationMasteryTier());
+        assertEquals(0, migrated.getSkills().getActiveMartialSlot());
+
+        ResourceLocation tech1 = new ResourceLocation("mythic_contracts", "gale_meridian_step");
+        ResourceLocation tech2 = new ResourceLocation("mythic_contracts", "soul_subjugation");
+        migrated.getSkills().unlockSkill(tech1);
+        migrated.getSkills().unlockSkill(tech2);
+        migrated.getSkills().setMartialSkillInSlot(0, tech1);
+        migrated.getSkills().setMartialSkillInSlot(1, tech2);
+        migrated.getSkills().setActiveMartialSlot(1);
+        migrated.getSkills().setActiveDivinePhase(2);
+        migrated.getSkills().setSubjugationMasteryTier(3);
+        migrated.getCultivation().setSpiritCombatCooldownTicks(65);
+        migrated.getSubjugation().addRecord(new SubjugatedEntityRecord(
+                UUID.randomUUID(),
+                new ResourceLocation("minecraft", "ravager"),
+                4,
+                900,
+                "Fera de Ferro",
+                new CompoundTag(),
+                SubjugatedEntityRecord.ServantStance.AGGRESSIVE,
+                true
+        ));
+
+        CompoundTag v4Full = PlayerDataSerializer.writeFull(migrated);
+        assertEquals(4, v4Full.getInt(PlayerDataSchema.TAG_DATA_VERSION));
+
+        PlayerData restored = new PlayerData();
+        PlayerDataSerializer.read(v4Full, restored);
+        assertEquals(tech1, restored.getSkills().getMartialSkillInSlot(0));
+        assertEquals(tech2, restored.getSkills().getMartialSkillInSlot(1));
+        assertEquals(1, restored.getSkills().getActiveMartialSlot());
+        assertEquals(2, restored.getSkills().getActiveDivinePhase());
+        assertEquals(3, restored.getSkills().getSubjugationMasteryTier());
+        assertEquals(65, restored.getCultivation().getSpiritCombatCooldownTicks());
+        assertEquals(SubjugatedEntityRecord.ServantStance.AGGRESSIVE,
+                restored.getSubjugation().getBoundEntities().get(0).stance());
+        assertTrue(restored.getSubjugation().getBoundEntities().get(0).summoned());
+
+        CompoundTag v4Sync = PlayerDataSerializer.writeClientSync(migrated);
+        PlayerData synced = new PlayerData();
+        PlayerDataSerializer.read(v4Sync, synced);
+        assertEquals(2, synced.getSkills().getActiveDivinePhase());
+        assertNull(synced.getSubjugation().getBoundEntities().get(0).entitySnapshot());
+        assertEquals(SubjugatedEntityRecord.ServantStance.AGGRESSIVE,
+                synced.getSubjugation().getBoundEntities().get(0).stance());
+        assertTrue(synced.getSubjugation().getBoundEntities().get(0).summoned());
     }
 }
