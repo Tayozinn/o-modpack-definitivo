@@ -1,0 +1,2 @@
+# Xaero's Minimap — Posicionado no canto superior direito para não sobrepor a HUD Murim (topo esquerdo) nem o Anel Divino (inferior esquerdo)
+minimap:0:0:true:false:true:false:false

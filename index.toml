@@ -65,12 +65,16 @@ file = "config/lostcities/profiles/pos_guerra_2010.json"
 hash = "a1ed5515f95ed086c6eddb28bf8162b79f192e3342a9ef0ab37d3a63cca537c8"
 
 [[files]]
+file = "config/xaerominimap.txt"
+hash = "f8147b881c17c5f6eedfd6ce85a0b029c85b4dd0e6706d7d43aa0d72d3509811"
+
+[[files]]
 file = "defaultconfigs/lostcities-server.toml"
 hash = "18843e71b8aa8f2bef3aba42c73d5f0cf0830f8e002f3afdee62643e24b243f9"
 
 [[files]]
 file = "defaultconfigs/options.txt"
-hash = "299d0fc31fe4a263320873d8b5f26dd924cdcac4768e33e15a7a60c59d8e41db"
+hash = "849cea452be906d43ceb36f5af5be6080d3b2450d72a631df8683c5a93085a00"
 
 [[files]]
 file = "kubejs/client_scripts/00_init.js"
@@ -99,6 +103,11 @@ hash = "fcb861419f0f1663883d50f39b5a55d338791c8fa0449f8502f6d003f300bd76"
 [[files]]
 file = "kubejs/startup_scripts/00_init.js"
 hash = "fcbd6ba824a35453c57bfb743deeac59cb038796ac29f1144d005bac5af1e5ea"
+
+[[files]]
+file = "mods/appleskin.pw.toml"
+hash = "793693a85f3c87d4e899ee0c58deabc53690bf5a70f17343f28fd5063ce8a1e1"
+metafile = true
 
 [[files]]
 file = "mods/architectury-api.pw.toml"
@@ -133,6 +142,16 @@ metafile = true
 [[files]]
 file = "mods/cloth-config.pw.toml"
 hash = "e3dd03e7fec88831974857e2cdded54dd5c5bdcaa3f6d6248c2800e82db4dd41"
+metafile = true
+
+[[files]]
+file = "mods/clumps.pw.toml"
+hash = "903352ffbd84d4b95fed905893f4715d9c3f88ec9fff6fb06f6e359e0b839dc3"
+metafile = true
+
+[[files]]
+file = "mods/controlling.pw.toml"
+hash = "4063abe583282834b2f78e3b3e6b9ee4d231a680f74c020e405a4ef196f21ee4"
 metafile = true
 
 [[files]]
@@ -211,6 +230,11 @@ hash = "99484c29e54191a2d32178d555ba03b1e4b6f93b3202f8bab6782d8146261b29"
 metafile = true
 
 [[files]]
+file = "mods/mouse-tweaks.pw.toml"
+hash = "679fa8f3b49b9ed3fbcb29d6ccdb99bce465faa01f9cec000464ac8d4fbe134f"
+metafile = true
+
+[[files]]
 file = "mods/mowzies-mobs.pw.toml"
 hash = "0e6b04ea03c95a193b564aee5c67b8912c52c1de61cd2bd43222c494e26bbbe9"
 metafile = true
@@ -230,8 +254,18 @@ hash = "5b92406160d9ea8a61ddf111caaecb7f6283678e2c40b08b72dce3eeaf20dc96"
 metafile = true
 
 [[files]]
+file = "mods/searchables.pw.toml"
+hash = "b8c7497acbf4890b4609b6b20de7affdd3482fc99af975d9ff6b29c075e1d8a7"
+metafile = true
+
+[[files]]
 file = "mods/simply-swords.pw.toml"
 hash = "e7b4f5d39d49d95fc3b11d7e39b29dc7206ef38274200f745912aae332d496e7"
+metafile = true
+
+[[files]]
+file = "mods/sound-physics-remastered.pw.toml"
+hash = "416bb6449da951ec1a04156348c502b9e47a947212becc173d277faaddaaaccd"
 metafile = true
 
 [[files]]
@@ -242,4 +276,14 @@ metafile = true
 [[files]]
 file = "mods/timeless-and-classics-zero.pw.toml"
 hash = "849e15667d1d13988f773ceae2cc9ba8e090381d45a3815f42366b50e8258c06"
+metafile = true
+
+[[files]]
+file = "mods/xaeros-minimap.pw.toml"
+hash = "7f87fe777d2f09bf5f19f06dc69b60023bc8caf34cba74ab6b62005cf184b348"
+metafile = true
+
+[[files]]
+file = "mods/xaeros-world-map.pw.toml"
+hash = "5290b1a5c4624ba20a080385052eb55cfdc42170dfc5cd5aeecd570115d5f947"
 metafile = true

@@ -75,3 +75,23 @@ A auditoria direta nas classes de registro de teclas (`KeyMapping`) na branch `1
               [Z: TaCZ Mod] [X: Conjurar] [C: Deitar]     [V: ★MANA/QI★]    [B: Modo Tiro] [N: BC Minerar]  [M: Coronhada/Zoom]
                             [Left Alt + Scroll: Trocar Feitiço]  [Espaço: Pular]
 ```
+
+
+---
+
+## Atualização Etapa 5 — Mapa (Xaero's), Atmosfera 2010 & QoL (Zero Conflitos)
+
+Todos os atalhos do **Xaero's Minimap** e **Xaero's World Map** foram movidos para pontuação e Numpad (`6–9`, `+`/`-`) para preservar 100% das teclas de *TaCZ* (`M`, `B`, `Z`), *Iron's Spells* (`Y`), *Mythic Contracts* (`V`, `G`, `U`, `ALT+G`, `ALT+V`) e *Jade* (`Numpad 0–5`):
+
+| Ação | Tecla Definida (`defaultconfigs/options.txt`) | Conflito Evitado |
+| :--- | :---: | :--- |
+| **Abrir Mapa-Múndi** (*Xaero's World Map*) | `,` (`key.keyboard.comma`) | `M` (*TaCZ* Coronhada/Zoom) |
+| **Novo Waypoint** (*Xaero's Minimap*) | `.` (`key.keyboard.period`) | `B` (*TaCZ* Seletor de Tiro) |
+| **Menu de Waypoints** (*Xaero's Minimap*) | `;` (`key.keyboard.semicolon`) | `U` (*Cultivator Screen*) |
+| **Ampliar Minimapa** (*Xaero's Minimap*) | `` ` `` (`key.keyboard.grave.accent`) | `Z` (*TaCZ* Refit) |
+| **Configurações do Minimapa / Mapa-Múndi** | `Numpad 6` / `Numpad 7` | `Y` (*Iron's Spells* Roda) |
+| **Alternar Minimapa / Waypoints no Mundo** | `Numpad 8` / `Numpad 9` | `Numpad 0–5` (*Jade*) |
+| **Zoom Minimapa (+ / -)** | `Numpad +` / `Numpad -` | `I` / `O` (*Curios* / *TaCZ*) |
+
+- **Posição da HUD do Minimapa (`config/xaerominimap.txt`):** travada no **canto superior direito**, mantendo o canto superior esquerdo livre para a **HUD Vital Murim** e o canto inferior esquerdo livre para o **Anel de Resistência Divina (`[G]`)**.
+- **Atmosfera & QoL adicionados:** *Sound Physics Remastered* (eco acústico realista nos prédios/metrôs de 2010), *AppleSkin*, *Mouse Tweaks*, *Controlling* + *Searchables* (busca de atalhos no menu) e *Clumps* (fusão de orbes de XP após bosses).

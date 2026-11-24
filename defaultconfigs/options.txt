@@ -82,3 +82,13 @@ key_key.jade.narrate:key.keyboard.keypad.5
 key_key.mythic_contracts.mana_infusion:key.keyboard.v
 key_key.mythic_contracts.unique_skill:key.keyboard.g
 key_key.mythic_contracts.cultivator_screen:key.keyboard.u
+key_gui.xaero_open_map:key.keyboard.comma
+key_gui.xaero_new_waypoint:key.keyboard.period
+key_gui.xaero_waypoints_key:key.keyboard.semicolon
+key_gui.xaero_enlarge_map:key.keyboard.grave.accent
+key_gui.xaero_minimap_settings:key.keyboard.keypad.6
+key_gui.xaero_open_settings:key.keyboard.keypad.7
+key_gui.xaero_toggle_map:key.keyboard.keypad.8
+key_gui.xaero_toggle_waypoints:key.keyboard.keypad.9
+key_gui.xaero_zoom_in:key.keyboard.keypad.add
+key_gui.xaero_zoom_out:key.keyboard.keypad.subtract
