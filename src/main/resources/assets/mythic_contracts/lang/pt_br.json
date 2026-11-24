@@ -1,5 +1,71 @@
 {
   "item.mythic_contracts.subjugation_seal": "Selo de Subjugação",
+  "item.mythic_contracts.body_refinement_pill": "Pílula de Refinamento Corporal",
+  "item.mythic_contracts.spirit_condensation_pill": "Pílula de Condensação Espiritual",
+  "item.mythic_contracts.tribulation_tome": "Tomo de Quebra de Reino",
   "key.mythic_contracts.mana_infusion": "Alternar Infusão de Mana",
-  "key.categories.mythic_contracts": "Contratos Míticos & Reinos"
+  "key.mythic_contracts.unique_skill": "Liberar Resquício Divino",
+  "key.mythic_contracts.cultivator_screen": "Abrir Interface do Cultivador",
+  "key.categories.mythic_contracts": "Contratos Míticos & Reinos",
+
+  "config.mythic_contracts.hud.title": "Configurações da HUD — Mythic Contracts",
+  "config.mythic_contracts.hud.tab.main": "HUD Principal",
+  "config.mythic_contracts.hud.tab.divine": "Anel Divino [G]",
+  "config.mythic_contracts.hud.tab.visual": "Visual & Qualidade",
+
+  "config.mythic_contracts.hud.enabled": "Ativar HUD",
+  "config.mythic_contracts.hud.compact": "Modo Compacto",
+  "config.mythic_contracts.hud.bar.body": "Vida Corporal",
+  "config.mythic_contracts.hud.bar.spirit": "Int. Espiritual",
+  "config.mythic_contracts.hud.bar.qi": "Qi [V]",
+  "config.mythic_contracts.hud.bar.stamina": "Vigor (Stamina)",
+  "config.mythic_contracts.hud.auto_hide_stamina": "Ocultar Vigor Cheio",
+  "config.mythic_contracts.hud.hide_vanilla_health": "Ocultar Corações",
+
+  "config.mythic_contracts.hud.anchor": "Âncora",
+  "config.mythic_contracts.hud.offset_x": "Offset X",
+  "config.mythic_contracts.hud.offset_y": "Offset Y",
+  "config.mythic_contracts.hud.scale": "Escala",
+  "config.mythic_contracts.hud.opacity": "Opacidade",
+
+  "config.mythic_contracts.divine.enabled": "Ativar Anel [G]",
+  "config.mythic_contracts.divine.show_numbers": "Exibir Números",
+
+  "config.mythic_contracts.visual.animations": "Animações Suaves",
+  "config.mythic_contracts.visual.model_3d": "Modelo 3D na UI",
+  "config.mythic_contracts.visual.quality": "Qualidade Visual",
+  "config.mythic_contracts.visual.desc_low": "Baixa: partículas e ornamentos reduzidos para maior FPS.",
+  "config.mythic_contracts.visual.desc_medium": "Média: equilíbrio padrão entre clareza visual e desempenho.",
+  "config.mythic_contracts.visual.desc_high": "Alta: densidade completa de partículas e acabamentos.",
+
+  "config.mythic_contracts.anchor.top_left": "Topo Esq.",
+  "config.mythic_contracts.anchor.top_right": "Topo Dir.",
+  "config.mythic_contracts.anchor.bottom_left": "Base Esq.",
+  "config.mythic_contracts.anchor.bottom_right": "Base Dir.",
+
+  "config.mythic_contracts.quality.low": "Baixa",
+  "config.mythic_contracts.quality.medium": "Média",
+  "config.mythic_contracts.quality.high": "Alta",
+
+  "config.mythic_contracts.hud.reset": "Restaurar Padrão",
+  "config.mythic_contracts.hud.done": "Concluir",
+  "config.mythic_contracts.hud.preview_hint": "Pré-visualização ao vivo nos cantos configurados",
+
+  "screen.mythic_contracts.cultivator.title": "INTERFACE DO CULTIVADOR [U]",
+  "screen.mythic_contracts.cultivator.loading": "Carregando dados do cultivador...",
+  "screen.mythic_contracts.cultivator.tab.overview": "Visão Geral",
+  "screen.mythic_contracts.cultivator.tab.body": "Corpo",
+  "screen.mythic_contracts.cultivator.tab.spirit": "Espírito",
+  "screen.mythic_contracts.cultivator.tab.attributes": "Atributos",
+  "screen.mythic_contracts.cultivator.tab.skills": "Habilidades",
+  "screen.mythic_contracts.cultivator.tab.contracts": "Contratos",
+  "screen.mythic_contracts.cultivator.tab.faction": "Facção",
+  "screen.mythic_contracts.cultivator.action.advance_stage": "Avançar Etapa",
+  "screen.mythic_contracts.cultivator.action.breakthrough": "Realizar Quebra de Reino",
+  "screen.mythic_contracts.cultivator.action.max_reached": "Ápice Alcançado",
+  "screen.mythic_contracts.cultivator.action.toggle_infusion": "Alternar Infusão",
+  "screen.mythic_contracts.cultivator.action.enable_infusion": "Ativar Infusão",
+  "screen.mythic_contracts.cultivator.action.disable_infusion": "Desligar Infusão",
+  "screen.mythic_contracts.cultivator.action.equip": "Equipar",
+  "screen.mythic_contracts.cultivator.action.equipped": "✓ Equipado"
 }

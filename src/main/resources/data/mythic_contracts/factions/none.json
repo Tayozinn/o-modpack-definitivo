@@ -1,0 +1,10 @@
+{
+  "display_name": "Sem Facção",
+  "tagline": "Cultivador livre sem juramento institucional.",
+  "accent_color": "#94A3B8",
+  "subjugation_threshold": 0.15,
+  "bonus_summary": "Sem restrições de votos sagrados ou profanos de facção.",
+  "restriction_summary": "Sem acesso a bônus exclusivos de facção até jurar lealdade.",
+  "passive_modifiers": [],
+  "default_relationships": {}
+}

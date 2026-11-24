@@ -1,0 +1,39 @@
+{
+  "id": "mythic_contracts:spirit_realm_5",
+  "type": "spirit",
+  "order": 5,
+  "display_name": "Domínio Etéreo",
+  "qi_base": 240.0,
+  "qi_regen_bonus": 10.0,
+  "infusion_drain_per_second": 4.5,
+  "infusion_drain_per_hit": 7.0,
+  "requirements": {
+    "previous_realm": "mythic_contracts:spirit_realm_4",
+    "tribulation": null,
+    "min_opposite_realm_order": 0,
+    "qi_cost": 0.0
+  },
+  "stages": [
+    {
+      "id": "base",
+      "display_name": "Base",
+      "qi_bonus": 0.0,
+      "infusion_flat_bonus": 25.0,
+      "attributes": []
+    },
+    {
+      "id": "fortification",
+      "display_name": "Fortificação",
+      "qi_bonus": 10.0,
+      "infusion_flat_bonus": 30.0,
+      "attributes": []
+    },
+    {
+      "id": "awakening",
+      "display_name": "Despertar",
+      "qi_bonus": 20.0,
+      "infusion_flat_bonus": 35.0,
+      "attributes": []
+    }
+  ]
+}

@@ -1,10 +1,10 @@
 package com.mythiccontracts.contract;
 
 import com.mythiccontracts.MythicContractsMod;
+import com.mythiccontracts.attribute.AttributeService;
 import com.mythiccontracts.capability.FactionType;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 
@@ -35,30 +35,23 @@ public final class LuciferPactContract {
             return;
         }
 
-        AttributeInstance maxHealthAttr = player.getAttribute(Attributes.MAX_HEALTH);
-        if (maxHealthAttr != null) {
-            maxHealthAttr.removeModifier(MAX_HEALTH_MODIFIER_UUID);
-            maxHealthAttr.addPermanentModifier(new AttributeModifier(
-                    MAX_HEALTH_MODIFIER_UUID,
-                    MAX_HEALTH_MODIFIER_NAME,
-                    MAX_HEALTH_PENALTY,
-                    AttributeModifier.Operation.ADDITION
-            ));
-            if (player.getHealth() > player.getMaxHealth()) {
-                player.setHealth(player.getMaxHealth());
-            }
-        }
+        AttributeService.applySingleModifier(
+                player,
+                Attributes.MAX_HEALTH,
+                MAX_HEALTH_MODIFIER_UUID,
+                MAX_HEALTH_MODIFIER_NAME,
+                MAX_HEALTH_PENALTY,
+                AttributeModifier.Operation.ADDITION
+        );
 
-        AttributeInstance attackDamageAttr = player.getAttribute(Attributes.ATTACK_DAMAGE);
-        if (attackDamageAttr != null) {
-            attackDamageAttr.removeModifier(ATTACK_DAMAGE_MODIFIER_UUID);
-            attackDamageAttr.addPermanentModifier(new AttributeModifier(
-                    ATTACK_DAMAGE_MODIFIER_UUID,
-                    ATTACK_DAMAGE_MODIFIER_NAME,
-                    ATTACK_DAMAGE_BONUS,
-                    AttributeModifier.Operation.MULTIPLY_BASE
-            ));
-        }
+        AttributeService.applySingleModifier(
+                player,
+                Attributes.ATTACK_DAMAGE,
+                ATTACK_DAMAGE_MODIFIER_UUID,
+                ATTACK_DAMAGE_MODIFIER_NAME,
+                ATTACK_DAMAGE_BONUS,
+                AttributeModifier.Operation.MULTIPLY_BASE
+        );
     }
 
     public static void removeModifiers(ServerPlayer player) {
@@ -66,14 +59,7 @@ public final class LuciferPactContract {
             return;
         }
 
-        AttributeInstance maxHealthAttr = player.getAttribute(Attributes.MAX_HEALTH);
-        if (maxHealthAttr != null) {
-            maxHealthAttr.removeModifier(MAX_HEALTH_MODIFIER_UUID);
-        }
-
-        AttributeInstance attackDamageAttr = player.getAttribute(Attributes.ATTACK_DAMAGE);
-        if (attackDamageAttr != null) {
-            attackDamageAttr.removeModifier(ATTACK_DAMAGE_MODIFIER_UUID);
-        }
+        AttributeService.removeModifier(player, Attributes.MAX_HEALTH, MAX_HEALTH_MODIFIER_UUID);
+        AttributeService.removeModifier(player, Attributes.ATTACK_DAMAGE, ATTACK_DAMAGE_MODIFIER_UUID);
     }
 }

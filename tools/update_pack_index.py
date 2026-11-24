@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Atualiza automaticamente:
-1. index.toml e pack.toml (Packwiz SHA-256) incluindo config/, defaultconfigs/, kubejs/ e mods/ (22 .pw.toml + mythic_contracts-1.0.0.jar).
+1. index.toml e pack.toml (Packwiz SHA-256) incluindo config/, defaultconfigs/, kubejs/ e mods/ (22 .pw.toml + mythic_contracts-2.0.0.jar).
 2. O_Modpack_Definitivo_Fase3.mrpack (instalador Modrinth completo).
 3. Instância local do Prism Launcher (%APPDATA%/PrismLauncher/instances/O_Modpack_Definitivo*), se existir na máquina.
 """
@@ -13,6 +13,17 @@ import shutil
 import zipfile
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
+JAR_NAME = "mythic_contracts-2.0.0.jar"
+
+
+def replace_core_jar(dest_dir: pathlib.Path, source_jar: pathlib.Path) -> None:
+    if not source_jar.exists():
+        return
+    dest_dir.mkdir(parents=True, exist_ok=True)
+    for stale in dest_dir.glob("mythic_contracts-*.jar"):
+        if stale.name != source_jar.name:
+            stale.unlink()
+    shutil.copy2(source_jar, dest_dir / source_jar.name)
 
 
 def sha256_file(path: pathlib.Path) -> str:
@@ -80,9 +91,9 @@ def rebuild_mrpack() -> None:
                     rel = p.relative_to(ROOT).as_posix()
                     zf.write(p, f"overrides/{rel}")
 
-        core_jar = ROOT / "mods" / "mythic_contracts-1.0.0.jar"
+        core_jar = ROOT / "mods" / JAR_NAME
         if core_jar.exists():
-            zf.write(core_jar, "overrides/mods/mythic_contracts-1.0.0.jar")
+            zf.write(core_jar, f"overrides/mods/{JAR_NAME}")
 
         opts = ROOT / "defaultconfigs" / "options.txt"
         if opts.exists():
@@ -106,12 +117,10 @@ def sync_local_prism_instances() -> None:
         if not mc_dir.exists():
             continue
 
-        # Copy mythic_contracts JAR
-        core_jar = ROOT / "mods" / "mythic_contracts-1.0.0.jar"
+        # Copy mythic_contracts JAR (removing any stale version first)
+        core_jar = ROOT / "mods" / JAR_NAME
         if core_jar.exists():
-            dest_mods = mc_dir / "mods"
-            dest_mods.mkdir(parents=True, exist_ok=True)
-            shutil.copy2(core_jar, dest_mods / "mythic_contracts-1.0.0.jar")
+            replace_core_jar(mc_dir / "mods", core_jar)
 
         # Sync config, defaultconfigs, kubejs
         for folder in ["config", "defaultconfigs", "kubejs"]:
@@ -129,12 +138,10 @@ def sync_local_prism_instances() -> None:
 
 
 if __name__ == "__main__":
-    # Se build/libs/mythic_contracts-1.0.0.jar for mais novo, copia para mods/
-    built_jar = ROOT / "build" / "libs" / "mythic_contracts-1.0.0.jar"
-    mods_jar = ROOT / "mods" / "mythic_contracts-1.0.0.jar"
+    # Se build/libs/mythic_contracts-2.0.0.jar existir, substitui com segurança em mods/
+    built_jar = ROOT / "build" / "libs" / JAR_NAME
     if built_jar.exists():
-        mods_jar.parent.mkdir(parents=True, exist_ok=True)
-        shutil.copy2(built_jar, mods_jar)
+        replace_core_jar(ROOT / "mods", built_jar)
 
     update_packwiz_index()
     rebuild_mrpack()

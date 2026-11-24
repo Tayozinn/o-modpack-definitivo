@@ -1,0 +1,17 @@
+{
+  "display_name": "Vajra de Indra",
+  "deity_origin": "Indra (Védica)",
+  "hud_color": "#38BDF8",
+  "archetype": "Trovão Soberano · Quebra de Chefes",
+  "mechanic_summary": "Explosão sônica em área, bônus contra Chefes de Alto Reino, Lentidão + Fraqueza e forte repulsão.",
+  "base_damage": 6.5,
+  "primary_realm_scale": 3.0,
+  "secondary_scale": 1.0,
+  "base_radius": 6.5,
+  "cost_multiplier": 1.0,
+  "cooldown_multiplier": 1.0,
+  "boss_damage_bonus_multiplier": 1.0,
+  "min_body_realm": 1,
+  "min_spirit_realm": 1,
+  "enabled": true
+}

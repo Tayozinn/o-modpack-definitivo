@@ -1,5 +1,71 @@
 {
   "item.mythic_contracts.subjugation_seal": "Seal of Subjugation",
+  "item.mythic_contracts.body_refinement_pill": "Body Refinement Pill",
+  "item.mythic_contracts.spirit_condensation_pill": "Spirit Condensation Pill",
+  "item.mythic_contracts.tribulation_tome": "Realm Breakthrough Tome",
   "key.mythic_contracts.mana_infusion": "Toggle Mana Infusion",
-  "key.categories.mythic_contracts": "Mythic Contracts & Realms"
+  "key.mythic_contracts.unique_skill": "Unleash Divine Remnant",
+  "key.mythic_contracts.cultivator_screen": "Open Cultivator Interface",
+  "key.categories.mythic_contracts": "Mythic Contracts & Realms",
+
+  "config.mythic_contracts.hud.title": "HUD Settings — Mythic Contracts",
+  "config.mythic_contracts.hud.tab.main": "Main HUD",
+  "config.mythic_contracts.hud.tab.divine": "Divine Ring [G]",
+  "config.mythic_contracts.hud.tab.visual": "Visual & Quality",
+
+  "config.mythic_contracts.hud.enabled": "Enable HUD",
+  "config.mythic_contracts.hud.compact": "Compact Mode",
+  "config.mythic_contracts.hud.bar.body": "Body Health",
+  "config.mythic_contracts.hud.bar.spirit": "Spirit Integrity",
+  "config.mythic_contracts.hud.bar.qi": "Qi [V]",
+  "config.mythic_contracts.hud.bar.stamina": "Vigor (Stamina)",
+  "config.mythic_contracts.hud.auto_hide_stamina": "Hide Full Vigor",
+  "config.mythic_contracts.hud.hide_vanilla_health": "Hide Vanilla Hearts",
+
+  "config.mythic_contracts.hud.anchor": "Anchor",
+  "config.mythic_contracts.hud.offset_x": "Offset X",
+  "config.mythic_contracts.hud.offset_y": "Offset Y",
+  "config.mythic_contracts.hud.scale": "Scale",
+  "config.mythic_contracts.hud.opacity": "Opacity",
+
+  "config.mythic_contracts.divine.enabled": "Enable Ring [G]",
+  "config.mythic_contracts.divine.show_numbers": "Show Numbers",
+
+  "config.mythic_contracts.visual.animations": "Smooth Animations",
+  "config.mythic_contracts.visual.model_3d": "3D Model in UI",
+  "config.mythic_contracts.visual.quality": "Visual Quality",
+  "config.mythic_contracts.visual.desc_low": "Low: reduced particles and flourishes for higher FPS.",
+  "config.mythic_contracts.visual.desc_medium": "Medium: balanced clarity and performance.",
+  "config.mythic_contracts.visual.desc_high": "High: full particle density and visual accents.",
+
+  "config.mythic_contracts.anchor.top_left": "Top Left",
+  "config.mythic_contracts.anchor.top_right": "Top Right",
+  "config.mythic_contracts.anchor.bottom_left": "Bottom Left",
+  "config.mythic_contracts.anchor.bottom_right": "Bottom Right",
+
+  "config.mythic_contracts.quality.low": "Low",
+  "config.mythic_contracts.quality.medium": "Medium",
+  "config.mythic_contracts.quality.high": "High",
+
+  "config.mythic_contracts.hud.reset": "Reset Defaults",
+  "config.mythic_contracts.hud.done": "Done",
+  "config.mythic_contracts.hud.preview_hint": "Live preview active at configured corners",
+
+  "screen.mythic_contracts.cultivator.title": "CULTIVATOR INTERFACE [U]",
+  "screen.mythic_contracts.cultivator.loading": "Loading cultivator data...",
+  "screen.mythic_contracts.cultivator.tab.overview": "Overview",
+  "screen.mythic_contracts.cultivator.tab.body": "Body",
+  "screen.mythic_contracts.cultivator.tab.spirit": "Spirit",
+  "screen.mythic_contracts.cultivator.tab.attributes": "Attributes",
+  "screen.mythic_contracts.cultivator.tab.skills": "Skills",
+  "screen.mythic_contracts.cultivator.tab.contracts": "Contracts",
+  "screen.mythic_contracts.cultivator.tab.faction": "Faction",
+  "screen.mythic_contracts.cultivator.action.advance_stage": "Advance Stage",
+  "screen.mythic_contracts.cultivator.action.breakthrough": "Attempt Breakthrough",
+  "screen.mythic_contracts.cultivator.action.max_reached": "Apex Reached",
+  "screen.mythic_contracts.cultivator.action.toggle_infusion": "Toggle Infusion",
+  "screen.mythic_contracts.cultivator.action.enable_infusion": "Enable Infusion",
+  "screen.mythic_contracts.cultivator.action.disable_infusion": "Disable Infusion",
+  "screen.mythic_contracts.cultivator.action.equip": "Equip",
+  "screen.mythic_contracts.cultivator.action.equipped": "✓ Equipped"
 }

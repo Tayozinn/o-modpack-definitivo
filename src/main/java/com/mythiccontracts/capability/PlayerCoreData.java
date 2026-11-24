@@ -1,169 +1,203 @@
 package com.mythiccontracts.capability;
 
+import com.mythiccontracts.core.persistence.PlayerDataSchema;
+import com.mythiccontracts.core.persistence.PlayerDataSerializer;
+import com.mythiccontracts.core.player.PlayerData;
+import com.mythiccontracts.core.service.EnergyService;
+import com.mythiccontracts.cultivation.progression.CultivationService;
+import com.mythiccontracts.cultivation.realm.CultivationPath;
+import com.mythiccontracts.cultivation.realm.RealmDefinition;
+import com.mythiccontracts.cultivation.realm.RealmRegistry;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
-import net.minecraft.nbt.StringTag;
-import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * Adaptador de capability mantido para compatibilidade incremental durante a migração v1 -> v2.
+ * Todo o estado reside exclusivamente no agregador modular {@link PlayerData}.
+ */
 public class PlayerCoreData {
     public static final int MIN_REALM = 1;
     public static final int MAX_REALM = 7;
     public static final int MIN_STAGE = 1;
     public static final int MAX_STAGE = 3;
 
-    private static final String TAG_FACTION = "Faction";
-    private static final String TAG_BODY_REALM = "BodyRealm";
-    private static final String TAG_BODY_STAGE = "BodyStage";
-    private static final String TAG_SPIRIT_REALM = "SpiritRealm";
-    private static final String TAG_SPIRIT_STAGE = "SpiritStage";
-    private static final String TAG_ACTIVE_CONTRACTS = "ActiveContracts";
-    private static final String TAG_SUBJUGATED_ENTITIES = "SubjugatedEntities";
-    private static final String TAG_MANA_INFUSION_ACTIVE = "ManaInfusionActive";
-    private static final String TAG_VOW_BROKEN = "VowBroken";
+    private final PlayerData playerData = new PlayerData();
 
-    private FactionType faction = FactionType.NONE;
-    private int bodyRealm = 1;
-    private int bodyStage = 1;
-    private int spiritRealm = 1;
-    private int spiritStage = 1;
-    private final Set<ResourceLocation> activeContracts = new LinkedHashSet<>();
-    private final List<ResourceLocation> subjugatedEntities = new ArrayList<>();
-    private boolean manaInfusionActive = false;
-    private boolean vowBroken = false;
+    public PlayerData getPlayerData() {
+        return this.playerData;
+    }
 
     public FactionType getFaction() {
-        return this.faction;
+        ResourceLocation id = this.playerData.getFaction().getCurrentFactionId();
+        return FactionType.fromString(id.getPath());
     }
 
     public void setFaction(FactionType faction) {
-        this.faction = faction != null ? faction : FactionType.NONE;
+        FactionType safe = faction != null ? faction : FactionType.NONE;
+        this.playerData.getFaction().setCurrentFactionId(
+                PlayerDataSchema.factionIdFromLegacy(safe.getId())
+        );
     }
 
     public int getBodyRealm() {
-        return this.bodyRealm;
+        return this.playerData.getCultivation().getBodyRealm();
     }
 
     public void setBodyRealm(int bodyRealm) {
-        this.bodyRealm = Mth.clamp(bodyRealm, MIN_REALM, MAX_REALM);
+        int clamped = Math.max(MIN_REALM, bodyRealm);
+        RealmDefinition def = RealmRegistry.getRealmByOrder(CultivationPath.BODY, clamped);
+        this.playerData.getCultivation().setBodyRealm(def != null ? def.order() : clamped);
+        this.playerData.getCultivation().setBodyRealmId(def != null ? def.id() : PlayerDataSchema.bodyRealmIdFromNumber(clamped));
+        EnergyService.recalculateMaxQi(this.playerData);
     }
 
     public int getBodyStage() {
-        return this.bodyStage;
+        return this.playerData.getCultivation().getBodyStage();
     }
 
     public void setBodyStage(int bodyStage) {
-        this.bodyStage = Mth.clamp(bodyStage, MIN_STAGE, MAX_STAGE);
+        RealmDefinition def = CultivationService.getCurrentRealm(this.playerData, CultivationPath.BODY);
+        int clamped = Mth.clamp(bodyStage, MIN_STAGE, def.getStageCount());
+        this.playerData.getCultivation().setBodyStage(clamped);
+        EnergyService.recalculateMaxQi(this.playerData);
     }
 
     public int getSpiritRealm() {
-        return this.spiritRealm;
+        return this.playerData.getCultivation().getSpiritRealm();
     }
 
     public void setSpiritRealm(int spiritRealm) {
-        this.spiritRealm = Mth.clamp(spiritRealm, MIN_REALM, MAX_REALM);
+        int clamped = Math.max(MIN_REALM, spiritRealm);
+        RealmDefinition def = RealmRegistry.getRealmByOrder(CultivationPath.SPIRIT, clamped);
+        this.playerData.getCultivation().setSpiritRealm(def != null ? def.order() : clamped);
+        this.playerData.getCultivation().setSpiritRealmId(def != null ? def.id() : PlayerDataSchema.spiritRealmIdFromNumber(clamped));
+        EnergyService.recalculateMaxQi(this.playerData);
     }
 
     public int getSpiritStage() {
-        return this.spiritStage;
+        return this.playerData.getCultivation().getSpiritStage();
     }
 
     public void setSpiritStage(int spiritStage) {
-        this.spiritStage = Mth.clamp(spiritStage, MIN_STAGE, MAX_STAGE);
+        RealmDefinition def = CultivationService.getCurrentRealm(this.playerData, CultivationPath.SPIRIT);
+        int clamped = Mth.clamp(spiritStage, MIN_STAGE, def.getStageCount());
+        this.playerData.getCultivation().setSpiritStage(clamped);
+        EnergyService.recalculateMaxQi(this.playerData);
     }
 
     public static String getStageDisplayName(int stage) {
-        return switch (Mth.clamp(stage, MIN_STAGE, MAX_STAGE)) {
+        return switch (Math.max(MIN_STAGE, stage)) {
             case 1 -> "Base";
             case 2 -> "Fortificação";
             case 3 -> "Despertar";
-            default -> "Base";
+            default -> "Estágio " + stage;
         };
     }
 
     public String getBodyStageName() {
-        return getStageDisplayName(this.bodyStage);
+        return CultivationService.getStageDisplayName(this.playerData, CultivationPath.BODY);
     }
 
     public String getSpiritStageName() {
-        return getStageDisplayName(this.spiritStage);
+        return CultivationService.getStageDisplayName(this.playerData, CultivationPath.SPIRIT);
     }
 
     public boolean hasContract(ResourceLocation contractId) {
-        return contractId != null && this.activeContracts.contains(contractId);
+        return this.playerData.getContracts().hasContract(contractId);
     }
 
     public boolean addContract(ResourceLocation contractId) {
-        if (contractId == null) {
-            return false;
-        }
-        return this.activeContracts.add(contractId);
+        return this.playerData.getContracts().addContract(contractId);
     }
 
     public boolean removeContract(ResourceLocation contractId) {
-        if (contractId == null) {
-            return false;
-        }
-        return this.activeContracts.remove(contractId);
+        return this.playerData.getContracts().removeContract(contractId);
     }
 
     public void clearContracts() {
-        this.activeContracts.clear();
+        this.playerData.getContracts().clearContracts();
     }
 
     public Set<ResourceLocation> getActiveContracts() {
-        return Collections.unmodifiableSet(this.activeContracts);
+        return this.playerData.getContracts().getActiveContractIds();
     }
 
     public List<ResourceLocation> getSubjugatedEntities() {
-        return Collections.unmodifiableList(this.subjugatedEntities);
+        return this.playerData.getSubjugation().getBoundEntityTypes();
     }
 
     public void addSubjugatedEntity(ResourceLocation entityId) {
-        if (entityId != null) {
-            this.subjugatedEntities.add(entityId);
-        }
+        this.playerData.getSubjugation().addEntityType(entityId);
     }
 
     public ResourceLocation popLastSubjugatedEntity() {
-        if (this.subjugatedEntities.isEmpty()) {
-            return null;
-        }
-        return this.subjugatedEntities.remove(this.subjugatedEntities.size() - 1);
+        var record = this.playerData.getSubjugation().popLastRecord();
+        return record != null ? record.entityType() : null;
     }
 
     public ResourceLocation peekLastSubjugatedEntity() {
-        if (this.subjugatedEntities.isEmpty()) {
-            return null;
-        }
-        return this.subjugatedEntities.get(this.subjugatedEntities.size() - 1);
+        var record = this.playerData.getSubjugation().peekLastRecord();
+        return record != null ? record.entityType() : null;
     }
 
     public void clearSubjugatedEntities() {
-        this.subjugatedEntities.clear();
+        this.playerData.getSubjugation().clearBoundEntities();
     }
 
     public boolean isManaInfusionActive() {
-        return this.manaInfusionActive;
+        return this.playerData.getCultivation().isManaInfusionActive();
     }
 
     public void setManaInfusionActive(boolean manaInfusionActive) {
-        this.manaInfusionActive = manaInfusionActive;
+        this.playerData.getCultivation().setManaInfusionActive(manaInfusionActive);
     }
 
     public boolean isVowBroken() {
-        return this.vowBroken;
+        return this.playerData.getContracts().isVowBroken();
     }
 
     public void setVowBroken(boolean vowBroken) {
-        this.vowBroken = vowBroken;
+        this.playerData.getContracts().setVowBroken(vowBroken);
+    }
+
+    public float getMaxQi() {
+        EnergyService.recalculateMaxQi(this.playerData);
+        return this.playerData.getCultivation().getMaxQiCapacity();
+    }
+
+    public float getCurrentQi() {
+        return this.playerData.getCultivation().getCurrentQi();
+    }
+
+    public void setCurrentQi(float currentQi) {
+        EnergyService.recalculateMaxQi(this.playerData);
+        this.playerData.getCultivation().setCurrentQi(currentQi);
+    }
+
+    public boolean consumeQi(float amount) {
+        EnergyService.recalculateMaxQi(this.playerData);
+        return EnergyService.consumeQi(this.playerData, amount);
+    }
+
+    public void addQi(float amount) {
+        EnergyService.recalculateMaxQi(this.playerData);
+        EnergyService.addQi(this.playerData, amount);
+    }
+
+    public int getUniqueSkillCooldownTicks() {
+        return this.playerData.getSkills().getUniqueSkillCooldownTicks();
+    }
+
+    public void setUniqueSkillCooldownTicks(int ticks) {
+        this.playerData.getSkills().setUniqueSkillCooldownTicks(ticks);
+    }
+
+    public void tickCooldowns() {
+        this.playerData.getSkills().tickAllCooldowns();
     }
 
     public void copyFrom(PlayerCoreData other) {
@@ -174,81 +208,24 @@ public class PlayerCoreData {
         if (other == null) {
             return;
         }
-        this.faction = other.faction;
-        this.bodyRealm = other.bodyRealm;
-        this.bodyStage = other.bodyStage;
-        this.spiritRealm = other.spiritRealm;
-        this.spiritStage = other.spiritStage;
-
-        this.activeContracts.clear();
-        this.activeContracts.addAll(other.activeContracts);
-
-        this.subjugatedEntities.clear();
-        this.subjugatedEntities.addAll(other.subjugatedEntities);
-
-        this.manaInfusionActive = wasDeath ? false : other.manaInfusionActive;
-        this.vowBroken = other.vowBroken;
+        this.playerData.copyFrom(other.playerData, wasDeath);
     }
 
     public void saveNBTData(CompoundTag tag) {
         if (tag == null) {
             return;
         }
-        tag.putString(TAG_FACTION, this.faction.getId());
-        tag.putInt(TAG_BODY_REALM, this.bodyRealm);
-        tag.putInt(TAG_BODY_STAGE, this.bodyStage);
-        tag.putInt(TAG_SPIRIT_REALM, this.spiritRealm);
-        tag.putInt(TAG_SPIRIT_STAGE, this.spiritStage);
-
-        ListTag contractsTag = new ListTag();
-        for (ResourceLocation contractId : this.activeContracts) {
-            contractsTag.add(StringTag.valueOf(contractId.toString()));
+        CompoundTag serialized = PlayerDataSerializer.writeFull(this.playerData);
+        for (String key : serialized.getAllKeys()) {
+            tag.put(key, serialized.get(key).copy());
         }
-        tag.put(TAG_ACTIVE_CONTRACTS, contractsTag);
-
-        ListTag subjugatedTag = new ListTag();
-        for (ResourceLocation entityId : this.subjugatedEntities) {
-            subjugatedTag.add(StringTag.valueOf(entityId.toString()));
-        }
-        tag.put(TAG_SUBJUGATED_ENTITIES, subjugatedTag);
-
-        tag.putBoolean(TAG_MANA_INFUSION_ACTIVE, this.manaInfusionActive);
-        tag.putBoolean(TAG_VOW_BROKEN, this.vowBroken);
     }
 
     public void loadNBTData(CompoundTag tag) {
         if (tag == null) {
             return;
         }
-        this.faction = FactionType.fromString(tag.getString(TAG_FACTION));
-        this.setBodyRealm(tag.contains(TAG_BODY_REALM, Tag.TAG_ANY_NUMERIC) ? tag.getInt(TAG_BODY_REALM) : 1);
-        this.setBodyStage(tag.contains(TAG_BODY_STAGE, Tag.TAG_ANY_NUMERIC) ? tag.getInt(TAG_BODY_STAGE) : 1);
-        this.setSpiritRealm(tag.contains(TAG_SPIRIT_REALM, Tag.TAG_ANY_NUMERIC) ? tag.getInt(TAG_SPIRIT_REALM) : 1);
-        this.setSpiritStage(tag.contains(TAG_SPIRIT_STAGE, Tag.TAG_ANY_NUMERIC) ? tag.getInt(TAG_SPIRIT_STAGE) : 1);
-
-        this.activeContracts.clear();
-        if (tag.contains(TAG_ACTIVE_CONTRACTS, Tag.TAG_LIST)) {
-            ListTag contractsTag = tag.getList(TAG_ACTIVE_CONTRACTS, Tag.TAG_STRING);
-            for (int i = 0; i < contractsTag.size(); i++) {
-                ResourceLocation parsed = ResourceLocation.tryParse(contractsTag.getString(i));
-                if (parsed != null) {
-                    this.activeContracts.add(parsed);
-                }
-            }
-        }
-
-        this.subjugatedEntities.clear();
-        if (tag.contains(TAG_SUBJUGATED_ENTITIES, Tag.TAG_LIST)) {
-            ListTag subjugatedTag = tag.getList(TAG_SUBJUGATED_ENTITIES, Tag.TAG_STRING);
-            for (int i = 0; i < subjugatedTag.size(); i++) {
-                ResourceLocation parsed = ResourceLocation.tryParse(subjugatedTag.getString(i));
-                if (parsed != null) {
-                    this.subjugatedEntities.add(parsed);
-                }
-            }
-        }
-
-        this.manaInfusionActive = tag.getBoolean(TAG_MANA_INFUSION_ACTIVE);
-        this.vowBroken = tag.getBoolean(TAG_VOW_BROKEN);
+        PlayerDataSerializer.read(tag, this.playerData);
+        EnergyService.recalculateMaxQi(this.playerData);
     }
 }

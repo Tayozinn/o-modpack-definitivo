@@ -1,0 +1,24 @@
+{
+  "parent": "mythic_contracts:body_realm_2",
+  "display": {
+    "icon": {
+      "item": "mythic_contracts:subjugation_seal"
+    },
+    "title": "Quebrador de Correntes",
+    "description": "Subjugue uma criatura poderosa com o Selo de Subjugação.",
+    "frame": "challenge",
+    "show_toast": true,
+    "announce_to_chat": false,
+    "hidden": false
+  },
+  "criteria": {
+    "unlocked": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "requirements": [
+    [
+      "unlocked"
+    ]
+  ]
+}

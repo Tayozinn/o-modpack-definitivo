@@ -1,0 +1,22 @@
+{
+  "display_name": "Selo Quebra-Tronos",
+  "description": "Pacto exclusivo dos Quebradores de Tronos: +4.0 de Armadura e +20% de Resistência a Repulsão.",
+  "allowed_factions": [
+    "quebradores_de_tronos"
+  ],
+  "attribute_modifiers": [
+    {
+      "attribute": "minecraft:generic.armor",
+      "operation": "addition",
+      "amount": 4.0
+    },
+    {
+      "attribute": "minecraft:generic.knockback_resistance",
+      "operation": "addition",
+      "amount": 0.20
+    }
+  ],
+  "periodic_absorption_hearts": 0.0,
+  "periodic_regen_amplifier": -1,
+  "break_on_attack_villager": false
+}

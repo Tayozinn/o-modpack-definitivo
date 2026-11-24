@@ -2,6 +2,8 @@ package com.mythiccontracts.client;
 
 import com.mojang.blaze3d.platform.InputConstants;
 import com.mythiccontracts.MythicContractsMod;
+import com.mythiccontracts.client.screen.CultivatorScreen;
+import com.mythiccontracts.network.ActivateUniqueSkillC2SPacket;
 import com.mythiccontracts.network.ModNetworking;
 import com.mythiccontracts.network.ToggleInfusionC2SPacket;
 import net.minecraft.client.KeyMapping;
@@ -25,6 +27,22 @@ public final class ClientKeyEvents {
             "key.categories.mythic_contracts"
     );
 
+    public static final KeyMapping UNIQUE_SKILL_KEY = new KeyMapping(
+            "key.mythic_contracts.unique_skill",
+            KeyConflictContext.IN_GAME,
+            InputConstants.Type.KEYSYM,
+            GLFW.GLFW_KEY_G,
+            "key.categories.mythic_contracts"
+    );
+
+    public static final KeyMapping CULTIVATOR_SCREEN_KEY = new KeyMapping(
+            "key.mythic_contracts.cultivator_screen",
+            KeyConflictContext.IN_GAME,
+            InputConstants.Type.KEYSYM,
+            GLFW.GLFW_KEY_U,
+            "key.categories.mythic_contracts"
+    );
+
     private ClientKeyEvents() {
     }
 
@@ -36,6 +54,8 @@ public final class ClientKeyEvents {
         @SubscribeEvent
         public static void onRegisterKeyMappings(RegisterKeyMappingsEvent event) {
             event.register(MANA_INFUSION_KEY);
+            event.register(UNIQUE_SKILL_KEY);
+            event.register(CULTIVATOR_SCREEN_KEY);
         }
     }
 
@@ -49,10 +69,26 @@ public final class ClientKeyEvents {
             if (event.phase != TickEvent.Phase.END) {
                 return;
             }
+            Minecraft mc = Minecraft.getInstance();
             while (MANA_INFUSION_KEY.consumeClick()) {
-                Player localPlayer = Minecraft.getInstance().player;
+                Player localPlayer = mc.player;
                 if (localPlayer != null && localPlayer.isAlive() && !localPlayer.isDeadOrDying()) {
                     ModNetworking.sendToServer(new ToggleInfusionC2SPacket());
+                }
+            }
+            while (UNIQUE_SKILL_KEY.consumeClick()) {
+                Player localPlayer = mc.player;
+                if (localPlayer != null && localPlayer.isAlive() && !localPlayer.isDeadOrDying()) {
+                    ModNetworking.sendToServer(new ActivateUniqueSkillC2SPacket());
+                }
+            }
+            while (CULTIVATOR_SCREEN_KEY.consumeClick()) {
+                Player localPlayer = mc.player;
+                if (localPlayer != null
+                        && mc.screen == null
+                        && localPlayer.isAlive()
+                        && !localPlayer.isDeadOrDying()) {
+                    mc.setScreen(new CultivatorScreen());
                 }
             }
         }

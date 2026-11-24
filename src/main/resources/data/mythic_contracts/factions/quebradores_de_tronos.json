@@ -1,0 +1,12 @@
+{
+  "display_name": "Quebradores de Tronos",
+  "tagline": "Domínio marcial focado em subjugação de entidades e supremacia.",
+  "accent_color": "#A855F7",
+  "subjugation_threshold": 0.25,
+  "bonus_summary": "Subjugação facilitada (<= 25% HP contra 15% padrão) e acesso ao Selo Quebra-Tronos.",
+  "restriction_summary": "Rejeitado pelas demais facções para contratos exclusivos Quebra-Tronos.",
+  "passive_modifiers": [],
+  "default_relationships": {
+    "juramentados_da_luz": "hostil"
+  }
+}

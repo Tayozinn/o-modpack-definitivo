@@ -1,0 +1,75 @@
+{
+  "id": "mythic_contracts:body_realm_4",
+  "type": "body",
+  "order": 4,
+  "display_name": "Carne de Jade",
+  "qi_base": 30.0,
+  "requirements": {
+    "previous_realm": "mythic_contracts:body_realm_3",
+    "tribulation": null,
+    "min_opposite_realm_order": 0,
+    "qi_cost": 0.0
+  },
+  "stages": [
+    {
+      "id": "base",
+      "display_name": "Base",
+      "qi_bonus": 0.0,
+      "infusion_multiplier": 0.65,
+      "attributes": [
+        {
+          "attribute": "minecraft:generic.attack_damage",
+          "operation": "addition",
+          "amount": 8.0,
+          "uuid": "a7f31c90-4b2e-4d8a-9c15-778899aabbcc"
+        },
+        {
+          "attribute": "minecraft:generic.max_health",
+          "operation": "addition",
+          "amount": 30.0,
+          "uuid": "b8e42d01-5c3f-4e9b-8d26-889900bbccdd"
+        }
+      ]
+    },
+    {
+      "id": "fortification",
+      "display_name": "Fortificação",
+      "qi_bonus": 0.0,
+      "infusion_multiplier": 0.7,
+      "attributes": [
+        {
+          "attribute": "minecraft:generic.attack_damage",
+          "operation": "addition",
+          "amount": 10.0,
+          "uuid": "a7f31c90-4b2e-4d8a-9c15-778899aabbcc"
+        },
+        {
+          "attribute": "minecraft:generic.max_health",
+          "operation": "addition",
+          "amount": 38.0,
+          "uuid": "b8e42d01-5c3f-4e9b-8d26-889900bbccdd"
+        }
+      ]
+    },
+    {
+      "id": "awakening",
+      "display_name": "Despertar",
+      "qi_bonus": 0.0,
+      "infusion_multiplier": 0.75,
+      "attributes": [
+        {
+          "attribute": "minecraft:generic.attack_damage",
+          "operation": "addition",
+          "amount": 12.0,
+          "uuid": "a7f31c90-4b2e-4d8a-9c15-778899aabbcc"
+        },
+        {
+          "attribute": "minecraft:generic.max_health",
+          "operation": "addition",
+          "amount": 46.0,
+          "uuid": "b8e42d01-5c3f-4e9b-8d26-889900bbccdd"
+        }
+      ]
+    }
+  ]
+}

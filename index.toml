@@ -21,6 +21,18 @@ file = "config/bettercombat/server.json5"
 hash = "32cb5614c7d2f86cfbbf53dee076852a861b214d0e38d93f98c60fce872007a9"
 
 [[files]]
+file = "config/ftbquests/quests/chapter_groups.snbt"
+hash = "d9b521a335803395cd48e2017e6f2da0977e0e007545b94f99abe37c24f263ac"
+
+[[files]]
+file = "config/ftbquests/quests/chapters/despertar_2010.snbt"
+hash = "066654345c495657ab3465adc17abf7446d126e317c014c7ea3acca758b0772a"
+
+[[files]]
+file = "config/ftbquests/quests/data.snbt"
+hash = "667c5b35fb74cf303caadec5551ff578716881521aab97050031e9989f7d4f5d"
+
+[[files]]
 file = "config/lostcities/client.toml"
 hash = "1c5b42ef6bc41199ff82bee66f42edccbdd1c45a790cd5dd75de2f421ffeaae3"
 
@@ -38,7 +50,7 @@ hash = "18843e71b8aa8f2bef3aba42c73d5f0cf0830f8e002f3afdee62643e24b243f9"
 
 [[files]]
 file = "defaultconfigs/options.txt"
-hash = "e3a60af3b230f5cb8388390921eed88a1ab2be91e6304f345742a8cfdebf0212"
+hash = "299d0fc31fe4a263320873d8b5f26dd924cdcac4768e33e15a7a60c59d8e41db"
 
 [[files]]
 file = "kubejs/client_scripts/00_init.js"
@@ -47,6 +59,14 @@ hash = "f68f317be9625b4f2f6e1491b3c4ffb64c1c8d556c77f03aff996c62961afa72"
 [[files]]
 file = "kubejs/server_scripts/00_smoke_test.js"
 hash = "4fd70a56cb45525c9c6f1dcb30922ea521180ad73ed60be9d934d5a7114c5ab2"
+
+[[files]]
+file = "kubejs/server_scripts/01_mythic_contracts_recipes.js"
+hash = "d202a98f451e7994bd5e6050cc6dde3c82368cbd783a13d4bb503c340644d2a6"
+
+[[files]]
+file = "kubejs/server_scripts/02_mythic_contracts_compat.js"
+hash = "7f676263c510890a8ee52a2aedb10eccef1035b6112c0a4db7c131ce7e89b438"
 
 [[files]]
 file = "kubejs/startup_scripts/00_init.js"
@@ -138,8 +158,8 @@ hash = "99484c29e54191a2d32178d555ba03b1e4b6f93b3202f8bab6782d8146261b29"
 metafile = true
 
 [[files]]
-file = "mods/mythic_contracts-1.0.0.jar"
-hash = "30dda3db1a5ccb2aff58c7d9ed9ed42382eb76e327b7718a9353a3efbade3a93"
+file = "mods/mythic_contracts-2.0.0.jar"
+hash = "76e20f38ba49e6e39465c0cf487409e5bc28cf12c70244579400da5894f9399b"
 
 [[files]]
 file = "mods/playeranimator.pw.toml"

@@ -1,0 +1,261 @@
+{
+	default_hide_dependency_lines: false
+	default_quest_shape: "rsquare"
+	filename: "despertar_2010"
+	group: "1A00000000000001"
+	icon: "mythic_contracts:subjugation_seal"
+	id: "2B00000000000001"
+	order_index: 0
+	quest_links: [ ]
+	quests: [
+		{
+			description: [
+				"Quinze anos após a Guerra dos Deuses devorar as metrópoles de 2010, o Qi voltou a fluir entre os escombros."
+				""
+				"Use [V] para ativar sua Infusão de Mana/Qi (consome Qi por segundo e por golpe, mas perfura a Pressão de Reino dos Bosses)."
+				"Use [G] para liberar o Resquício Divino de um Deus caído na guerra (independente da sua Facção)!"
+				"Use [U] para abrir a Interface do Cultivador (Corpo, Espírito, Habilidades, Contratos e Facção)."
+			]
+			id: "3C00000000000001"
+			rewards: [
+				{
+					count: 1
+					id: "4D00000000000001"
+					item: "mythic_contracts:body_refinement_pill"
+					type: "item"
+				}
+			]
+			subtitle: "Ative o Qi nas ruínas de 2010"
+			tasks: [
+				{
+					id: "5E00000000000001"
+					title: "Sobrevivente do Colapso"
+					type: "checkmark"
+				}
+			]
+			title: "1. O Despertar do Véu"
+			x: -3.0d
+			y: 0.0d
+		}
+		{
+			dependencies: ["3C00000000000001"]
+			description: [
+				"Sintetize Pílulas de Refinamento Corporal e Condensação Espiritual para elevar suas Etapas (Base -> Fortificação -> Despertar)."
+			]
+			id: "3C00000000000002"
+			rewards: [
+				{
+					count: 1
+					id: "4D00000000000002"
+					item: "mythic_contracts:spirit_condensation_pill"
+					type: "item"
+				}
+			]
+			subtitle: "Forje o Corpo e o Espírito"
+			tasks: [
+				{
+					id: "5E00000000000002"
+					item: "mythic_contracts:body_refinement_pill"
+					type: "item"
+				}
+			]
+			title: "2. Refinamento Murim"
+			x: -1.0d
+			y: 0.0d
+		}
+		{
+			dependencies: ["3C00000000000002"]
+			description: [
+				"Quando um caminho atingir a Etapa 3 (Despertar), use o Tomo de Quebra de Reino para invocar a Tribulação e ascender ao próximo Reino!"
+				""
+				"Clique Direito: avança Corpo | Shift + Clique: avança Espírito."
+			]
+			id: "3C00000000000003"
+			rewards: [
+				{
+					count: 1
+					id: "4D00000000000003"
+					item: "mythic_contracts:subjugation_seal"
+					type: "item"
+				}
+			]
+			subtitle: "Supere o relâmpago da ascensão"
+			tasks: [
+				{
+					id: "5E00000000000003"
+					item: "mythic_contracts:tribulation_tome"
+					type: "item"
+				}
+			]
+			title: "3. Tribulação de Reino"
+			x: 1.0d
+			y: 0.0d
+		}
+		{
+			dependencies: ["3C00000000000003"]
+			description: [
+				"Enfraqueça criaturas subjugáveis (Warden, Wither, Ravager, Iron Golem) para <= 15% de vida (<= 25% para Quebradores de Tronos) e sele-as com o Selo de Subjugação."
+				""
+				"Use Shift + Botão Direito para invocar seu guardião selado em batalha!"
+			]
+			id: "3C00000000000004"
+			rewards: [
+				{
+					count: 2
+					id: "4D00000000000004"
+					item: "mythic_contracts:tribulation_tome"
+					type: "item"
+				}
+			]
+			subtitle: "Subjugue os titãs do pós-guerra"
+			tasks: [
+				{
+					id: "5E00000000000004"
+					item: "mythic_contracts:subjugation_seal"
+					type: "item"
+				}
+			]
+			title: "4. Quebra de Tronos"
+			x: 3.0d
+			y: 0.0d
+		}
+		{
+			dependencies: ["3C00000000000001"]
+			description: [
+				"Sintonize um Resquício Divino na tela [U] (Olho de Rá, Ceifa da Morrígan, Vajra de Indra ou Passo de Tezcatlipoca) e dispare-o com [G]."
+			]
+			id: "3C00000000000005"
+			rewards: [
+				{
+					count: 1
+					id: "4D00000000000005"
+					item: "mythic_contracts:spirit_condensation_pill"
+					type: "item"
+				}
+			]
+			subtitle: "Desperte o poder de um Deus caído"
+			tasks: [
+				{
+					advancement: "mythic_contracts:divine_channeling"
+					criterion: ""
+					id: "5E00000000000005"
+					type: "advancement"
+				}
+			]
+			title: "5. Ressonância Divina"
+			x: -3.0d
+			y: 2.0d
+		}
+		{
+			dependencies: ["3C00000000000003"]
+			description: [
+				"Supere sua primeira Tribulação Corporal e consolide o Reino Corporal II."
+			]
+			id: "3C00000000000006"
+			rewards: [
+				{
+					count: 2
+					id: "4D00000000000006"
+					item: "mythic_contracts:body_refinement_pill"
+					type: "item"
+				}
+			]
+			subtitle: "Forje carne capaz de suportar o Qi"
+			tasks: [
+				{
+					advancement: "mythic_contracts:body_realm_2"
+					criterion: ""
+					id: "5E00000000000006"
+					type: "advancement"
+				}
+			]
+			title: "6. Corpo Forjado — Reino II"
+			x: 1.0d
+			y: -2.0d
+		}
+		{
+			dependencies: ["3C00000000000003"]
+			description: [
+				"Supere sua primeira Tribulação Espiritual para alcançar o Reino Espiritual II, ampliando seu Qi e Integridade Espiritual."
+			]
+			id: "3C00000000000007"
+			rewards: [
+				{
+					count: 2
+					id: "4D00000000000007"
+					item: "mythic_contracts:spirit_condensation_pill"
+					type: "item"
+				}
+			]
+			subtitle: "Proteja sua alma contra artes arcanas"
+			tasks: [
+				{
+					advancement: "mythic_contracts:spirit_realm_2"
+					criterion: ""
+					id: "5E00000000000007"
+					type: "advancement"
+				}
+			]
+			title: "7. Espírito Condensado — Reino II"
+			x: 1.0d
+			y: 2.0d
+		}
+		{
+			dependencies: ["3C00000000000007"]
+			description: [
+				"Assine seu primeiro Contrato Mítico (como o Voto de Ressonância do Véu em Espírito R2+) e receba bônus permanentes de cultivo."
+			]
+			id: "3C00000000000008"
+			rewards: [
+				{
+					command: "/contrato reputacao errantes_do_veu add 25"
+					elevate_perms: true
+					id: "4D00000000000008"
+					silent: false
+					title: "+25 Reputação (Errantes do Véu)"
+					type: "command"
+				}
+			]
+			subtitle: "Sele o pacto e colha a reputação"
+			tasks: [
+				{
+					advancement: "mythic_contracts:first_contract"
+					criterion: ""
+					id: "5E00000000000008"
+					type: "advancement"
+				}
+			]
+			title: "8. Juramentos & Contratos"
+			x: 3.0d
+			y: 2.0d
+		}
+		{
+			dependencies: ["3C00000000000004"]
+			description: [
+				"Subjugue sua primeira entidade poderosa (incluindo o Dead King ou Citadel Keeper de Iron's Spells) com o Selo de Subjugação."
+			]
+			id: "3C00000000000009"
+			rewards: [
+				{
+					count: 2
+					id: "4D00000000000009"
+					item: "mythic_contracts:tribulation_tome"
+					type: "item"
+				}
+			]
+			subtitle: "Comande os campeões caídos do pós-guerra"
+			tasks: [
+				{
+					advancement: "mythic_contracts:first_subjugation"
+					criterion: ""
+					id: "5E00000000000009"
+					type: "advancement"
+				}
+			]
+			title: "9. Domínio do Selo"
+			x: 5.0d
+			y: 0.0d
+		}
+	]
+	title: "Despertar Pós-Colapso (2010)"
+}

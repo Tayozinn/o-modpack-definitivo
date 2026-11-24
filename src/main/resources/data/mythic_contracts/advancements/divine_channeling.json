@@ -1,0 +1,24 @@
+{
+  "parent": "mythic_contracts:root",
+  "display": {
+    "icon": {
+      "item": "minecraft:nether_star"
+    },
+    "title": "Ressonância Divina",
+    "description": "Manifeste o poder de um Resquício Divino com a tecla [G].",
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": false,
+    "hidden": false
+  },
+  "criteria": {
+    "unlocked": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "requirements": [
+    [
+      "unlocked"
+    ]
+  ]
+}

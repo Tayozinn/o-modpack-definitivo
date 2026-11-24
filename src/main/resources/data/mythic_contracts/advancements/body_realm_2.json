@@ -1,0 +1,24 @@
+{
+  "parent": "mythic_contracts:root",
+  "display": {
+    "icon": {
+      "item": "mythic_contracts:body_refinement_pill"
+    },
+    "title": "Corpo Forjado",
+    "description": "Alcance o Reino Corporal II (ou superior) através da Tribulação.",
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": false,
+    "hidden": false
+  },
+  "criteria": {
+    "unlocked": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "requirements": [
+    [
+      "unlocked"
+    ]
+  ]
+}

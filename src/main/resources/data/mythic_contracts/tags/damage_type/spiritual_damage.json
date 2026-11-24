@@ -1,0 +1,9 @@
+{
+  "replace": false,
+  "values": [
+    "minecraft:wither",
+    "minecraft:wither_skull",
+    "minecraft:sonic_boom",
+    { "id": "irons_spellbooks:eldritch_magic", "required": false }
+  ]
+}

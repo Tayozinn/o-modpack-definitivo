@@ -1,0 +1,7 @@
+{
+  "replace": false,
+  "values": [
+    { "id": "#simplyswords:uniques", "required": false },
+    { "id": "#simplyswords:runic_gear", "required": false }
+  ]
+}

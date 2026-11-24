@@ -1,0 +1,17 @@
+{
+  "display_name": "Ceifa da Morrígan",
+  "deity_origin": "The Morrígan (Celta)",
+  "hud_color": "#EF4444",
+  "archetype": "Colheita Sombria · Roubo de Vida & Decomposição",
+  "mechanic_summary": "Corte físico em área com Decomposição (Wither) e cura proporcional ao dano causado.",
+  "base_damage": 7.0,
+  "primary_realm_scale": 2.5,
+  "secondary_scale": 1.5,
+  "base_radius": 6.0,
+  "cost_multiplier": 1.0,
+  "cooldown_multiplier": 1.0,
+  "boss_damage_bonus_multiplier": 1.0,
+  "min_body_realm": 1,
+  "min_spirit_realm": 1,
+  "enabled": true
+}

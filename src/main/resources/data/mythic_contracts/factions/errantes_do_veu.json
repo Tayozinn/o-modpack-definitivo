@@ -1,0 +1,13 @@
+{
+  "display_name": "Errantes do Véu",
+  "tagline": "Cultivadores independentes que caminham entre Corpo, Espírito e Véu.",
+  "accent_color": "#38BDF8",
+  "subjugation_threshold": 0.15,
+  "bonus_summary": "Equilíbrio versátil entre pactos neutros e domínio dos 4 Resquícios Divinos.",
+  "restriction_summary": "Não firma contratos exclusivos dos Quebradores de Tronos.",
+  "passive_modifiers": [],
+  "default_relationships": {
+    "juramentados_da_luz": "neutro",
+    "irmandade_divida_eterna": "neutro"
+  }
+}

@@ -1,0 +1,39 @@
+{
+  "id": "mythic_contracts:spirit_realm_7",
+  "type": "spirit",
+  "order": 7,
+  "display_name": "Divindade Suprema",
+  "qi_base": 310.0,
+  "qi_regen_bonus": 13.0,
+  "infusion_drain_per_second": 5.5,
+  "infusion_drain_per_hit": 9.0,
+  "requirements": {
+    "previous_realm": "mythic_contracts:spirit_realm_6",
+    "tribulation": null,
+    "min_opposite_realm_order": 0,
+    "qi_cost": 0.0
+  },
+  "stages": [
+    {
+      "id": "base",
+      "display_name": "Base",
+      "qi_bonus": 0.0,
+      "infusion_flat_bonus": 49.0,
+      "attributes": []
+    },
+    {
+      "id": "fortification",
+      "display_name": "Fortificação",
+      "qi_bonus": 10.0,
+      "infusion_flat_bonus": 56.0,
+      "attributes": []
+    },
+    {
+      "id": "awakening",
+      "display_name": "Despertar",
+      "qi_bonus": 20.0,
+      "infusion_flat_bonus": 63.0,
+      "attributes": []
+    }
+  ]
+}

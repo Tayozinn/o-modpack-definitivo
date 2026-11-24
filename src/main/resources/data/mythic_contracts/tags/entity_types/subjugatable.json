@@ -4,6 +4,8 @@
     "minecraft:warden",
     "minecraft:wither",
     "minecraft:iron_golem",
-    "minecraft:ravager"
+    "minecraft:ravager",
+    { "id": "irons_spellbooks:dead_king", "required": false },
+    { "id": "irons_spellbooks:citadel_keeper", "required": false }
   ]
 }

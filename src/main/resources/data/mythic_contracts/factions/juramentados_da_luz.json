@@ -1,0 +1,12 @@
+{
+  "display_name": "Juramentados da Luz",
+  "tagline": "Guardiões de votos sagrados e proteção aos inocentes.",
+  "accent_color": "#FBBF24",
+  "subjugation_threshold": 0.15,
+  "bonus_summary": "Compatível com Voto de Paladino (Absorção passiva; quebra ao atacar aldeões).",
+  "restriction_summary": "Proíbe Pacto de Lúcifer e Juramento de Sangue.",
+  "passive_modifiers": [],
+  "default_relationships": {
+    "irmandade_divida_eterna": "rival"
+  }
+}

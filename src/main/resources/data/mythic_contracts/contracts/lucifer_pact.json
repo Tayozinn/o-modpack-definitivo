@@ -1,0 +1,24 @@
+{
+  "display_name": "Pacto de Lúcifer",
+  "description": "-4 corações de vida máxima em troca de +40% de dano físico.",
+  "forbidden_factions": [
+    "juramentados_da_luz"
+  ],
+  "attribute_modifiers": [
+    {
+      "attribute": "minecraft:generic.max_health",
+      "operation": "addition",
+      "amount": -8.0,
+      "uuid": "c8a47b1e-5d92-4f10-9a3b-112233445566"
+    },
+    {
+      "attribute": "minecraft:generic.attack_damage",
+      "operation": "multiply_base",
+      "amount": 0.40,
+      "uuid": "d9b58c2f-6e03-4a21-8b4c-665544332211"
+    }
+  ],
+  "periodic_absorption_hearts": 0.0,
+  "periodic_regen_amplifier": -1,
+  "break_on_attack_villager": false
+}

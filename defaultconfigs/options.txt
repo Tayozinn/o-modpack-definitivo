@@ -79,3 +79,6 @@ key_key.jade.toggle_liquid:key.keyboard.keypad.2
 key_key.jade.show_recipes:key.keyboard.keypad.3
 key_key.jade.show_uses:key.keyboard.keypad.4
 key_key.jade.narrate:key.keyboard.keypad.5
+key_key.mythic_contracts.mana_infusion:key.keyboard.v
+key_key.mythic_contracts.unique_skill:key.keyboard.g
+key_key.mythic_contracts.cultivator_screen:key.keyboard.u

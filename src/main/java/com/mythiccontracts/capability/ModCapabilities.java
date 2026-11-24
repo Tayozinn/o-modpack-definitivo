@@ -1,8 +1,12 @@
 package com.mythiccontracts.capability;
 
 import com.mythiccontracts.MythicContractsMod;
+import com.mythiccontracts.core.persistence.PlayerDataSerializer;
+import com.mythiccontracts.core.player.PlayerData;
+import com.mythiccontracts.integration.ModAdvancements;
 import com.mythiccontracts.network.ModNetworking;
 import com.mythiccontracts.network.SyncCoreDataS2CPacket;
+import com.mythiccontracts.network.SyncEnergyS2CPacket;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
@@ -27,6 +31,10 @@ public final class ModCapabilities {
             return Optional.empty();
         }
         return player.getCapability(PLAYER_CORE_DATA).resolve();
+    }
+
+    public static Optional<PlayerData> getData(Player player) {
+        return get(player).map(PlayerCoreData::getPlayerData);
     }
 
     public static void savePersistedBackup(Player player, PlayerCoreData data) {
@@ -65,6 +73,7 @@ public final class ModCapabilities {
         if (player == null || data == null) {
             return false;
         }
+        PlayerData playerData = data.getPlayerData();
         boolean isDefaultState = data.getFaction() == FactionType.NONE
                 && data.getBodyRealm() == PlayerCoreData.MIN_REALM
                 && data.getBodyStage() == PlayerCoreData.MIN_STAGE
@@ -72,7 +81,12 @@ public final class ModCapabilities {
                 && data.getSpiritStage() == PlayerCoreData.MIN_STAGE
                 && data.getActiveContracts().isEmpty()
                 && data.getSubjugatedEntities().isEmpty()
-                && !data.isVowBroken();
+                && !data.isVowBroken()
+                && playerData.getSkills().getUnlockedSkills().isEmpty()
+                && playerData.getSkills().getEquippedSkills().isEmpty()
+                && !playerData.getSkills().isDivineOverloaded()
+                && playerData.getFaction().getReputations().isEmpty()
+                && playerData.getContracts().getBrokenContractsHistory().isEmpty();
         if (!isDefaultState) {
             return false;
         }
@@ -85,9 +99,32 @@ public final class ModCapabilities {
         }
         get(player).ifPresent(data -> {
             savePersistedBackup(player, data);
-            CompoundTag nbt = new CompoundTag();
-            data.saveNBTData(nbt);
-            ModNetworking.sendToPlayer(new SyncCoreDataS2CPacket(nbt), player);
+            ModAdvancements.syncFromPlayerData(player, data.getPlayerData());
+            CompoundTag syncTag = PlayerDataSerializer.writeClientSync(data.getPlayerData());
+            ModNetworking.sendToPlayer(new SyncCoreDataS2CPacket(syncTag), player);
         });
+    }
+
+    public static void syncEnergy(ServerPlayer player) {
+        if (player == null) {
+            return;
+        }
+        getData(player).ifPresent(playerData -> ModNetworking.sendToPlayer(
+                new SyncEnergyS2CPacket(
+                        playerData.getCultivation().getCurrentQi(),
+                        playerData.getCultivation().getMaxQiCapacity(),
+                        playerData.getCultivation().isManaInfusionActive(),
+                        playerData.getSkills().getUniqueSkillCooldownTicks(),
+                        playerData.getSkills().getCurrentDivineResistance(),
+                        playerData.getSkills().getMaxDivineResistance(),
+                        playerData.getSkills().getDivineOverloadTicks(),
+                        playerData.getCultivation().getCurrentSpiritualIntegrity(),
+                        playerData.getCultivation().getMaxSpiritualIntegrity(),
+                        playerData.getCultivation().getSpiritShatterTicks(),
+                        playerData.getCultivation().getCurrentStamina(),
+                        playerData.getCultivation().getMaxStamina()
+                ),
+                player
+        ));
     }
 }

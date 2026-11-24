@@ -1,0 +1,75 @@
+{
+  "id": "mythic_contracts:body_realm_6",
+  "type": "body",
+  "order": 6,
+  "display_name": "Corpo Imortal",
+  "qi_base": 50.0,
+  "requirements": {
+    "previous_realm": "mythic_contracts:body_realm_5",
+    "tribulation": null,
+    "min_opposite_realm_order": 0,
+    "qi_cost": 0.0
+  },
+  "stages": [
+    {
+      "id": "base",
+      "display_name": "Base",
+      "qi_bonus": 0.0,
+      "infusion_multiplier": 1.05,
+      "attributes": [
+        {
+          "attribute": "minecraft:generic.attack_damage",
+          "operation": "addition",
+          "amount": 18.0,
+          "uuid": "a7f31c90-4b2e-4d8a-9c15-778899aabbcc"
+        },
+        {
+          "attribute": "minecraft:generic.max_health",
+          "operation": "addition",
+          "amount": 70.0,
+          "uuid": "b8e42d01-5c3f-4e9b-8d26-889900bbccdd"
+        }
+      ]
+    },
+    {
+      "id": "fortification",
+      "display_name": "Fortificação",
+      "qi_bonus": 0.0,
+      "infusion_multiplier": 1.1,
+      "attributes": [
+        {
+          "attribute": "minecraft:generic.attack_damage",
+          "operation": "addition",
+          "amount": 21.0,
+          "uuid": "a7f31c90-4b2e-4d8a-9c15-778899aabbcc"
+        },
+        {
+          "attribute": "minecraft:generic.max_health",
+          "operation": "addition",
+          "amount": 82.0,
+          "uuid": "b8e42d01-5c3f-4e9b-8d26-889900bbccdd"
+        }
+      ]
+    },
+    {
+      "id": "awakening",
+      "display_name": "Despertar",
+      "qi_bonus": 0.0,
+      "infusion_multiplier": 1.15,
+      "attributes": [
+        {
+          "attribute": "minecraft:generic.attack_damage",
+          "operation": "addition",
+          "amount": 24.0,
+          "uuid": "a7f31c90-4b2e-4d8a-9c15-778899aabbcc"
+        },
+        {
+          "attribute": "minecraft:generic.max_health",
+          "operation": "addition",
+          "amount": 94.0,
+          "uuid": "b8e42d01-5c3f-4e9b-8d26-889900bbccdd"
+        }
+      ]
+    }
+  ]
+}

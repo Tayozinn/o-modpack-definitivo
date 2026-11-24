@@ -1,0 +1,12 @@
+{
+  "display_name": "Irmandade da Dívida Eterna",
+  "tagline": "Pactuantes pragmáticos que trocam vitalidade por poder ofensivo.",
+  "accent_color": "#EF4444",
+  "subjugation_threshold": 0.15,
+  "bonus_summary": "Acesso livre ao Pacto de Lúcifer e Juramento de Sangue.",
+  "restriction_summary": "Proíbe Voto de Paladino e Selo Quebra-Tronos.",
+  "passive_modifiers": [],
+  "default_relationships": {
+    "juramentados_da_luz": "rival"
+  }
+}

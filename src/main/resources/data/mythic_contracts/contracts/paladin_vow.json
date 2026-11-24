@@ -1,0 +1,11 @@
+{
+  "display_name": "Voto de Paladino",
+  "description": "Concede 2 corações de Absorção passiva. Quebra ao atacar aldeões.",
+  "forbidden_factions": [
+    "irmandade_divida_eterna"
+  ],
+  "attribute_modifiers": [],
+  "periodic_absorption_hearts": 4.0,
+  "periodic_regen_amplifier": -1,
+  "break_on_attack_villager": true
+}

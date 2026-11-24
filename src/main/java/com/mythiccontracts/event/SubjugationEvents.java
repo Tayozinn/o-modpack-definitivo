@@ -40,6 +40,7 @@ public final class SubjugationEvents {
 
         // Caso 1: Entidade Subjugada
         if (mob.getPersistentData().hasUUID(SubjugationSealItem.TAG_SUBJUGATED_OWNER)) {
+            mob.addTag(SubjugationSealItem.ENTITY_TAG_SUBJUGATED);
             injectSubjugatedAI(mob);
             return;
         }
@@ -127,11 +128,15 @@ public final class SubjugationEvents {
         if (entity.level().isClientSide() || !(entity instanceof Mob mob)) {
             return;
         }
+        if (!mob.getTags().contains(SubjugationSealItem.ENTITY_TAG_SUBJUGATED) && mob.tickCount > 2) {
+            return;
+        }
 
         UUID ownerUUID = SubjugationSealItem.getOwnerUUID(mob);
         if (ownerUUID == null) {
             return;
         }
+        mob.addTag(SubjugationSealItem.ENTITY_TAG_SUBJUGATED);
 
         if (mob.getTarget() != null && SubjugationSealItem.isAlliedWithOwner(mob.getTarget(), ownerUUID)) {
             mob.setTarget(null);

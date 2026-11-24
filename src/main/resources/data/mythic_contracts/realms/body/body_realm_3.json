@@ -1,0 +1,75 @@
+{
+  "id": "mythic_contracts:body_realm_3",
+  "type": "body",
+  "order": 3,
+  "display_name": "Tempero de Ferro",
+  "qi_base": 20.0,
+  "requirements": {
+    "previous_realm": "mythic_contracts:body_realm_2",
+    "tribulation": null,
+    "min_opposite_realm_order": 0,
+    "qi_cost": 0.0
+  },
+  "stages": [
+    {
+      "id": "base",
+      "display_name": "Base",
+      "qi_bonus": 0.0,
+      "infusion_multiplier": 0.45,
+      "attributes": [
+        {
+          "attribute": "minecraft:generic.attack_damage",
+          "operation": "addition",
+          "amount": 4.5,
+          "uuid": "a7f31c90-4b2e-4d8a-9c15-778899aabbcc"
+        },
+        {
+          "attribute": "minecraft:generic.max_health",
+          "operation": "addition",
+          "amount": 16.0,
+          "uuid": "b8e42d01-5c3f-4e9b-8d26-889900bbccdd"
+        }
+      ]
+    },
+    {
+      "id": "fortification",
+      "display_name": "Fortificação",
+      "qi_bonus": 0.0,
+      "infusion_multiplier": 0.5,
+      "attributes": [
+        {
+          "attribute": "minecraft:generic.attack_damage",
+          "operation": "addition",
+          "amount": 6.0,
+          "uuid": "a7f31c90-4b2e-4d8a-9c15-778899aabbcc"
+        },
+        {
+          "attribute": "minecraft:generic.max_health",
+          "operation": "addition",
+          "amount": 22.0,
+          "uuid": "b8e42d01-5c3f-4e9b-8d26-889900bbccdd"
+        }
+      ]
+    },
+    {
+      "id": "awakening",
+      "display_name": "Despertar",
+      "qi_bonus": 0.0,
+      "infusion_multiplier": 0.55,
+      "attributes": [
+        {
+          "attribute": "minecraft:generic.attack_damage",
+          "operation": "addition",
+          "amount": 7.5,
+          "uuid": "a7f31c90-4b2e-4d8a-9c15-778899aabbcc"
+        },
+        {
+          "attribute": "minecraft:generic.max_health",
+          "operation": "addition",
+          "amount": 28.0,
+          "uuid": "b8e42d01-5c3f-4e9b-8d26-889900bbccdd"
+        }
+      ]
+    }
+  ]
+}

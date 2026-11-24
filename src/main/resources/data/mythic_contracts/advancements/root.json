@@ -1,0 +1,24 @@
+{
+  "display": {
+    "icon": {
+      "item": "mythic_contracts:subjugation_seal"
+    },
+    "title": "O Despertar do Véu",
+    "description": "Inicie sua jornada de cultivo, contratos e resquícios divinos nas ruínas de 2010.",
+    "background": "minecraft:textures/block/obsidian.png",
+    "frame": "task",
+    "show_toast": false,
+    "announce_to_chat": false,
+    "hidden": false
+  },
+  "criteria": {
+    "unlocked": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "requirements": [
+    [
+      "unlocked"
+    ]
+  ]
+}

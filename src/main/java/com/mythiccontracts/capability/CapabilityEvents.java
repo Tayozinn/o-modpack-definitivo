@@ -2,6 +2,10 @@ package com.mythiccontracts.capability;
 
 import com.mythiccontracts.MythicContractsMod;
 import com.mythiccontracts.contract.ContractManager;
+import com.mythiccontracts.integration.CombatCompatService;
+import com.mythiccontracts.network.ActivateUniqueSkillC2SPacket;
+import com.mythiccontracts.network.CultivatorActionC2SPacket;
+import com.mythiccontracts.network.ToggleInfusionC2SPacket;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
@@ -9,6 +13,7 @@ import net.minecraftforge.common.capabilities.RegisterCapabilitiesEvent;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
+import net.minecraftforge.event.server.ServerStoppedEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
@@ -110,8 +115,20 @@ public final class CapabilityEvents {
     public static void onPlayerLoggedOut(PlayerEvent.PlayerLoggedOutEvent event) {
         Player player = event.getEntity();
         if (!player.level().isClientSide()) {
+            ToggleInfusionC2SPacket.clearRateLimit(player.getUUID());
+            CultivatorActionC2SPacket.clearRateLimit(player.getUUID());
+            ActivateUniqueSkillC2SPacket.clearRateLimit(player.getUUID());
+            CombatCompatService.clearPlayerState(player.getUUID());
             ModCapabilities.get(player).ifPresent(data -> ModCapabilities.savePersistedBackup(player, data));
         }
+    }
+
+    @SubscribeEvent
+    public static void onServerStopped(ServerStoppedEvent event) {
+        ToggleInfusionC2SPacket.clearAllRateLimits();
+        CultivatorActionC2SPacket.clearAllRateLimits();
+        ActivateUniqueSkillC2SPacket.clearAllRateLimits();
+        CombatCompatService.clearAllState();
     }
 
     @SubscribeEvent
@@ -122,14 +139,14 @@ public final class CapabilityEvents {
         }
     }
 
-    private static void syncAndRefreshPlayer(Player player, boolean forceDisableInfusion) {
+    private static void syncAndRefreshPlayer(Player player, boolean isDeathRespawn) {
         if (player instanceof ServerPlayer serverPlayer) {
             ModCapabilities.get(serverPlayer).ifPresent(data -> {
                 ModCapabilities.restoreFromPersistedBackupIfNeeded(serverPlayer, data);
-                if (forceDisableInfusion) {
+                if (isDeathRespawn) {
                     data.setManaInfusionActive(false);
                 }
-                ContractManager.refreshPlayerContractAttributes(serverPlayer, data);
+                ContractManager.refreshPlayerContractAttributes(serverPlayer, data, isDeathRespawn);
                 ModCapabilities.sync(serverPlayer);
             });
         }

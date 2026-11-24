@@ -1,19 +1,20 @@
 package com.mythiccontracts.network;
 
 import com.mythiccontracts.capability.ModCapabilities;
-import net.minecraft.ChatFormatting;
-import net.minecraft.core.particles.ParticleTypes;
+import com.mythiccontracts.cultivation.progression.CultivationActionService;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.network.chat.Component;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.sounds.SoundEvents;
-import net.minecraft.sounds.SoundSource;
 import net.minecraftforge.network.NetworkEvent;
 
+import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
 
 public class ToggleInfusionC2SPacket {
+
+    public static final long MIN_TOGGLE_INTERVAL_TICKS = 10L;
+    private static final Map<UUID, Long> LAST_TOGGLE_TICK = new ConcurrentHashMap<>();
 
     public ToggleInfusionC2SPacket() {
     }
@@ -24,6 +25,31 @@ public class ToggleInfusionC2SPacket {
     public void toBytes(FriendlyByteBuf buf) {
     }
 
+    public static boolean tryAcquireRateLimit(UUID playerUuid, long gameTime) {
+        if (playerUuid == null) {
+            return false;
+        }
+        final boolean[] allowed = { false };
+        LAST_TOGGLE_TICK.compute(playerUuid, (id, prev) -> {
+            if (prev == null || gameTime < prev || (gameTime - prev) >= MIN_TOGGLE_INTERVAL_TICKS) {
+                allowed[0] = true;
+                return gameTime;
+            }
+            return prev;
+        });
+        return allowed[0];
+    }
+
+    public static void clearRateLimit(UUID playerUuid) {
+        if (playerUuid != null) {
+            LAST_TOGGLE_TICK.remove(playerUuid);
+        }
+    }
+
+    public static void clearAllRateLimits() {
+        LAST_TOGGLE_TICK.clear();
+    }
+
     public boolean handle(Supplier<NetworkEvent.Context> supplier) {
         NetworkEvent.Context ctx = supplier.get();
         ctx.enqueueWork(() -> {
@@ -31,69 +57,13 @@ public class ToggleInfusionC2SPacket {
             if (sender == null || !sender.isAlive() || sender.isDeadOrDying()) {
                 return;
             }
-            ModCapabilities.get(sender).ifPresent(data -> {
-                boolean active = !data.isManaInfusionActive();
-                data.setManaInfusionActive(active);
-                ModCapabilities.sync(sender);
+            if (!tryAcquireRateLimit(sender.getUUID(), sender.level().getGameTime())) {
+                return;
+            }
 
-                ServerLevel serverLevel = sender.serverLevel();
-                if (active) {
-                    sender.displayClientMessage(
-                            Component.literal("✦ Infusão de Mana: ATIVADA (Corpo Nv." + data.getBodyRealm()
-                                            + " / Espírito Nv." + data.getSpiritRealm() + ")")
-                                    .withStyle(ChatFormatting.AQUA, ChatFormatting.BOLD),
-                            true
-                    );
-                    serverLevel.sendParticles(
-                            ParticleTypes.SOUL_FIRE_FLAME,
-                            sender.getX(),
-                            sender.getY() + 1.0D,
-                            sender.getZ(),
-                            20,
-                            0.4D,
-                            0.6D,
-                            0.4D,
-                            0.03D
-                    );
-                    serverLevel.playSound(
-                            null,
-                            sender.getX(),
-                            sender.getY(),
-                            sender.getZ(),
-                            SoundEvents.BEACON_ACTIVATE,
-                            SoundSource.PLAYERS,
-                            0.8F,
-                            1.25F
-                    );
-                } else {
-                    sender.displayClientMessage(
-                            Component.literal("✦ Infusão de Mana: DESATIVADA")
-                                    .withStyle(ChatFormatting.GRAY),
-                            true
-                    );
-                    serverLevel.sendParticles(
-                            ParticleTypes.SMOKE,
-                            sender.getX(),
-                            sender.getY() + 1.0D,
-                            sender.getZ(),
-                            12,
-                            0.3D,
-                            0.5D,
-                            0.3D,
-                            0.02D
-                    );
-                    serverLevel.playSound(
-                            null,
-                            sender.getX(),
-                            sender.getY(),
-                            sender.getZ(),
-                            SoundEvents.BEACON_DEACTIVATE,
-                            SoundSource.PLAYERS,
-                            0.6F,
-                            1.1F
-                    );
-                }
-            });
+            ModCapabilities.get(sender).ifPresent(data ->
+                    CultivationActionService.executeToggleInfusion(sender, data)
+            );
         });
         ctx.setPacketHandled(true);
         return true;

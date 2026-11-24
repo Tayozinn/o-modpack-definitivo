@@ -3,6 +3,7 @@ package com.mythiccontracts.item;
 import com.mythiccontracts.capability.FactionType;
 import com.mythiccontracts.capability.ModCapabilities;
 import com.mythiccontracts.capability.PlayerCoreData;
+import com.mythiccontracts.faction.FactionRegistry;
 import com.mythiccontracts.network.ClientPacketHandler;
 import com.mythiccontracts.util.ModTags;
 import net.minecraft.ChatFormatting;
@@ -37,6 +38,7 @@ import java.util.UUID;
 
 public class SubjugationSealItem extends Item {
     public static final String TAG_SUBJUGATED_OWNER = "SubjugatedOwner";
+    public static final String ENTITY_TAG_SUBJUGATED = "mc_subjugated";
 
     public SubjugationSealItem(Properties properties) {
         super(properties);
@@ -94,14 +96,14 @@ public class SubjugationSealItem extends Item {
             return InteractionResult.FAIL;
         }
 
-        float threshold = (data.getFaction() == FactionType.QUEBRADORES_DE_TRONOS) ? 0.25F : 0.15F;
+        float threshold = FactionRegistry.getSubjugationThreshold(data.getFaction());
         float maxHealth = Math.max(1.0F, target.getMaxHealth());
         float healthRatio = target.getHealth() / maxHealth;
 
         if (healthRatio > threshold) {
             if (!player.level().isClientSide()) {
                 String currentPct = String.format(Locale.ROOT, "%.1f%%", healthRatio * 100.0F);
-                String requiredPct = (data.getFaction() == FactionType.QUEBRADORES_DE_TRONOS) ? "25%" : "15%";
+                String requiredPct = String.format(Locale.ROOT, "%.0f%%", threshold * 100.0F);
                 Component msg = Component.literal(
                         "§cA entidade resiste ao Selo! Vida atual: §e" + currentPct + " §c(Necessário: <= §6" + requiredPct + "§c)"
                 );
@@ -213,6 +215,7 @@ public class SubjugationSealItem extends Item {
 
             created.moveTo(spawnX, spawnY, spawnZ, serverPlayer.getYRot(), 0.0F);
             created.getPersistentData().putUUID(TAG_SUBJUGATED_OWNER, serverPlayer.getUUID());
+            created.addTag(ENTITY_TAG_SUBJUGATED);
             created.setCustomName(Component.literal(
                     "§6[Subjugado de " + serverPlayer.getName().getString() + "] " + created.getType().getDescription().getString()
             ));
@@ -269,13 +272,16 @@ public class SubjugationSealItem extends Item {
         if (level != null && level.isClientSide()) {
             PlayerCoreData clientData = DistExecutor.unsafeCallWhenOn(
                     Dist.CLIENT,
-                    () -> ClientPacketHandler::getClientPlayerCoreData
+                    () -> () -> ClientPacketHandler.getClientPlayerCoreData()
             );
             if (clientData != null) {
-                boolean isThroneBreaker = clientData.getFaction() == FactionType.QUEBRADORES_DE_TRONOS;
-                String activeThreshold = isThroneBreaker ? "25% (Quebradores de Tronos)" : "15% (Padrão)";
+                FactionType activeFaction = clientData.getFaction();
+                float threshold = FactionRegistry.getSubjugationThreshold(activeFaction);
+                boolean boosted = threshold > 0.16F;
+                String activeThreshold = String.format(Locale.ROOT, "%.0f%% (%s)",
+                        threshold * 100.0F, activeFaction.getDisplayName());
                 tooltipComponents.add(Component.literal("• Seu Limite Ativo: <= " + activeThreshold)
-                        .withStyle(isThroneBreaker ? ChatFormatting.LIGHT_PURPLE : ChatFormatting.YELLOW));
+                        .withStyle(boosted ? ChatFormatting.LIGHT_PURPLE : ChatFormatting.YELLOW));
 
                 List<ResourceLocation> sealed = clientData.getSubjugatedEntities();
                 ResourceLocation lastEntityId = clientData.peekLastSubjugatedEntity();
