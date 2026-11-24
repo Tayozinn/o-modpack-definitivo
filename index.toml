@@ -69,6 +69,14 @@ file = "kubejs/server_scripts/02_mythic_contracts_compat.js"
 hash = "7f676263c510890a8ee52a2aedb10eccef1035b6112c0a4db7c131ce7e89b438"
 
 [[files]]
+file = "kubejs/server_scripts/03_urban_2010_loot.js"
+hash = "088fc845dbd19705e521139aaaa1151b3dec2f1eeff3b9afed93ab3926082ce8"
+
+[[files]]
+file = "kubejs/server_scripts/04_progression_economy.js"
+hash = "fcb861419f0f1663883d50f39b5a55d338791c8fa0449f8502f6d003f300bd76"
+
+[[files]]
 file = "kubejs/startup_scripts/00_init.js"
 hash = "fcbd6ba824a35453c57bfb743deeac59cb038796ac29f1144d005bac5af1e5ea"
 
